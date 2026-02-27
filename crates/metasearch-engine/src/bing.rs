@@ -15,7 +15,7 @@ use metasearch_core::{
 };
 use reqwest::Client;
 use scraper::{Html, Selector};
-use tracing::{info, warn};
+use tracing::info;
 
 pub struct Bing {
     metadata: EngineMetadata,

@@ -13,29 +13,35 @@ use metasearch_core::{
 };
 
 pub struct BingVideos {
+    metadata: EngineMetadata,
     client: Client,
 }
 
 impl BingVideos {
     pub fn new(client: Client) -> Self {
-        Self { client }
+        Self {
+            metadata: EngineMetadata {
+                name: "bing_videos".to_string(),
+                display_name: "Bing Videos".to_string(),
+                homepage: "https://www.bing.com/videos".to_string(),
+                categories: vec![SearchCategory::Videos],
+                enabled: true,
+                timeout_ms: 5000,
+                weight: 1.0,
+            },
+            client,
+        }
     }
 }
 
 #[async_trait]
 impl SearchEngine for BingVideos {
-    fn metadata(&self) -> EngineMetadata {
-        EngineMetadata {
-            name: "bing_videos".to_string(),
-            display_name: "Bing Videos".to_string(),
-            categories: vec![SearchCategory::Videos],
-            enabled: true,
-            weight: 1.0,
-        }
+    fn metadata(&self) -> &EngineMetadata {
+        &self.metadata
     }
 
     async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
-        let page = query.page.unwrap_or(1) as u32;
+        let page = query.page;
         let first = (page - 1) * 35 + 1;
 
         let url = format!(
@@ -99,8 +105,8 @@ impl SearchEngine for BingVideos {
                 snippet,
                 "bing_videos".to_string(),
             );
-            result.engine_rank = Some(i + 1);
-            result.category = Some(SearchCategory::Videos);
+            result.engine_rank = (i + 1) as u32;
+            result.category = SearchCategory::Videos.to_string();
             result.thumbnail = thumbnail;
             results.push(result);
         }

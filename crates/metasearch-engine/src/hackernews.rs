@@ -12,29 +12,35 @@ use metasearch_core::{
 };
 
 pub struct HackerNews {
+    metadata: EngineMetadata,
     client: Client,
 }
 
 impl HackerNews {
     pub fn new(client: Client) -> Self {
-        Self { client }
+        Self {
+            metadata: EngineMetadata {
+                name: "hackernews".to_string(),
+                display_name: "Hacker News".to_string(),
+                homepage: "https://news.ycombinator.com".to_string(),
+                categories: vec![SearchCategory::IT],
+                enabled: true,
+                timeout_ms: 5000,
+                weight: 1.0,
+            },
+            client,
+        }
     }
 }
 
 #[async_trait]
 impl SearchEngine for HackerNews {
-    fn metadata(&self) -> EngineMetadata {
-        EngineMetadata {
-            name: "hackernews".to_string(),
-            display_name: "Hacker News".to_string(),
-            categories: vec![SearchCategory::IT],
-            enabled: true,
-            weight: 1.0,
-        }
+    fn metadata(&self) -> &EngineMetadata {
+        &self.metadata
     }
 
     async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
-        let page = query.page.unwrap_or(1).saturating_sub(1);
+        let page = query.page.saturating_sub(1);
 
         let url = format!(
             "https://hn.algolia.com/api/v1/search?query={}&page={}&hitsPerPage=30&tags=story",
@@ -78,8 +84,8 @@ impl SearchEngine for HackerNews {
                     snippet,
                     "hackernews".to_string(),
                 );
-                result.engine_rank = Some(i + 1);
-                result.category = Some(SearchCategory::IT);
+                result.engine_rank = (i + 1) as u32;
+                result.category = SearchCategory::IT.to_string();
                 results.push(result);
             }
         }

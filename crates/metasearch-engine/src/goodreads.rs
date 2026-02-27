@@ -13,29 +13,35 @@ use metasearch_core::{
 };
 
 pub struct Goodreads {
+    metadata: EngineMetadata,
     client: Client,
 }
 
 impl Goodreads {
     pub fn new(client: Client) -> Self {
-        Self { client }
+        Self {
+            metadata: EngineMetadata {
+                name: "goodreads".to_string(),
+                display_name: "Goodreads".to_string(),
+                homepage: "https://www.goodreads.com".to_string(),
+                categories: vec![SearchCategory::General],
+                enabled: true,
+                timeout_ms: 5000,
+                weight: 0.8,
+            },
+            client,
+        }
     }
 }
 
 #[async_trait]
 impl SearchEngine for Goodreads {
-    fn metadata(&self) -> EngineMetadata {
-        EngineMetadata {
-            name: "goodreads".to_string(),
-            display_name: "Goodreads".to_string(),
-            categories: vec![SearchCategory::General],
-            enabled: true,
-            weight: 0.8,
-        }
+    fn metadata(&self) -> &EngineMetadata {
+        &self.metadata
     }
 
     async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
-        let page = query.page.unwrap_or(1);
+        let page = query.page;
         let url = format!(
             "https://www.goodreads.com/search?q={}&page={}",
             urlencoding::encode(&query.query),
@@ -90,8 +96,8 @@ impl SearchEngine for Goodreads {
                 snippet,
                 "goodreads".to_string(),
             );
-            result.engine_rank = Some(i + 1);
-            result.category = Some(SearchCategory::General);
+            result.engine_rank = (i + 1) as u32;
+            result.category = SearchCategory::General.to_string();
             result.thumbnail = thumbnail;
             results.push(result);
         }

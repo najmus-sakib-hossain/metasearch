@@ -12,29 +12,35 @@ use metasearch_core::{
 };
 
 pub struct YouTube {
+    metadata: EngineMetadata,
     client: Client,
 }
 
 impl YouTube {
     pub fn new(client: Client) -> Self {
-        Self { client }
+        Self {
+            metadata: EngineMetadata {
+                name: "youtube".to_string(),
+                display_name: "YouTube".to_string(),
+                homepage: "https://www.youtube.com".to_string(),
+                categories: vec![SearchCategory::Videos],
+                enabled: true,
+                timeout_ms: 5000,
+                weight: 1.5,
+            },
+            client,
+        }
     }
 }
 
 #[async_trait]
 impl SearchEngine for YouTube {
-    fn metadata(&self) -> EngineMetadata {
-        EngineMetadata {
-            name: "youtube".to_string(),
-            display_name: "YouTube".to_string(),
-            categories: vec![SearchCategory::Videos],
-            enabled: true,
-            weight: 1.5,
-        }
+    fn metadata(&self) -> &EngineMetadata {
+        &self.metadata
     }
 
     async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
-        let page = query.page.unwrap_or(1);
+        let page = query.page;
         let url = format!(
             "https://www.youtube.com/results?search_query={}&page={}",
             urlencoding::encode(&query.query),
@@ -105,8 +111,8 @@ impl SearchEngine for YouTube {
                             snippet,
                             "youtube".to_string(),
                         );
-                        result.engine_rank = Some(results.len() + 1);
-                        result.category = Some(SearchCategory::Videos);
+                        result.engine_rank = (results.len() + 1) as u32;
+                        result.category = SearchCategory::Videos.to_string();
                         result.thumbnail = Some(thumbnail);
                         results.push(result);
                     }

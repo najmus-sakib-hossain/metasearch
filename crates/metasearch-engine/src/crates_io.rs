@@ -14,29 +14,35 @@ use metasearch_core::{
 const PAGE_SIZE: u32 = 10;
 
 pub struct CratesIo {
+    metadata: EngineMetadata,
     client: Client,
 }
 
 impl CratesIo {
     pub fn new(client: Client) -> Self {
-        Self { client }
+        Self {
+            metadata: EngineMetadata {
+                name: "crates_io".to_string(),
+                display_name: "crates.io".to_string(),
+                homepage: "https://crates.io".to_string(),
+                categories: vec![SearchCategory::IT],
+                enabled: true,
+                timeout_ms: 5000,
+                weight: 1.0,
+            },
+            client,
+        }
     }
 }
 
 #[async_trait]
 impl SearchEngine for CratesIo {
-    fn metadata(&self) -> EngineMetadata {
-        EngineMetadata {
-            name: "crates_io".to_string(),
-            display_name: "crates.io".to_string(),
-            categories: vec![SearchCategory::IT],
-            enabled: true,
-            weight: 1.0,
-        }
+    fn metadata(&self) -> &EngineMetadata {
+        &self.metadata
     }
 
     async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
-        let page = query.page.unwrap_or(1);
+        let page = query.page;
 
         let url = format!(
             "https://crates.io/api/v1/crates?q={}&page={}&per_page={}",
@@ -78,8 +84,8 @@ impl SearchEngine for CratesIo {
                     snippet,
                     "crates_io".to_string(),
                 );
-                result.engine_rank = Some(i + 1);
-                result.category = Some(SearchCategory::IT);
+                result.engine_rank = (i + 1) as u32;
+                result.category = SearchCategory::IT.to_string();
                 results.push(result);
             }
         }

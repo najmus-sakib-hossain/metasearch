@@ -14,6 +14,7 @@ use metasearch_core::{
 };
 
 pub struct GitLab {
+    metadata: EngineMetadata,
     client: Client,
     base_url: String,
 }
@@ -21,6 +22,15 @@ pub struct GitLab {
 impl GitLab {
     pub fn new(client: Client) -> Self {
         Self {
+            metadata: EngineMetadata {
+                name: "gitlab".to_string(),
+                display_name: "GitLab".to_string(),
+                homepage: "https://gitlab.com".to_string(),
+                categories: vec![SearchCategory::IT],
+                enabled: true,
+                timeout_ms: 5000,
+                weight: 0.8,
+            },
             client,
             base_url: "https://gitlab.com".to_string(),
         }
@@ -28,6 +38,15 @@ impl GitLab {
 
     pub fn with_base_url(client: Client, base_url: &str) -> Self {
         Self {
+            metadata: EngineMetadata {
+                name: "gitlab".to_string(),
+                display_name: "GitLab".to_string(),
+                homepage: base_url.to_string(),
+                categories: vec![SearchCategory::IT],
+                enabled: true,
+                timeout_ms: 5000,
+                weight: 0.8,
+            },
             client,
             base_url: base_url.to_string(),
         }
@@ -36,18 +55,12 @@ impl GitLab {
 
 #[async_trait]
 impl SearchEngine for GitLab {
-    fn metadata(&self) -> EngineMetadata {
-        EngineMetadata {
-            name: "gitlab".to_string(),
-            display_name: "GitLab".to_string(),
-            categories: vec![SearchCategory::IT],
-            enabled: true,
-            weight: 0.8,
-        }
+    fn metadata(&self) -> &EngineMetadata {
+        &self.metadata
     }
 
     async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
-        let page = query.page.unwrap_or(1);
+        let page = query.page;
 
         let url = format!(
             "{}/api/v4/projects?search={}&page={}",
@@ -87,8 +100,8 @@ impl SearchEngine for GitLab {
                     snippet,
                     "gitlab".to_string(),
                 );
-                result.engine_rank = Some(i + 1);
-                result.category = Some(SearchCategory::IT);
+                result.engine_rank = (i + 1) as u32;
+                result.category = SearchCategory::IT.to_string();
                 result.thumbnail = item["avatar_url"].as_str().map(|s| s.to_string());
                 results.push(result);
             }

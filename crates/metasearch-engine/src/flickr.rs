@@ -12,29 +12,35 @@ use metasearch_core::{
 };
 
 pub struct Flickr {
+    metadata: EngineMetadata,
     client: Client,
 }
 
 impl Flickr {
     pub fn new(client: Client) -> Self {
-        Self { client }
+        Self {
+            metadata: EngineMetadata {
+                name: "flickr".to_string(),
+                display_name: "Flickr".to_string(),
+                homepage: "https://www.flickr.com".to_string(),
+                categories: vec![SearchCategory::Images],
+                enabled: true,
+                timeout_ms: 5000,
+                weight: 1.0,
+            },
+            client,
+        }
     }
 }
 
 #[async_trait]
 impl SearchEngine for Flickr {
-    fn metadata(&self) -> EngineMetadata {
-        EngineMetadata {
-            name: "flickr".to_string(),
-            display_name: "Flickr".to_string(),
-            categories: vec![SearchCategory::Images],
-            enabled: true,
-            weight: 1.0,
-        }
+    fn metadata(&self) -> &EngineMetadata {
+        &self.metadata
     }
 
     async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
-        let page = query.page.unwrap_or(1);
+        let page = query.page;
         let url = format!(
             "https://www.flickr.com/search?text={}&page={}",
             urlencoding::encode(&query.query),
@@ -130,8 +136,8 @@ impl SearchEngine for Flickr {
                         snippet,
                         "flickr".to_string(),
                     );
-                    result.engine_rank = Some(i + 1);
-                    result.category = Some(SearchCategory::Images);
+                    result.engine_rank = (i + 1) as u32;
+                    result.category = SearchCategory::Images.to_string();
                     result.thumbnail = Some(img_src);
                     results.push(result);
                 }

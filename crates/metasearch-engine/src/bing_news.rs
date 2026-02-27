@@ -13,29 +13,35 @@ use metasearch_core::{
 };
 
 pub struct BingNews {
+    metadata: EngineMetadata,
     client: Client,
 }
 
 impl BingNews {
     pub fn new(client: Client) -> Self {
-        Self { client }
+        Self {
+            metadata: EngineMetadata {
+                name: "bing_news".to_string(),
+                display_name: "Bing News".to_string(),
+                homepage: "https://www.bing.com/news".to_string(),
+                categories: vec![SearchCategory::News],
+                enabled: true,
+                timeout_ms: 5000,
+                weight: 1.0,
+            },
+            client,
+        }
     }
 }
 
 #[async_trait]
 impl SearchEngine for BingNews {
-    fn metadata(&self) -> EngineMetadata {
-        EngineMetadata {
-            name: "bing_news".to_string(),
-            display_name: "Bing News".to_string(),
-            categories: vec![SearchCategory::News],
-            enabled: true,
-            weight: 1.0,
-        }
+    fn metadata(&self) -> &EngineMetadata {
+        &self.metadata
     }
 
     async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
-        let page = query.page.unwrap_or(1) as u32;
+        let page = query.page;
         let first = (page - 1) * 10 + 1;
 
         let url = format!(
@@ -81,8 +87,8 @@ impl SearchEngine for BingNews {
                 content.trim().to_string(),
                 "bing_news".to_string(),
             );
-            result.engine_rank = Some(i + 1);
-            result.category = Some(SearchCategory::News);
+            result.engine_rank = (i + 1) as u32;
+            result.category = SearchCategory::News.to_string();
             results.push(result);
         }
 

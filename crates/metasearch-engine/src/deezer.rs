@@ -12,30 +12,36 @@ use metasearch_core::{
 };
 
 pub struct Deezer {
+    metadata: EngineMetadata,
     client: Client,
 }
 
 impl Deezer {
     pub fn new(client: Client) -> Self {
-        Self { client }
+        Self {
+            metadata: EngineMetadata {
+                name: "deezer".to_string(),
+                display_name: "Deezer".to_string(),
+                homepage: "https://www.deezer.com".to_string(),
+                categories: vec![SearchCategory::Music],
+                enabled: true,
+                timeout_ms: 5000,
+                weight: 1.0,
+            },
+            client,
+        }
     }
 }
 
 #[async_trait]
 impl SearchEngine for Deezer {
-    fn metadata(&self) -> EngineMetadata {
-        EngineMetadata {
-            name: "deezer".to_string(),
-            display_name: "Deezer".to_string(),
-            categories: vec![SearchCategory::Music],
-            enabled: true,
-            weight: 1.0,
-        }
+    fn metadata(&self) -> &EngineMetadata {
+        &self.metadata
     }
 
     async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
-        let page = query.page.unwrap_or(1);
-        let offset = (page as u32 - 1) * 25;
+        let page = query.page;
+        let offset = (page - 1) * 25;
 
         let url = format!(
             "https://api.deezer.com/search?q={}&index={}",
@@ -83,8 +89,8 @@ impl SearchEngine for Deezer {
                     snippet,
                     "deezer".to_string(),
                 );
-                result.engine_rank = Some(i + 1);
-                result.category = Some(SearchCategory::Music);
+                result.engine_rank = (i + 1) as u32;
+                result.category = SearchCategory::Music.to_string();
                 result.thumbnail = item["album"]["cover_medium"].as_str().map(|s| s.to_string());
                 results.push(result);
             }

@@ -12,6 +12,7 @@ use metasearch_core::{
 };
 
 pub struct HuggingFace {
+    metadata: EngineMetadata,
     client: Client,
     endpoint: String, // "models", "datasets", or "spaces"
 }
@@ -19,6 +20,15 @@ pub struct HuggingFace {
 impl HuggingFace {
     pub fn new(client: Client) -> Self {
         Self {
+            metadata: EngineMetadata {
+                name: "huggingface".to_string(),
+                display_name: "Hugging Face".to_string(),
+                homepage: "https://huggingface.co".to_string(),
+                categories: vec![SearchCategory::IT],
+                enabled: true,
+                timeout_ms: 5000,
+                weight: 1.0,
+            },
             client,
             endpoint: "models".to_string(),
         }
@@ -26,6 +36,15 @@ impl HuggingFace {
 
     pub fn with_endpoint(client: Client, endpoint: &str) -> Self {
         Self {
+            metadata: EngineMetadata {
+                name: "huggingface".to_string(),
+                display_name: "Hugging Face".to_string(),
+                homepage: "https://huggingface.co".to_string(),
+                categories: vec![SearchCategory::IT],
+                enabled: true,
+                timeout_ms: 5000,
+                weight: 1.0,
+            },
             client,
             endpoint: endpoint.to_string(),
         }
@@ -34,14 +53,8 @@ impl HuggingFace {
 
 #[async_trait]
 impl SearchEngine for HuggingFace {
-    fn metadata(&self) -> EngineMetadata {
-        EngineMetadata {
-            name: "huggingface".to_string(),
-            display_name: "Hugging Face".to_string(),
-            categories: vec![SearchCategory::IT],
-            enabled: true,
-            weight: 1.0,
-        }
+    fn metadata(&self) -> &EngineMetadata {
+        &self.metadata
     }
 
     async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
@@ -89,7 +102,7 @@ impl SearchEngine for HuggingFace {
                     content_parts.push(format!("❤️ {}", likes));
                 }
                 if downloads > 0 {
-                    content_parts.push(format!("📥 {:,}", downloads));
+                    content_parts.push(format!("📥 {}", downloads));
                 }
                 if !tags.is_empty() {
                     content_parts.push(format!("Tags: {}", tags.join(", ")));
@@ -106,8 +119,8 @@ impl SearchEngine for HuggingFace {
                     snippet,
                     "huggingface".to_string(),
                 );
-                result.engine_rank = Some(i + 1);
-                result.category = Some(SearchCategory::IT);
+                result.engine_rank = (i + 1) as u32;
+                result.category = SearchCategory::IT.to_string();
                 results.push(result);
             }
         }

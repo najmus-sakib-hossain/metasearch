@@ -14,29 +14,35 @@ use metasearch_core::{
 const PAGE_SIZE: u32 = 5;
 
 pub struct Genius {
+    metadata: EngineMetadata,
     client: Client,
 }
 
 impl Genius {
     pub fn new(client: Client) -> Self {
-        Self { client }
+        Self {
+            metadata: EngineMetadata {
+                name: "genius".to_string(),
+                display_name: "Genius".to_string(),
+                homepage: "https://genius.com".to_string(),
+                categories: vec![SearchCategory::Music],
+                enabled: true,
+                timeout_ms: 5000,
+                weight: 1.0,
+            },
+            client,
+        }
     }
 }
 
 #[async_trait]
 impl SearchEngine for Genius {
-    fn metadata(&self) -> EngineMetadata {
-        EngineMetadata {
-            name: "genius".to_string(),
-            display_name: "Genius".to_string(),
-            categories: vec![SearchCategory::Music],
-            enabled: true,
-            weight: 1.0,
-        }
+    fn metadata(&self) -> &EngineMetadata {
+        &self.metadata
     }
 
     async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
-        let page = query.page.unwrap_or(1);
+        let page = query.page;
 
         let url = format!(
             "https://genius.com/api/search/multi?q={}&page={}&per_page={}",
@@ -81,8 +87,8 @@ impl SearchEngine for Genius {
                                     content,
                                     "genius".to_string(),
                                 );
-                                result.engine_rank = Some(results.len() + 1);
-                                result.category = Some(SearchCategory::Music);
+                                result.engine_rank = (results.len() + 1) as u32;
+                                result.category = SearchCategory::Music.to_string();
                                 result.thumbnail = res["song_art_image_thumbnail_url"]
                                     .as_str().map(|s| s.to_string());
                                 results.push(result);
@@ -97,8 +103,8 @@ impl SearchEngine for Genius {
                                     "Artist on Genius".to_string(),
                                     "genius".to_string(),
                                 );
-                                result.engine_rank = Some(results.len() + 1);
-                                result.category = Some(SearchCategory::Music);
+                                result.engine_rank = (results.len() + 1) as u32;
+                                result.category = SearchCategory::Music.to_string();
                                 result.thumbnail = res["image_url"]
                                     .as_str().map(|s| s.to_string());
                                 results.push(result);
@@ -122,8 +128,8 @@ impl SearchEngine for Genius {
                                     content,
                                     "genius".to_string(),
                                 );
-                                result.engine_rank = Some(results.len() + 1);
-                                result.category = Some(SearchCategory::Music);
+                                result.engine_rank = (results.len() + 1) as u32;
+                                result.category = SearchCategory::Music.to_string();
                                 result.thumbnail = res["cover_art_url"]
                                     .as_str().map(|s| s.to_string());
                                 results.push(result);

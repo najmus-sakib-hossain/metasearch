@@ -12,6 +12,7 @@ use metasearch_core::{
 };
 
 pub struct Lemmy {
+    metadata: EngineMetadata,
     client: Client,
     base_url: String,
 }
@@ -19,6 +20,15 @@ pub struct Lemmy {
 impl Lemmy {
     pub fn new(client: Client) -> Self {
         Self {
+            metadata: EngineMetadata {
+                name: "lemmy".to_string(),
+                display_name: "Lemmy".to_string(),
+                homepage: "https://lemmy.ml".to_string(),
+                categories: vec![SearchCategory::SocialMedia],
+                enabled: true,
+                timeout_ms: 5000,
+                weight: 0.8,
+            },
             client,
             base_url: "https://lemmy.ml".to_string(),
         }
@@ -26,6 +36,15 @@ impl Lemmy {
 
     pub fn with_base_url(client: Client, base_url: &str) -> Self {
         Self {
+            metadata: EngineMetadata {
+                name: "lemmy".to_string(),
+                display_name: "Lemmy".to_string(),
+                homepage: base_url.to_string(),
+                categories: vec![SearchCategory::SocialMedia],
+                enabled: true,
+                timeout_ms: 5000,
+                weight: 0.8,
+            },
             client,
             base_url: base_url.to_string(),
         }
@@ -34,18 +53,12 @@ impl Lemmy {
 
 #[async_trait]
 impl SearchEngine for Lemmy {
-    fn metadata(&self) -> EngineMetadata {
-        EngineMetadata {
-            name: "lemmy".to_string(),
-            display_name: "Lemmy".to_string(),
-            categories: vec![SearchCategory::SocialMedia],
-            enabled: true,
-            weight: 0.8,
-        }
+    fn metadata(&self) -> &EngineMetadata {
+        &self.metadata
     }
 
     async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
-        let page = query.page.unwrap_or(1);
+        let page = query.page;
 
         let url = format!(
             "{}/api/v3/search?q={}&page={}&type_=Posts",
@@ -100,8 +113,8 @@ impl SearchEngine for Lemmy {
                     snippet,
                     "lemmy".to_string(),
                 );
-                result.engine_rank = Some(i + 1);
-                result.category = Some(SearchCategory::SocialMedia);
+                result.engine_rank = (i + 1) as u32;
+                result.category = SearchCategory::SocialMedia.to_string();
                 result.thumbnail = post["thumbnail_url"].as_str().map(|s| s.to_string());
                 results.push(result);
             }

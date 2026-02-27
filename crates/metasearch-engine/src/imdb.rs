@@ -13,25 +13,31 @@ use metasearch_core::{
 use std::collections::HashMap;
 
 pub struct Imdb {
+    metadata: EngineMetadata,
     client: Client,
 }
 
 impl Imdb {
     pub fn new(client: Client) -> Self {
-        Self { client }
+        Self {
+            metadata: EngineMetadata {
+                name: "imdb".to_string(),
+                display_name: "IMDb".to_string(),
+                homepage: "https://www.imdb.com".to_string(),
+                categories: vec![SearchCategory::General],
+                enabled: true,
+                timeout_ms: 5000,
+                weight: 0.8,
+            },
+            client,
+        }
     }
 }
 
 #[async_trait]
 impl SearchEngine for Imdb {
-    fn metadata(&self) -> EngineMetadata {
-        EngineMetadata {
-            name: "imdb".to_string(),
-            display_name: "IMDb".to_string(),
-            categories: vec![SearchCategory::General],
-            enabled: true,
-            weight: 0.8,
-        }
+    fn metadata(&self) -> &EngineMetadata {
+        &self.metadata
     }
 
     async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
@@ -92,8 +98,8 @@ impl SearchEngine for Imdb {
                     content,
                     "imdb".to_string(),
                 );
-                result.engine_rank = Some(i + 1);
-                result.category = Some(SearchCategory::General);
+                result.engine_rank = (i + 1) as u32;
+                result.category = SearchCategory::General.to_string();
 
                 // Try to get thumbnail image
                 if let Some(image_url) = entry["i"]["imageUrl"].as_str() {

@@ -14,30 +14,36 @@ use metasearch_core::{
 const PAGE_SIZE: u32 = 25;
 
 pub struct Npm {
+    metadata: EngineMetadata,
     client: Client,
 }
 
 impl Npm {
     pub fn new(client: Client) -> Self {
-        Self { client }
+        Self {
+            metadata: EngineMetadata {
+                name: "npm".to_string(),
+                display_name: "npm".to_string(),
+                homepage: "https://www.npmjs.com".to_string(),
+                categories: vec![SearchCategory::IT],
+                enabled: true,
+                timeout_ms: 5000,
+                weight: 1.0,
+            },
+            client,
+        }
     }
 }
 
 #[async_trait]
 impl SearchEngine for Npm {
-    fn metadata(&self) -> EngineMetadata {
-        EngineMetadata {
-            name: "npm".to_string(),
-            display_name: "npm".to_string(),
-            categories: vec![SearchCategory::IT],
-            enabled: true,
-            weight: 1.0,
-        }
+    fn metadata(&self) -> &EngineMetadata {
+        &self.metadata
     }
 
     async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
-        let page = query.page.unwrap_or(1);
-        let from = (page as u32 - 1) * PAGE_SIZE;
+        let page = query.page;
+        let from = (page - 1) * PAGE_SIZE;
 
         let url = format!(
             "https://api.npms.io/v2/search?q={}&from={}&size={}",
@@ -77,8 +83,8 @@ impl SearchEngine for Npm {
                     snippet,
                     "npm".to_string(),
                 );
-                result.engine_rank = Some(i + 1);
-                result.category = Some(SearchCategory::IT);
+                result.engine_rank = (i + 1) as u32;
+                result.category = SearchCategory::IT.to_string();
                 results.push(result);
             }
         }
