@@ -26,8 +26,9 @@
 //! ## Batch 5 — More SearXNG translations (5):
 //! - 1337x, APKMirror, Arch Linux Wiki, ArtStation, F-Droid
 //!
-//! ## Batch 6 — More SearXNG translations (5):
-//! - AcFun, ANSA, BitChute, Emojipedia, FindThatMeme
+//! ## Batch 6 — More SearXNG translations (9):
+//! - AcFun, ANSA, BitChute, BPB, Chefkoch, Emojipedia,
+//!   FindThatMeme, Fyyd, Mixcloud
 
 // Original engines
 pub mod google;
@@ -96,8 +97,12 @@ pub mod fdroid;
 pub mod acfun;
 pub mod ansa;
 pub mod bitchute;
+pub mod bpb;
+pub mod chefkoch;
 pub mod emojipedia;
 pub mod findthatmeme;
+pub mod fyyd;
+pub mod mixcloud;
 
 pub mod registry;
 
