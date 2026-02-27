@@ -54,6 +54,12 @@ use crate::{
     semantic_scholar::SemanticScholar,
     stackexchange::StackExchange,
     freesound::Freesound,
+    // Batch 5
+    leet_x::LeetX,
+    apkmirror::ApkMirror,
+    archlinux::ArchLinux,
+    artstation::ArtStation,
+    fdroid::Fdroid,
 };
 
 /// Central registry of all search engines.
@@ -68,7 +74,7 @@ impl EngineRegistry {
         }
     }
 
-    /// Create a registry pre-loaded with all built-in engines (46 total).
+    /// Create a registry pre-loaded with all built-in engines (51 total).
     pub fn with_defaults(client: Client) -> Self {
         let mut registry = Self::new();
 
@@ -127,6 +133,13 @@ impl EngineRegistry {
         registry.register(Arc::new(SemanticScholar::new(client.clone())));
         registry.register(Arc::new(StackExchange::new(client.clone())));
         registry.register(Arc::new(Freesound::new(client.clone())));
+
+        // ── Batch 5: More SearXNG translations ────────────
+        registry.register(Arc::new(LeetX::new(client.clone())));
+        registry.register(Arc::new(ApkMirror::new(client.clone())));
+        registry.register(Arc::new(ArchLinux::new(client.clone())));
+        registry.register(Arc::new(ArtStation::new(client.clone())));
+        registry.register(Arc::new(Fdroid::new(client.clone())));
 
         registry
     }
