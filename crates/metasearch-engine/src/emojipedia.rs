@@ -1,16 +1,20 @@
-//! Emojipedia engine — search emoji via HTML scraping.
-//! Translated from SearXNG `searx/engines/emojipedia.py`.
+//! Emojipedia search engine.
+//!
+//! Emojipedia is an emoji reference website documenting the meaning
+//! and common usage of emoji characters in the Unicode Standard.
 
 use async_trait::async_trait;
 use reqwest::Client;
 use scraper::{Html, Selector};
-use metasearch_core::{
-    engine::{SearchEngine, EngineMetadata},
-    result::SearchResult,
-    query::SearchQuery,
-    category::SearchCategory,
-    error::MetasearchError,
-};
+use url::Url;
+
+use metasearch_core::engine::{EngineMetadata, SearchEngine};
+use metasearch_core::query::SearchQuery;
+use metasearch_core::result::SearchResult;
+use metasearch_core::error::MetasearchError;
+use metasearch_core::category::SearchCategory;
+
+const BASE_URL: &str = "https://emojipedia.org";
 
 pub struct Emojipedia {
     client: Client,
@@ -26,56 +30,52 @@ impl Emojipedia {
 impl SearchEngine for Emojipedia {
     fn metadata(&self) -> EngineMetadata {
         EngineMetadata {
-            name: "emojipedia".to_string(),
-            display_name: "Emojipedia".to_string(),
+            name: "Emojipedia".to_string(),
+            base_url: BASE_URL.to_string(),
             categories: vec![SearchCategory::General],
             enabled: true,
-            weight: 0.5,
         }
     }
 
     async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
-        let url = format!(
-            "https://emojipedia.org/search?q={}",
-            urlencoding::encode(&query.query),
-        );
+        let mut url = Url::parse(&format!("{}/search", BASE_URL))
+            .map_err(|e| MetasearchError::Request(e.to_string()))?;
+        url.query_pairs_mut().append_pair("q", &query.query);
 
-        let resp = self.client
-            .get(&url)
+        let resp = self
+            .client
+            .get(url.as_str())
             .send()
             .await
-            .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
+            .map_err(|e| MetasearchError::Request(e.to_string()))?
+            .text()
+            .await
+            .map_err(|e| MetasearchError::Request(e.to_string()))?;
 
-        let html_text = resp.text().await
-            .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
+        let document = Html::parse_document(&resp);
 
-        let document = Html::parse_document(&html_text);
-        let list_sel = Selector::parse(r#"div[class^="EmojisList"] a"#).unwrap();
+        // Emojipedia uses div class starting with "EmojisList" containing <a> links
+        let container_sel = Selector::parse("div[class^='EmojisList'] a").unwrap();
 
         let mut results = Vec::new();
 
-        for (i, el) in document.select(&list_sel).enumerate() {
-            let href = el.value().attr("href").unwrap_or_default();
-            let result_url = if href.starts_with("http") {
-                href.to_string()
-            } else {
-                format!("https://emojipedia.org{}", href)
-            };
+        for element in document.select(&container_sel) {
+            let href = element.value().attr("href").unwrap_or_default();
+            let title: String = element.text().collect::<Vec<_>>().join(" ").trim().to_string();
 
-            let title: String = el.text().collect();
-            if title.trim().is_empty() {
+            if title.is_empty() || href.is_empty() {
                 continue;
             }
 
-            let mut result = SearchResult::new(
-                title.trim().to_string(),
-                result_url,
-                String::new(),
-                "emojipedia".to_string(),
-            );
-            result.engine_rank = Some(i + 1);
-            result.category = Some(SearchCategory::General);
-            results.push(result);
+            let emoji_url = format!("{}{}", BASE_URL, href);
+
+            results.push(SearchResult {
+                title,
+                url: emoji_url,
+                content: String::new(),
+                engine: "Emojipedia".to_string(),
+                score: 1.0,
+            });
         }
 
         Ok(results)

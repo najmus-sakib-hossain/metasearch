@@ -61,12 +61,11 @@ use crate::{
     artstation::ArtStation,
     fdroid::Fdroid,
     // Batch 6
+    acfun::AcFun,
+    ansa::Ansa,
+    bitchute::BitChute,
     emojipedia::Emojipedia,
-    fyyd::Fyyd,
-    mixcloud::Mixcloud,
-    bitchute::Bitchute,
-    bpb::Bpb,
-    chefkoch::Chefkoch,
+    findthatmeme::FindThatMeme,
 };
 
 /// Central registry of all search engines.
@@ -81,7 +80,7 @@ impl EngineRegistry {
         }
     }
 
-    /// Create a registry pre-loaded with all built-in engines (57 total).
+    /// Create a registry pre-loaded with all built-in engines (56 total).
     pub fn with_defaults(client: Client) -> Self {
         let mut registry = Self::new();
 
@@ -149,12 +148,11 @@ impl EngineRegistry {
         registry.register(Arc::new(Fdroid::new(client.clone())));
 
         // ── Batch 6: More SearXNG translations ────────────
+        registry.register(Arc::new(AcFun::new(client.clone())));
+        registry.register(Arc::new(Ansa::new(client.clone())));
+        registry.register(Arc::new(BitChute::new(client.clone())));
         registry.register(Arc::new(Emojipedia::new(client.clone())));
-        registry.register(Arc::new(Fyyd::new(client.clone())));
-        registry.register(Arc::new(Mixcloud::new(client.clone())));
-        registry.register(Arc::new(Bitchute::new(client.clone())));
-        registry.register(Arc::new(Bpb::new(client.clone())));
-        registry.register(Arc::new(Chefkoch::new(client.clone())));
+        registry.register(Arc::new(FindThatMeme::new(client.clone())));
 
         registry
     }

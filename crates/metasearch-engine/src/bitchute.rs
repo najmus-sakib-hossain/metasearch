@@ -1,91 +1,121 @@
-//! Bitchute engine — search videos via Bitchute JSON API.
-//! Translated from SearXNG `searx/engines/bitchute.py`.
+//! BitChute video search engine.
+//!
+//! BitChute is a peer-to-peer video hosting service. This engine
+//! queries their JSON search API.
 
 use async_trait::async_trait;
 use reqwest::Client;
-use metasearch_core::{
-    engine::{SearchEngine, EngineMetadata},
-    result::SearchResult,
-    query::SearchQuery,
-    category::SearchCategory,
-    error::MetasearchError,
-};
+use serde::Deserialize;
+use serde_json::json;
 
-pub struct Bitchute {
+use metasearch_core::engine::{EngineMetadata, SearchEngine};
+use metasearch_core::query::SearchQuery;
+use metasearch_core::result::SearchResult;
+use metasearch_core::error::MetasearchError;
+use metasearch_core::category::SearchCategory;
+
+const API_URL: &str = "https://api.bitchute.com/api/beta/search/videos";
+const RESULTS_PER_PAGE: u32 = 20;
+
+pub struct BitChute {
     client: Client,
 }
 
-impl Bitchute {
+impl BitChute {
     pub fn new(client: Client) -> Self {
         Self { client }
     }
 }
 
+#[derive(Deserialize)]
+struct ApiResponse {
+    videos: Option<Vec<VideoItem>>,
+}
+
+#[derive(Deserialize)]
+struct VideoItem {
+    video_name: Option<String>,
+    video_id: Option<String>,
+    description: Option<String>,
+    #[serde(default)]
+    channel: ChannelInfo,
+}
+
+#[derive(Deserialize, Default)]
+struct ChannelInfo {
+    channel_name: Option<String>,
+}
+
 #[async_trait]
-impl SearchEngine for Bitchute {
+impl SearchEngine for BitChute {
     fn metadata(&self) -> EngineMetadata {
         EngineMetadata {
-            name: "bitchute".to_string(),
-            display_name: "BitChute".to_string(),
+            name: "BitChute".to_string(),
+            base_url: "https://www.bitchute.com".to_string(),
             categories: vec![SearchCategory::Videos],
             enabled: true,
-            weight: 0.5,
         }
     }
 
     async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
         let page = query.page.unwrap_or(1);
-        let results_per_page: u32 = 20;
-        let offset = (page as u32 - 1) * results_per_page;
+        let offset = (page.saturating_sub(1) as u32) * RESULTS_PER_PAGE;
 
-        let body = serde_json::json!({
-            "offset": offset,
-            "limit": results_per_page,
+        let body = json!({
             "query": query.query,
+            "offset": offset,
+            "limit": RESULTS_PER_PAGE,
             "sensitivity_id": "normal",
             "sort": "new"
         });
 
-        let resp = self.client
-            .post("https://api.bitchute.com/api/beta/search/videos")
+        let resp = self
+            .client
+            .post(API_URL)
             .header("content-type", "application/json")
             .json(&body)
             .send()
             .await
-            .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
-
-        let data: serde_json::Value = resp.json().await
-            .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
+            .map_err(|e| MetasearchError::Request(e.to_string()))?
+            .json::<ApiResponse>()
+            .await
+            .map_err(|e| MetasearchError::Parse(e.to_string()))?;
 
         let mut results = Vec::new();
 
-        if let Some(videos) = data["videos"].as_array() {
-            for (i, item) in videos.iter().enumerate() {
-                let video_id = item["video_id"].as_str().unwrap_or_default();
-                let title = item["video_name"].as_str().unwrap_or_default();
-                let description = item["description"].as_str().unwrap_or_default();
-                let channel = item["channel"]["channel_name"].as_str().unwrap_or_default();
-
-                let content = html_escape::decode_html_entities(description).to_string();
-                let snippet = if content.len() > 200 {
-                    format!("{}... — {}", &content[..200], channel)
-                } else {
-                    format!("{} — {}", content, channel)
-                };
-
-                let video_url = format!("https://www.bitchute.com/video/{}", video_id);
-
-                let mut result = SearchResult::new(
-                    title.to_string(),
-                    video_url,
-                    snippet,
-                    "bitchute".to_string(),
-                );
-                result.engine_rank = Some(i + 1);
-                result.category = Some(SearchCategory::Videos);
-                result.thumbnail = item["thumbnail_url"].as_str().map(|s| s.to_string());
-                results.push(result);
+        for item in resp.videos.unwrap_or_default() {
+            let video_id = item.video_id.unwrap_or_default();
+            let title = item.video_name.unwrap_or_default();
+            if title.is_empty() || video_id.is_empty() {
+                continue;
             }
+
+            let video_url = format!("https://www.bitchute.com/video/{}", video_id);
+
+            let mut content = html_escape::decode_html_entities(
+                &item.description.unwrap_or_default(),
+            )
+            .to_string();
+
+            // Strip HTML tags from description
+            let tag_re = regex::Regex::new(r"<[^>]+>").unwrap();
+            content = tag_re.replace_all(&content, "").trim().to_string();
+
+            if let Some(channel) = item.channel.channel_name.as_deref() {
+                if !content.is_empty() {
+                    content = format!("{} — {}", channel, content);
+                } else {
+                    content = channel.to_string();
+                }
+            }
+
+            results.push(SearchResult {
+                title,
+                url: video_url,
+                content,
+                engine: "BitChute".to_string(),
+                score: 1.0,
+            });
         }
 
         Ok(results)
