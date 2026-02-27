@@ -59,6 +59,7 @@ struct GagPost {
     title: String,
     #[serde(default)]
     description: String,
+    #[serde(default)]
     #[serde(rename = "creationTs")]
     creation_ts: Option<i64>,
     images: GagImages,

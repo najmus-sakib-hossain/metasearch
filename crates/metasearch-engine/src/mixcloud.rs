@@ -8,33 +8,39 @@ use metasearch_core::{
     result::SearchResult,
     query::SearchQuery,
     category::SearchCategory,
-    error::MetasearchError,
+    error::{MetasearchError, Result},
 };
 
 pub struct Mixcloud {
+    metadata: EngineMetadata,
     client: Client,
 }
 
 impl Mixcloud {
     pub fn new(client: Client) -> Self {
-        Self { client }
+        Self {
+            metadata: EngineMetadata {
+                name: "mixcloud".to_string(),
+                display_name: "Mixcloud".to_string(),
+                homepage: "https://www.mixcloud.com".to_string(),
+                categories: vec![SearchCategory::Music],
+                enabled: true,
+                timeout_ms: 3000,
+                weight: 0.7,
+            },
+            client,
+        }
     }
 }
 
 #[async_trait]
 impl SearchEngine for Mixcloud {
-    fn metadata(&self) -> EngineMetadata {
-        EngineMetadata {
-            name: "mixcloud".to_string(),
-            display_name: "Mixcloud".to_string(),
-            categories: vec![SearchCategory::Music],
-            enabled: true,
-            weight: 0.7,
-        }
+    fn metadata(&self) -> &EngineMetadata {
+        &self.metadata
     }
 
-    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
-        let page = query.page.unwrap_or(1);
+    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>> {
+        let page = query.page;
         let offset = (page as u32 - 1) * 10;
 
         let url = format!(
@@ -66,8 +72,8 @@ impl SearchEngine for Mixcloud {
                     format!("by {}", user_name),
                     "mixcloud".to_string(),
                 );
-                result.engine_rank = Some(i + 1);
-                result.category = Some(SearchCategory::Music);
+                result.engine_rank = (i + 1) as u32;
+                result.category = "music".to_string();
                 result.thumbnail = item["pictures"]["medium"]
                     .as_str()
                     .map(|s| s.to_string());

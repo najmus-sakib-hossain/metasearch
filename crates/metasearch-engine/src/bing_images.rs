@@ -9,33 +9,39 @@ use metasearch_core::{
     result::SearchResult,
     query::SearchQuery,
     category::SearchCategory,
-    error::MetasearchError,
+    error::{MetasearchError, Result},
 };
 
 pub struct BingImages {
+    metadata: EngineMetadata,
     client: Client,
 }
 
 impl BingImages {
     pub fn new(client: Client) -> Self {
-        Self { client }
+        Self {
+            metadata: EngineMetadata {
+                name: "bing_images".to_string(),
+                display_name: "Bing Images".to_string(),
+                homepage: "https://www.bing.com".to_string(),
+                categories: vec![SearchCategory::Images],
+                enabled: true,
+                timeout_ms: 3000,
+                weight: 1.0,
+            },
+            client,
+        }
     }
 }
 
 #[async_trait]
 impl SearchEngine for BingImages {
-    fn metadata(&self) -> EngineMetadata {
-        EngineMetadata {
-            name: "bing_images".to_string(),
-            display_name: "Bing Images".to_string(),
-            categories: vec![SearchCategory::Images],
-            enabled: true,
-            weight: 1.0,
-        }
+    fn metadata(&self) -> &EngineMetadata {
+        &self.metadata
     }
 
-    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
-        let page = query.page.unwrap_or(1) as u32;
+    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>> {
+        let page = query.page as u32;
         let first = (page - 1) * 35 + 1;
 
         let url = format!(
@@ -95,8 +101,8 @@ impl SearchEngine for BingImages {
                 snippet,
                 "bing_images".to_string(),
             );
-            result.engine_rank = Some(i + 1);
-            result.category = Some(SearchCategory::Images);
+            result.engine_rank = (i + 1) as u32;
+            result.category = "images".to_string();
             result.thumbnail = if thumbnail_src.is_empty() { None } else { Some(thumbnail_src.to_string()) };
             results.push(result);
         }

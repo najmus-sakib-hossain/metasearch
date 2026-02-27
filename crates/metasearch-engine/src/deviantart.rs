@@ -9,32 +9,38 @@ use metasearch_core::{
     result::SearchResult,
     query::SearchQuery,
     category::SearchCategory,
-    error::MetasearchError,
+    error::{MetasearchError, Result},
 };
 
 pub struct DeviantArt {
+    metadata: EngineMetadata,
     client: Client,
 }
 
 impl DeviantArt {
     pub fn new(client: Client) -> Self {
-        Self { client }
+        Self {
+            metadata: EngineMetadata {
+                name: "deviantart".to_string(),
+                display_name: "DeviantArt".to_string(),
+                homepage: "https://www.deviantart.com".to_string(),
+                categories: vec![SearchCategory::Images],
+                enabled: true,
+                timeout_ms: 3000,
+                weight: 0.7,
+            },
+            client,
+        }
     }
 }
 
 #[async_trait]
 impl SearchEngine for DeviantArt {
-    fn metadata(&self) -> EngineMetadata {
-        EngineMetadata {
-            name: "deviantart".to_string(),
-            display_name: "DeviantArt".to_string(),
-            categories: vec![SearchCategory::Images],
-            enabled: true,
-            weight: 0.7,
-        }
+    fn metadata(&self) -> &EngineMetadata {
+        &self.metadata
     }
 
-    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
+    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>> {
         let url = format!(
             "https://www.deviantart.com/search?q={}",
             urlencoding::encode(&query.query),
@@ -99,8 +105,8 @@ impl SearchEngine for DeviantArt {
                 String::new(),
                 "deviantart".to_string(),
             );
-            result.engine_rank = Some(i + 1);
-            result.category = Some(SearchCategory::Images);
+            result.engine_rank = (i + 1) as u32;
+            result.category = "images".to_string();
             result.thumbnail = Some(thumbnail_src);
             result.image_src = Some(img_src);
             results.push(result);

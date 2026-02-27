@@ -12,16 +12,28 @@ use metasearch_core::{
     result::SearchResult,
     query::SearchQuery,
     category::SearchCategory,
-    error::MetasearchError,
+    error::{MetasearchError, Result},
 };
 
 pub struct Unsplash {
+    metadata: EngineMetadata,
     client: Client,
 }
 
 impl Unsplash {
     pub fn new(client: Client) -> Self {
-        Self { client }
+        Self {
+            metadata: EngineMetadata {
+                name: "unsplash".to_string(),
+                display_name: "Unsplash".to_string(),
+                homepage: "https://unsplash.com".to_string(),
+                categories: vec![SearchCategory::Images],
+                enabled: true,
+                timeout_ms: 3000,
+                weight: 1.0,
+            },
+            client,
+        }
     }
 }
 
@@ -53,18 +65,12 @@ fn clean_url(raw_url: &str) -> String {
 
 #[async_trait]
 impl SearchEngine for Unsplash {
-    fn metadata(&self) -> EngineMetadata {
-        EngineMetadata {
-            name: "unsplash".to_string(),
-            display_name: "Unsplash".to_string(),
-            categories: vec![SearchCategory::Images],
-            enabled: true,
-            weight: 1.0,
-        }
+    fn metadata(&self) -> &EngineMetadata {
+        &self.metadata
     }
 
-    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
-        let page = query.page.unwrap_or(1);
+    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>> {
+        let page = query.page;
         let per_page: u32 = 20;
 
         let url = format!(
@@ -112,8 +118,8 @@ impl SearchEngine for Unsplash {
                     snippet,
                     "unsplash".to_string(),
                 );
-                sr.engine_rank = Some(i + 1);
-                sr.category = Some(SearchCategory::Images);
+                sr.engine_rank = (i + 1) as u32;
+                sr.category = "images".to_string();
                 sr.thumbnail = if thumb_url.is_empty() {
                     None
                 } else {

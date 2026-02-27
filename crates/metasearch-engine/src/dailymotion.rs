@@ -8,35 +8,41 @@ use metasearch_core::{
     result::SearchResult,
     query::SearchQuery,
     category::SearchCategory,
-    error::MetasearchError,
+    error::{MetasearchError, Result},
 };
 
 const RESULTS_PER_PAGE: u32 = 10;
 
 pub struct Dailymotion {
+    metadata: EngineMetadata,
     client: Client,
 }
 
 impl Dailymotion {
     pub fn new(client: Client) -> Self {
-        Self { client }
+        Self {
+            metadata: EngineMetadata {
+                name: "dailymotion".to_string(),
+                display_name: "Dailymotion".to_string(),
+                homepage: "https://www.dailymotion.com".to_string(),
+                categories: vec![SearchCategory::Videos],
+                enabled: true,
+                timeout_ms: 3000,
+                weight: 1.0,
+            },
+            client,
+        }
     }
 }
 
 #[async_trait]
 impl SearchEngine for Dailymotion {
-    fn metadata(&self) -> EngineMetadata {
-        EngineMetadata {
-            name: "dailymotion".to_string(),
-            display_name: "Dailymotion".to_string(),
-            categories: vec![SearchCategory::Videos],
-            enabled: true,
-            weight: 1.0,
-        }
+    fn metadata(&self) -> &EngineMetadata {
+        &self.metadata
     }
 
-    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
-        let page = query.page.unwrap_or(1);
+    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>> {
+        let page = query.page;
         let fields = "allow_embed,description,title,created_time,duration,url,thumbnail_360_url,id";
 
         let url = format!(
@@ -87,8 +93,8 @@ impl SearchEngine for Dailymotion {
                     content,
                     "dailymotion".to_string(),
                 );
-                result.engine_rank = Some(i + 1);
-                result.category = Some(SearchCategory::Videos);
+                result.engine_rank = (i + 1) as u32;
+                result.category = "videos".to_string();
                 result.thumbnail = item["thumbnail_360_url"].as_str()
                     .map(|t| t.replace("http://", "https://"));
                 results.push(result);

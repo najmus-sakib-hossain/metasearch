@@ -11,35 +11,41 @@ use metasearch_core::{
     result::SearchResult,
     query::SearchQuery,
     category::SearchCategory,
-    error::MetasearchError,
+    error::{MetasearchError, Result},
 };
 
 pub struct Qwant {
+    metadata: EngineMetadata,
     client: Client,
 }
 
 impl Qwant {
     pub fn new(client: Client) -> Self {
-        Self { client }
+        Self {
+            metadata: EngineMetadata {
+                name: "qwant".to_string(),
+                display_name: "Qwant".to_string(),
+                homepage: "https://www.qwant.com".to_string(),
+                categories: vec![SearchCategory::General],
+                enabled: true,
+                timeout_ms: 3000,
+                weight: 1.0,
+            },
+            client,
+        }
     }
 }
 
 #[async_trait]
 impl SearchEngine for Qwant {
-    fn metadata(&self) -> EngineMetadata {
-        EngineMetadata {
-            name: "qwant".to_string(),
-            display_name: "Qwant".to_string(),
-            categories: vec![SearchCategory::General],
-            enabled: true,
-            weight: 1.0,
-        }
+    fn metadata(&self) -> &EngineMetadata {
+        &self.metadata
     }
 
-    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
-        let page = query.page.unwrap_or(1) as u32;
+    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>> {
+        let page = query.page as u32;
         let count: u32 = 10;
-        let offset = (page - 1) * count;
+        let offset = page.saturating_sub(1) * count;
 
         let url = format!(
             "https://api.qwant.com/v3/search/web?q={}&count={}&locale=en_US&safesearch=1&llm=false&tgp=3&offset={}",
@@ -61,9 +67,9 @@ impl SearchEngine for Qwant {
         // Check API status
         if data["status"].as_str() != Some("success") {
             let error_code = data["data"]["error_code"].as_u64().unwrap_or(0);
-            return Err(MetasearchError::EngineError(
+            return Err(MetasearchError::EngineError { engine: "qwant".to_string(), message: 
                 format!("Qwant API error (code: {})", error_code),
-            ));
+             });
         }
 
         let mut results = Vec::new();
@@ -96,8 +102,8 @@ impl SearchEngine for Qwant {
                             desc.to_string(),
                             "qwant".to_string(),
                         );
-                        sr.engine_rank = Some(results.len() + 1);
-                        sr.category = Some(SearchCategory::General);
+                        sr.engine_rank = (results.len() as u32 + 1);
+                        sr.category = "general".to_string();
                         results.push(sr);
                     }
                 }

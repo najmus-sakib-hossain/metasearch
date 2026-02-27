@@ -12,16 +12,28 @@ use url::Url;
 use metasearch_core::engine::{EngineMetadata, SearchEngine};
 use metasearch_core::query::SearchQuery;
 use metasearch_core::result::SearchResult;
-use metasearch_core::error::MetasearchError;
+use metasearch_core::error::{MetasearchError, Result};
 use metasearch_core::category::SearchCategory;
 
 pub struct AcFun {
+    metadata: EngineMetadata,
     client: Client,
 }
 
 impl AcFun {
     pub fn new(client: Client) -> Self {
-        Self { client }
+        Self {
+            metadata: EngineMetadata {
+                name: "acfun".to_string(),
+                display_name: "AcFun".to_string(),
+                homepage: "https://www.acfun.cn".to_string(),
+                categories: vec![SearchCategory::Videos],
+                enabled: true,
+                timeout_ms: 3000,
+                weight: 1.0,
+            },
+            client,
+        }
     }
 }
 
@@ -38,34 +50,29 @@ struct VideoExposureLog {
 
 #[async_trait]
 impl SearchEngine for AcFun {
-    fn metadata(&self) -> EngineMetadata {
-        EngineMetadata {
-            name: "AcFun".to_string(),
-            base_url: "https://www.acfun.cn".to_string(),
-            categories: vec![SearchCategory::Videos],
-            enabled: true,
-        }
+    fn metadata(&self) -> &EngineMetadata {
+        &self.metadata
     }
 
-    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
-        let mut url = Url::parse("https://www.acfun.cn/search").map_err(|e| MetasearchError::Request(e.to_string()))?;
+    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>> {
+        let mut url = Url::parse("https://www.acfun.cn/search").map_err(|e| MetasearchError::HttpError(e.to_string()))?;
         url.query_pairs_mut()
             .append_pair("keyword", &query.query)
-            .append_pair("pCursor", &query.page.unwrap_or(1).to_string());
+            .append_pair("pCursor", &query.page.to_string());
 
         let resp = self
             .client
             .get(url.as_str())
             .send()
             .await
-            .map_err(|e| MetasearchError::Request(e.to_string()))?
+            .map_err(|e| MetasearchError::HttpError(e.to_string()))?
             .text()
             .await
-            .map_err(|e| MetasearchError::Request(e.to_string()))?;
+            .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
 
         let mut results = Vec::new();
         let re = Regex::new(r"bigPipe\.onPageletArrive\((\{.*?\})\);")
-            .map_err(|e| MetasearchError::Parse(e.to_string()))?;
+            .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
 
         for cap in re.captures_iter(&resp) {
             let json_str = &cap[1];
@@ -93,13 +100,7 @@ impl SearchEngine for AcFun {
 
                         let video_url = format!("https://www.acfun.cn/v/ac{}", content_id);
 
-                        results.push(SearchResult {
-                            title,
-                            url: video_url,
-                            content: String::new(),
-                            engine: "AcFun".to_string(),
-                            score: 1.0,
-                        });
+                        results.push(SearchResult::new(title, video_url, String::new(), "AcFun".to_string()));
                     }
                 }
             }

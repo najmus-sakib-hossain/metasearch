@@ -11,35 +11,42 @@ use url::Url;
 use metasearch_core::engine::{EngineMetadata, SearchEngine};
 use metasearch_core::query::SearchQuery;
 use metasearch_core::result::SearchResult;
-use metasearch_core::error::MetasearchError;
+use metasearch_core::error::{MetasearchError, Result};
 use metasearch_core::category::SearchCategory;
 
 const BASE_URL: &str = "https://emojipedia.org";
 
 pub struct Emojipedia {
+    metadata: EngineMetadata,
     client: Client,
 }
 
 impl Emojipedia {
     pub fn new(client: Client) -> Self {
-        Self { client }
+        Self {
+            metadata: EngineMetadata {
+                name: "emojipedia".to_string(),
+                display_name: "Emojipedia".to_string(),
+                homepage: "https://emojipedia.org".to_string(),
+                categories: vec![SearchCategory::General],
+                enabled: true,
+                timeout_ms: 3000,
+                weight: 1.0,
+            },
+            client,
+        }
     }
 }
 
 #[async_trait]
 impl SearchEngine for Emojipedia {
-    fn metadata(&self) -> EngineMetadata {
-        EngineMetadata {
-            name: "Emojipedia".to_string(),
-            base_url: BASE_URL.to_string(),
-            categories: vec![SearchCategory::General],
-            enabled: true,
-        }
+    fn metadata(&self) -> &EngineMetadata {
+        &self.metadata
     }
 
-    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
+    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>> {
         let mut url = Url::parse(&format!("{}/search", BASE_URL))
-            .map_err(|e| MetasearchError::Request(e.to_string()))?;
+            .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
         url.query_pairs_mut().append_pair("q", &query.query);
 
         let resp = self
@@ -47,10 +54,10 @@ impl SearchEngine for Emojipedia {
             .get(url.as_str())
             .send()
             .await
-            .map_err(|e| MetasearchError::Request(e.to_string()))?
+            .map_err(|e| MetasearchError::HttpError(e.to_string()))?
             .text()
             .await
-            .map_err(|e| MetasearchError::Request(e.to_string()))?;
+            .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
 
         let document = Html::parse_document(&resp);
 
@@ -69,13 +76,7 @@ impl SearchEngine for Emojipedia {
 
             let emoji_url = format!("{}{}", BASE_URL, href);
 
-            results.push(SearchResult {
-                title,
-                url: emoji_url,
-                content: String::new(),
-                engine: "Emojipedia".to_string(),
-                score: 1.0,
-            });
+            results.push(SearchResult::new(title, emoji_url, String::new(), "Emojipedia".to_string()));
         }
 
         Ok(results)

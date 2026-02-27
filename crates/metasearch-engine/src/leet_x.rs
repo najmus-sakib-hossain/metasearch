@@ -9,33 +9,39 @@ use metasearch_core::{
     result::SearchResult,
     query::SearchQuery,
     category::SearchCategory,
-    error::MetasearchError,
+    error::{MetasearchError, Result},
 };
 
 pub struct LeetX {
+    metadata: EngineMetadata,
     client: Client,
 }
 
 impl LeetX {
     pub fn new(client: Client) -> Self {
-        Self { client }
+        Self {
+            metadata: EngineMetadata {
+                name: "1337x".to_string(),
+                display_name: "1337x".to_string(),
+                homepage: "https://www.1337x.to".to_string(),
+                categories: vec![SearchCategory::Files],
+                enabled: true,
+                timeout_ms: 3000,
+                weight: 0.7,
+            },
+            client,
+        }
     }
 }
 
 #[async_trait]
 impl SearchEngine for LeetX {
-    fn metadata(&self) -> EngineMetadata {
-        EngineMetadata {
-            name: "1337x".to_string(),
-            display_name: "1337x".to_string(),
-            categories: vec![SearchCategory::Files],
-            enabled: true,
-            weight: 0.7,
-        }
+    fn metadata(&self) -> &EngineMetadata {
+        &self.metadata
     }
 
-    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
-        let page = query.page.unwrap_or(1);
+    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>> {
+        let page = query.page;
         let url = format!(
             "https://1337x.to/search/{}/{}/",
             urlencoding::encode(&query.query),
@@ -100,8 +106,8 @@ impl SearchEngine for LeetX {
                 snippet,
                 "1337x".to_string(),
             );
-            result.engine_rank = Some(i + 1);
-            result.category = Some(SearchCategory::Files);
+            result.engine_rank = (i + 1) as u32;
+            result.category = "files".to_string();
             results.push(result);
         }
 

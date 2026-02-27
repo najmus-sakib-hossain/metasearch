@@ -12,16 +12,28 @@ use metasearch_core::{
     result::SearchResult,
     query::SearchQuery,
     category::SearchCategory,
-    error::MetasearchError,
+    error::{MetasearchError, Result},
 };
 
 pub struct Yahoo {
+    metadata: EngineMetadata,
     client: Client,
 }
 
 impl Yahoo {
     pub fn new(client: Client) -> Self {
-        Self { client }
+        Self {
+            metadata: EngineMetadata {
+                name: "yahoo".to_string(),
+                display_name: "Yahoo".to_string(),
+                homepage: "https://search.yahoo.com".to_string(),
+                categories: vec![SearchCategory::General],
+                enabled: true,
+                timeout_ms: 3000,
+                weight: 1.0,
+            },
+            client,
+        }
     }
 }
 
@@ -60,18 +72,12 @@ fn parse_url(url_string: &str) -> String {
 
 #[async_trait]
 impl SearchEngine for Yahoo {
-    fn metadata(&self) -> EngineMetadata {
-        EngineMetadata {
-            name: "yahoo".to_string(),
-            display_name: "Yahoo".to_string(),
-            categories: vec![SearchCategory::General],
-            enabled: true,
-            weight: 1.0,
-        }
+    fn metadata(&self) -> &EngineMetadata {
+        &self.metadata
     }
 
-    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
-        let page = query.page.unwrap_or(1) as u32;
+    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>> {
+        let page = query.page as u32;
 
         let mut url = format!(
             "https://search.yahoo.com/search?p={}",
@@ -144,8 +150,8 @@ impl SearchEngine for Yahoo {
                 content,
                 "yahoo".to_string(),
             );
-            sr.engine_rank = Some(i + 1);
-            sr.category = Some(SearchCategory::General);
+            sr.engine_rank = (i + 1) as u32;
+            sr.category = "general".to_string();
             results.push(sr);
         }
 

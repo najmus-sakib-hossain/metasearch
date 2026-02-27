@@ -69,11 +69,12 @@ struct BiliData {
 struct BiliItem {
     title: String,
     arcurl: String,
-    description: String,
     author: String,
     pic: String,
     aid: u64,
     pubdate: i64,
+    #[serde(default)]
+    description: String,
     #[serde(default)]
     duration: String,
 }

@@ -12,33 +12,39 @@ use metasearch_core::{
     result::SearchResult,
     query::SearchQuery,
     category::SearchCategory,
-    error::MetasearchError,
+    error::{MetasearchError, Result},
 };
 
 pub struct ArtStation {
+    metadata: EngineMetadata,
     client: Client,
 }
 
 impl ArtStation {
     pub fn new(client: Client) -> Self {
-        Self { client }
+        Self {
+            metadata: EngineMetadata {
+                name: "artstation".to_string(),
+                display_name: "ArtStation".to_string(),
+                homepage: "https://www.artstation.com".to_string(),
+                categories: vec![SearchCategory::Images],
+                enabled: true,
+                timeout_ms: 3000,
+                weight: 0.8,
+            },
+            client,
+        }
     }
 }
 
 #[async_trait]
 impl SearchEngine for ArtStation {
-    fn metadata(&self) -> EngineMetadata {
-        EngineMetadata {
-            name: "artstation".to_string(),
-            display_name: "ArtStation".to_string(),
-            categories: vec![SearchCategory::Images],
-            enabled: true,
-            weight: 0.8,
-        }
+    fn metadata(&self) -> &EngineMetadata {
+        &self.metadata
     }
 
-    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
-        let page = query.page.unwrap_or(1);
+    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>> {
+        let page = query.page;
 
         // Step 1: Fetch CSRF tokens
         let token_resp = self.client
@@ -48,9 +54,18 @@ impl SearchEngine for ArtStation {
             .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
 
         let private_token = token_resp
-            .cookies()
-            .find(|c| c.name() == "PRIVATE-CSRF-TOKEN")
-            .map(|c| c.value().to_string())
+            .headers()
+            .get_all("set-cookie")
+            .iter()
+            .find_map(|v| {
+                let s = v.to_str().ok()?;
+                s.split(';').next().and_then(|part| {
+                    let mut kv = part.splitn(2, '=');
+                    let key = kv.next()?.trim();
+                    let val = kv.next()?.trim();
+                    if key == "PRIVATE-CSRF-TOKEN" { Some(val.to_string()) } else { None }
+                })
+            })
             .unwrap_or_default();
 
         let token_data: serde_json::Value = token_resp.json().await
@@ -119,8 +134,8 @@ impl SearchEngine for ArtStation {
                     snippet,
                     "artstation".to_string(),
                 );
-                result.engine_rank = Some(i + 1);
-                result.category = Some(SearchCategory::Images);
+                result.engine_rank = (i + 1) as u32;
+                result.category = "images".to_string();
                 result.thumbnail = Some(fullsize.to_string());
                 results.push(result);
             }

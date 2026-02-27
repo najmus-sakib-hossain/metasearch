@@ -8,36 +8,42 @@ use metasearch_core::{
     result::SearchResult,
     query::SearchQuery,
     category::SearchCategory,
-    error::MetasearchError,
+    error::{MetasearchError, Result},
 };
 
 const PAGE_SIZE: u32 = 10;
 
 pub struct DockerHub {
+    metadata: EngineMetadata,
     client: Client,
 }
 
 impl DockerHub {
     pub fn new(client: Client) -> Self {
-        Self { client }
+        Self {
+            metadata: EngineMetadata {
+                name: "docker_hub".to_string(),
+                display_name: "Docker Hub".to_string(),
+                homepage: "https://hub.docker.com".to_string(),
+                categories: vec![SearchCategory::IT],
+                enabled: true,
+                timeout_ms: 3000,
+                weight: 1.0,
+            },
+            client,
+        }
     }
 }
 
 #[async_trait]
 impl SearchEngine for DockerHub {
-    fn metadata(&self) -> EngineMetadata {
-        EngineMetadata {
-            name: "docker_hub".to_string(),
-            display_name: "Docker Hub".to_string(),
-            categories: vec![SearchCategory::IT],
-            enabled: true,
-            weight: 1.0,
-        }
+    fn metadata(&self) -> &EngineMetadata {
+        &self.metadata
     }
 
-    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
-        let page = query.page.unwrap_or(1);
-        let from = PAGE_SIZE * (page as u32 - 1);
+    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>> {
+        let page = query.page;
+        let from = PAGE_SIZE * page.saturating_sub(1);
 
         let url = format!(
             "https://hub.docker.com/api/search/v3/catalog/search?query={}&from={}&size={}",
@@ -77,8 +83,8 @@ impl SearchEngine for DockerHub {
                     snippet,
                     "docker_hub".to_string(),
                 );
-                result.engine_rank = Some(i + 1);
-                result.category = Some(SearchCategory::IT);
+                result.engine_rank = (i + 1) as u32;
+                result.category = "it".to_string();
                 results.push(result);
             }
         }

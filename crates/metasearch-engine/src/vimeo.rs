@@ -11,16 +11,28 @@ use metasearch_core::{
     result::SearchResult,
     query::SearchQuery,
     category::SearchCategory,
-    error::MetasearchError,
+    error::{MetasearchError, Result},
 };
 
 pub struct Vimeo {
+    metadata: EngineMetadata,
     client: Client,
 }
 
 impl Vimeo {
     pub fn new(client: Client) -> Self {
-        Self { client }
+        Self {
+            metadata: EngineMetadata {
+                name: "vimeo".to_string(),
+                display_name: "Vimeo".to_string(),
+                homepage: "https://vimeo.com".to_string(),
+                categories: vec![SearchCategory::Videos],
+                enabled: true,
+                timeout_ms: 3000,
+                weight: 1.0,
+            },
+            client,
+        }
     }
 }
 
@@ -34,18 +46,12 @@ fn extract_between<'a>(text: &'a str, start: &str, end: &str) -> Option<&'a str>
 
 #[async_trait]
 impl SearchEngine for Vimeo {
-    fn metadata(&self) -> EngineMetadata {
-        EngineMetadata {
-            name: "vimeo".to_string(),
-            display_name: "Vimeo".to_string(),
-            categories: vec![SearchCategory::Videos],
-            enabled: true,
-            weight: 1.0,
-        }
+    fn metadata(&self) -> &EngineMetadata {
+        &self.metadata
     }
 
-    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
-        let page = query.page.unwrap_or(1);
+    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>> {
+        let page = query.page;
 
         let url = format!(
             "https://vimeo.com/search/page:{}?q={}",
@@ -114,8 +120,8 @@ impl SearchEngine for Vimeo {
                     snippet,
                     "vimeo".to_string(),
                 );
-                sr.engine_rank = Some(i + 1);
-                sr.category = Some(SearchCategory::Videos);
+                sr.engine_rank = (i + 1) as u32;
+                sr.category = "videos".to_string();
                 sr.thumbnail = thumbnail;
                 results.push(sr);
             }

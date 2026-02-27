@@ -12,10 +12,11 @@ use metasearch_core::{
     result::SearchResult,
     query::SearchQuery,
     category::SearchCategory,
-    error::MetasearchError,
+    error::{MetasearchError, Result},
 };
 
 pub struct Spotify {
+    metadata: EngineMetadata,
     client: Client,
     client_id: Option<String>,
     client_secret: Option<String>,
@@ -24,6 +25,15 @@ pub struct Spotify {
 impl Spotify {
     pub fn new(client: Client) -> Self {
         Self {
+            metadata: EngineMetadata {
+            name: "spotify".to_string(),
+            display_name: "Spotify".to_string(),
+            homepage: "https://www.spotify.com".to_string(),
+            categories: vec![SearchCategory::Music],
+            enabled: false,
+            timeout_ms: 3000, // Disabled by default — needs API credentials
+            weight: 1.0,
+        },
             client,
             client_id: None,
             client_secret: None,
@@ -32,13 +42,22 @@ impl Spotify {
 
     pub fn with_credentials(client: Client, client_id: String, client_secret: String) -> Self {
         Self {
+            metadata: EngineMetadata {
+            name: "spotify".to_string(),
+            display_name: "Spotify".to_string(),
+            homepage: "https://www.spotify.com".to_string(),
+            categories: vec![SearchCategory::Music],
+            enabled: false,
+            timeout_ms: 3000, // Disabled by default — needs API credentials
+            weight: 1.0,
+        },
             client,
             client_id: Some(client_id),
             client_secret: Some(client_secret),
         }
     }
 
-    async fn get_access_token(&self) -> Result<String, MetasearchError> {
+    async fn get_access_token(&self) -> Result<String> {
         let cid = self.client_id.as_deref().unwrap_or("");
         let csecret = self.client_secret.as_deref().unwrap_or("");
 
@@ -65,26 +84,20 @@ impl Spotify {
 
         data["access_token"].as_str()
             .map(|s| s.to_string())
-            .ok_or_else(|| MetasearchError::EngineError("Failed to get Spotify access token".to_string()))
+            .ok_or_else(|| MetasearchError::EngineError { engine: "spotify".to_string(), message: "Failed to get Spotify access token".to_string() })
     }
 }
 
 #[async_trait]
 impl SearchEngine for Spotify {
-    fn metadata(&self) -> EngineMetadata {
-        EngineMetadata {
-            name: "spotify".to_string(),
-            display_name: "Spotify".to_string(),
-            categories: vec![SearchCategory::Music],
-            enabled: false, // Disabled by default — needs API credentials
-            weight: 1.0,
-        }
+    fn metadata(&self) -> &EngineMetadata {
+        &self.metadata
     }
 
-    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
+    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>> {
         let token = self.get_access_token().await?;
-        let page = query.page.unwrap_or(1);
-        let offset = (page as u32 - 1) * 20;
+        let page = query.page;
+        let offset = page.saturating_sub(1) * 20;
 
         let url = format!(
             "https://api.spotify.com/v1/search?q={}&type=track&offset={}",
@@ -129,8 +142,8 @@ impl SearchEngine for Spotify {
                     snippet,
                     "spotify".to_string(),
                 );
-                result.engine_rank = Some(i + 1);
-                result.category = Some(SearchCategory::Music);
+                result.engine_rank = (i + 1) as u32;
+                result.category = "music".to_string();
                 result.thumbnail = item["album"]["images"].as_array()
                     .and_then(|imgs| imgs.first())
                     .and_then(|img| img["url"].as_str())

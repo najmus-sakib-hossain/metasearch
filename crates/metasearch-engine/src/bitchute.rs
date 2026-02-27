@@ -11,19 +11,31 @@ use serde_json::json;
 use metasearch_core::engine::{EngineMetadata, SearchEngine};
 use metasearch_core::query::SearchQuery;
 use metasearch_core::result::SearchResult;
-use metasearch_core::error::MetasearchError;
+use metasearch_core::error::{MetasearchError, Result};
 use metasearch_core::category::SearchCategory;
 
 const API_URL: &str = "https://api.bitchute.com/api/beta/search/videos";
 const RESULTS_PER_PAGE: u32 = 20;
 
 pub struct BitChute {
+    metadata: EngineMetadata,
     client: Client,
 }
 
 impl BitChute {
     pub fn new(client: Client) -> Self {
-        Self { client }
+        Self {
+            metadata: EngineMetadata {
+                name: "bitchute".to_string(),
+                display_name: "BitChute".to_string(),
+                homepage: "https://www.bitchute.com".to_string(),
+                categories: vec![SearchCategory::Videos],
+                enabled: true,
+                timeout_ms: 3000,
+                weight: 1.0,
+            },
+            client,
+        }
     }
 }
 
@@ -48,18 +60,12 @@ struct ChannelInfo {
 
 #[async_trait]
 impl SearchEngine for BitChute {
-    fn metadata(&self) -> EngineMetadata {
-        EngineMetadata {
-            name: "BitChute".to_string(),
-            base_url: "https://www.bitchute.com".to_string(),
-            categories: vec![SearchCategory::Videos],
-            enabled: true,
-        }
+    fn metadata(&self) -> &EngineMetadata {
+        &self.metadata
     }
 
-    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
-        let page = query.page.unwrap_or(1);
-        let offset = (page.saturating_sub(1) as u32) * RESULTS_PER_PAGE;
+    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>> {
+        let offset = query.page.saturating_sub(1) * RESULTS_PER_PAGE;
 
         let body = json!({
             "query": query.query,
@@ -76,10 +82,10 @@ impl SearchEngine for BitChute {
             .json(&body)
             .send()
             .await
-            .map_err(|e| MetasearchError::Request(e.to_string()))?
+            .map_err(|e| MetasearchError::HttpError(e.to_string()))?
             .json::<ApiResponse>()
             .await
-            .map_err(|e| MetasearchError::Parse(e.to_string()))?;
+            .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
 
         let mut results = Vec::new();
 
@@ -109,13 +115,7 @@ impl SearchEngine for BitChute {
                 }
             }
 
-            results.push(SearchResult {
-                title,
-                url: video_url,
-                content,
-                engine: "BitChute".to_string(),
-                score: 1.0,
-            });
+            results.push(SearchResult::new(title, video_url, content, "bitchute".to_string()));
         }
 
         Ok(results)

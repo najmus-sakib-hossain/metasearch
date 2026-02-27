@@ -8,10 +8,11 @@ use metasearch_core::{
     result::SearchResult,
     query::SearchQuery,
     category::SearchCategory,
-    error::MetasearchError,
+    error::{MetasearchError, Result},
 };
 
 pub struct Mastodon {
+    metadata: EngineMetadata,
     client: Client,
     base_url: String,
 }
@@ -19,6 +20,15 @@ pub struct Mastodon {
 impl Mastodon {
     pub fn new(client: Client) -> Self {
         Self {
+            metadata: EngineMetadata {
+            name: "mastodon".to_string(),
+            display_name: "Mastodon".to_string(),
+            homepage: "https://mastodon.social".to_string(),
+            categories: vec![SearchCategory::SocialMedia],
+            enabled: true,
+            timeout_ms: 3000,
+            weight: 0.8,
+        },
             client,
             base_url: "https://mastodon.social".to_string(),
         }
@@ -26,6 +36,15 @@ impl Mastodon {
 
     pub fn with_base_url(client: Client, base_url: &str) -> Self {
         Self {
+            metadata: EngineMetadata {
+            name: "mastodon".to_string(),
+            display_name: "Mastodon".to_string(),
+            homepage: "https://mastodon.social".to_string(),
+            categories: vec![SearchCategory::SocialMedia],
+            enabled: true,
+            timeout_ms: 3000,
+            weight: 0.8,
+        },
             client,
             base_url: base_url.to_string(),
         }
@@ -34,17 +53,11 @@ impl Mastodon {
 
 #[async_trait]
 impl SearchEngine for Mastodon {
-    fn metadata(&self) -> EngineMetadata {
-        EngineMetadata {
-            name: "mastodon".to_string(),
-            display_name: "Mastodon".to_string(),
-            categories: vec![SearchCategory::SocialMedia],
-            enabled: true,
-            weight: 0.8,
-        }
+    fn metadata(&self) -> &EngineMetadata {
+        &self.metadata
     }
 
-    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
+    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>> {
         let url = format!(
             "{}/api/v2/search?q={}&resolve=false&type=accounts&limit=40",
             self.base_url,
@@ -83,8 +96,8 @@ impl SearchEngine for Mastodon {
                     clean_note.trim().to_string(),
                     "mastodon".to_string(),
                 );
-                result.engine_rank = Some(i + 1);
-                result.category = Some(SearchCategory::SocialMedia);
+                result.engine_rank = (i + 1) as u32;
+                result.category = "social media".to_string();
                 result.thumbnail = account["avatar"].as_str().map(|s| s.to_string());
                 results.push(result);
             }
@@ -110,8 +123,8 @@ impl SearchEngine for Mastodon {
                     snippet,
                     "mastodon".to_string(),
                 );
-                result.engine_rank = Some(results.len() + i + 1);
-                result.category = Some(SearchCategory::SocialMedia);
+                result.engine_rank = results.len() as u32 + i as u32 + 1;
+                result.category = "social media".to_string();
                 results.push(result);
             }
         }

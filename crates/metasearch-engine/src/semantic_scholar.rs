@@ -12,36 +12,42 @@ use metasearch_core::{
     result::SearchResult,
     query::SearchQuery,
     category::SearchCategory,
-    error::MetasearchError,
+    error::{MetasearchError, Result},
 };
 
 const SEARCH_URL: &str = "https://www.semanticscholar.org/api/1/search";
 const BASE_URL: &str = "https://www.semanticscholar.org";
 
 pub struct SemanticScholar {
+    metadata: EngineMetadata,
     client: Client,
 }
 
 impl SemanticScholar {
     pub fn new(client: Client) -> Self {
-        Self { client }
+        Self {
+            metadata: EngineMetadata {
+                name: "semantic_scholar".to_string(),
+                display_name: "Semantic Scholar".to_string(),
+                homepage: "https://www.semanticscholar.org".to_string(),
+                categories: vec![SearchCategory::Science],
+                enabled: true,
+                timeout_ms: 3000,
+                weight: 1.2,
+            },
+            client,
+        }
     }
 }
 
 #[async_trait]
 impl SearchEngine for SemanticScholar {
-    fn metadata(&self) -> EngineMetadata {
-        EngineMetadata {
-            name: "semantic_scholar".to_string(),
-            display_name: "Semantic Scholar".to_string(),
-            categories: vec![SearchCategory::Science],
-            enabled: true,
-            weight: 1.2,
-        }
+    fn metadata(&self) -> &EngineMetadata {
+        &self.metadata
     }
 
-    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
-        let page = query.page.unwrap_or(1);
+    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>> {
+        let page = query.page;
 
         // Build the POST JSON body — mirrors the Python implementation
         let body = serde_json::json!({
@@ -175,8 +181,8 @@ impl SearchEngine for SemanticScholar {
                     snippet,
                     "semantic_scholar".to_string(),
                 );
-                sr.engine_rank = Some(i + 1);
-                sr.category = Some(SearchCategory::Science);
+                sr.engine_rank = (i + 1) as u32;
+                sr.category = "science".to_string();
                 results.push(sr);
             }
         }

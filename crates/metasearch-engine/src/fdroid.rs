@@ -9,33 +9,39 @@ use metasearch_core::{
     result::SearchResult,
     query::SearchQuery,
     category::SearchCategory,
-    error::MetasearchError,
+    error::{MetasearchError, Result},
 };
 
 pub struct Fdroid {
+    metadata: EngineMetadata,
     client: Client,
 }
 
 impl Fdroid {
     pub fn new(client: Client) -> Self {
-        Self { client }
+        Self {
+            metadata: EngineMetadata {
+                name: "fdroid".to_string(),
+                display_name: "F-Droid".to_string(),
+                homepage: "https://f-droid.org".to_string(),
+                categories: vec![SearchCategory::Files],
+                enabled: true,
+                timeout_ms: 3000,
+                weight: 0.7,
+            },
+            client,
+        }
     }
 }
 
 #[async_trait]
 impl SearchEngine for Fdroid {
-    fn metadata(&self) -> EngineMetadata {
-        EngineMetadata {
-            name: "fdroid".to_string(),
-            display_name: "F-Droid".to_string(),
-            categories: vec![SearchCategory::Files],
-            enabled: true,
-            weight: 0.7,
-        }
+    fn metadata(&self) -> &EngineMetadata {
+        &self.metadata
     }
 
-    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
-        let page = query.page.unwrap_or(1);
+    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>> {
+        let page = query.page;
         let url = format!(
             "https://search.f-droid.org/?q={}&page={}&lang=",
             urlencoding::encode(&query.query),
@@ -91,8 +97,8 @@ impl SearchEngine for Fdroid {
                 snippet.trim().to_string(),
                 "fdroid".to_string(),
             );
-            result.engine_rank = Some(i + 1);
-            result.category = Some(SearchCategory::Files);
+            result.engine_rank = (i + 1) as u32;
+            result.category = "files".to_string();
             result.thumbnail = thumbnail;
             results.push(result);
         }

@@ -9,33 +9,39 @@ use metasearch_core::{
     result::SearchResult,
     query::SearchQuery,
     category::SearchCategory,
-    error::MetasearchError,
+    error::{MetasearchError, Result},
 };
 
 pub struct Kickass {
+    metadata: EngineMetadata,
     client: Client,
 }
 
 impl Kickass {
     pub fn new(client: Client) -> Self {
-        Self { client }
+        Self {
+            metadata: EngineMetadata {
+                name: "kickass".to_string(),
+                display_name: "Kickass Torrents".to_string(),
+                homepage: "https://kickassanime.am".to_string(),
+                categories: vec![SearchCategory::Files],
+                enabled: true,
+                timeout_ms: 3000,
+                weight: 0.6,
+            },
+            client,
+        }
     }
 }
 
 #[async_trait]
 impl SearchEngine for Kickass {
-    fn metadata(&self) -> EngineMetadata {
-        EngineMetadata {
-            name: "kickass".to_string(),
-            display_name: "Kickass Torrents".to_string(),
-            categories: vec![SearchCategory::Files],
-            enabled: true,
-            weight: 0.6,
-        }
+    fn metadata(&self) -> &EngineMetadata {
+        &self.metadata
     }
 
-    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
-        let page = query.page.unwrap_or(1);
+    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>> {
+        let page = query.page;
         let base = "https://kickasstorrents.to";
 
         let url = format!(
@@ -102,8 +108,8 @@ impl SearchEngine for Kickass {
                 snippet,
                 "kickass".to_string(),
             );
-            result.engine_rank = Some(i + 1);
-            result.category = Some(SearchCategory::Files);
+            result.engine_rank = (i + 1) as u32;
+            result.category = "files".to_string();
             results.push(result);
         }
 

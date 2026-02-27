@@ -12,39 +12,54 @@ use metasearch_core::{
     result::SearchResult,
     query::SearchQuery,
     category::SearchCategory,
-    error::MetasearchError,
+    error::{MetasearchError, Result},
 };
 
 const RESULTS_PER_PAGE: u32 = 10;
 
 pub struct SoundCloud {
+    metadata: EngineMetadata,
     client: Client,
     client_id: Option<String>,
 }
 
 impl SoundCloud {
     pub fn new(client: Client) -> Self {
-        Self { client, client_id: None }
+        Self {
+            metadata: EngineMetadata {
+            name: "soundcloud".to_string(),
+            display_name: "SoundCloud".to_string(),
+            homepage: "https://soundcloud.com".to_string(),
+            categories: vec![SearchCategory::Music],
+            enabled: true,
+            timeout_ms: 3000,
+            weight: 1.0,
+        },
+             client, client_id: None }
     }
 
     pub fn with_client_id(client: Client, client_id: String) -> Self {
-        Self { client, client_id: Some(client_id) }
+        Self {
+            metadata: EngineMetadata {
+            name: "soundcloud".to_string(),
+            display_name: "SoundCloud".to_string(),
+            homepage: "https://soundcloud.com".to_string(),
+            categories: vec![SearchCategory::Music],
+            enabled: true,
+            timeout_ms: 3000,
+            weight: 1.0,
+        },
+             client, client_id: Some(client_id) }
     }
 }
 
 #[async_trait]
 impl SearchEngine for SoundCloud {
-    fn metadata(&self) -> EngineMetadata {
-        EngineMetadata {
-            name: "soundcloud".to_string(),
-            display_name: "SoundCloud".to_string(),
-            categories: vec![SearchCategory::Music],
-            enabled: true,
-            weight: 1.0,
-        }
+    fn metadata(&self) -> &EngineMetadata {
+        &self.metadata
     }
 
-    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
+    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>> {
         // If no client_id, try to discover one from soundcloud.com HTML
         let cid = match &self.client_id {
             Some(id) => id.clone(),
@@ -54,8 +69,8 @@ impl SearchEngine for SoundCloud {
             }
         };
 
-        let page = query.page.unwrap_or(1);
-        let offset = (page as u32 - 1) * RESULTS_PER_PAGE;
+        let page = query.page;
+        let offset = page.saturating_sub(1) * RESULTS_PER_PAGE;
 
         let url = format!(
             "https://api-v2.soundcloud.com/search?q={}&offset={}&limit={}&facet=model&client_id={}",
@@ -111,8 +126,8 @@ impl SearchEngine for SoundCloud {
                     snippet,
                     "soundcloud".to_string(),
                 );
-                result.engine_rank = Some(i + 1);
-                result.category = Some(SearchCategory::Music);
+                result.engine_rank = (i + 1) as u32;
+                result.category = "music".to_string();
                 result.thumbnail = item["artwork_url"].as_str()
                     .or_else(|| item["user"]["avatar_url"].as_str())
                     .map(|s| s.to_string());
