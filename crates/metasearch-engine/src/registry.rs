@@ -64,19 +64,18 @@ use crate::{
     acfun::AcFun,
     ansa::Ansa,
     bitchute::BitChute,
-    emojipedia::Emojipedia,
-    findthatmeme::FindThatMeme,
-    // Batch 7 (orphan fix)
     bpb::Bpb,
     chefkoch::Chefkoch,
+    emojipedia::Emojipedia,
+    findthatmeme::FindThatMeme,
     fyyd::Fyyd,
     mixcloud::Mixcloud,
-    // Batch 8
-    imgur::Imgur,
-    lib_rs::LibRs,
-    kickass::Kickass,
+    // Batch 7
+    bt4g::Bt4g,
+    btdigg::Btdigg,
+    cachy_os::CachyOs,
     ccc_media::CccMedia,
-    deviantart::DeviantArt,
+    destatis::Destatis,
 };
 
 /// Central registry of all search engines.
@@ -162,21 +161,19 @@ impl EngineRegistry {
         registry.register(Arc::new(AcFun::new(client.clone())));
         registry.register(Arc::new(Ansa::new(client.clone())));
         registry.register(Arc::new(BitChute::new(client.clone())));
-        registry.register(Arc::new(Emojipedia::new(client.clone())));
-        registry.register(Arc::new(FindThatMeme::new(client.clone())));
-
-        // ── Batch 7: Orphan fix ───────────────────────────
         registry.register(Arc::new(Bpb::new(client.clone())));
         registry.register(Arc::new(Chefkoch::new(client.clone())));
+        registry.register(Arc::new(Emojipedia::new(client.clone())));
+        registry.register(Arc::new(FindThatMeme::new(client.clone())));
         registry.register(Arc::new(Fyyd::new(client.clone())));
         registry.register(Arc::new(Mixcloud::new(client.clone())));
 
-        // ── Batch 8: More SearXNG translations ────────────
-        registry.register(Arc::new(Imgur::new(client.clone())));
-        registry.register(Arc::new(LibRs::new(client.clone())));
-        registry.register(Arc::new(Kickass::new(client.clone())));
+        // ── Batch 7: More SearXNG translations ────────────
+        registry.register(Arc::new(Bt4g::new(client.clone())));
+        registry.register(Arc::new(Btdigg::new(client.clone())));
+        registry.register(Arc::new(CachyOs::new(client.clone())));
         registry.register(Arc::new(CccMedia::new(client.clone())));
-        registry.register(Arc::new(DeviantArt::new(client.clone())));
+        registry.register(Arc::new(Destatis::new(client.clone())));
 
         registry
     }
