@@ -21,14 +21,14 @@ impl HuggingFace {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-            name: "huggingface".to_string(),
-            display_name: "Hugging Face".to_string(),
-            homepage: "https://huggingface.co".to_string(),
-            categories: vec![SearchCategory::IT],
-            enabled: true,
-            timeout_ms: 3000,
-            weight: 1.0,
-        },
+                name: "huggingface".to_string(),
+                display_name: "Hugging Face".to_string(),
+                homepage: "https://huggingface.co".to_string(),
+                categories: vec![SearchCategory::IT],
+                enabled: true,
+                timeout_ms: 3000,
+                weight: 1.0,
+            },
             client,
             endpoint: "models".to_string(),
         }
@@ -37,14 +37,14 @@ impl HuggingFace {
     pub fn with_endpoint(client: Client, endpoint: &str) -> Self {
         Self {
             metadata: EngineMetadata {
-            name: "huggingface".to_string(),
-            display_name: "Hugging Face".to_string(),
-            homepage: "https://huggingface.co".to_string(),
-            categories: vec![SearchCategory::IT],
-            enabled: true,
-            timeout_ms: 3000,
-            weight: 1.0,
-        },
+                name: "huggingface".to_string(),
+                display_name: "Hugging Face".to_string(),
+                homepage: "https://huggingface.co".to_string(),
+                categories: vec![SearchCategory::IT],
+                enabled: true,
+                timeout_ms: 3000,
+                weight: 1.0,
+            },
             client,
             endpoint: endpoint.to_string(),
         }

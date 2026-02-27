@@ -22,14 +22,14 @@ impl Ebay {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-            name: "ebay".to_string(),
-            display_name: "eBay".to_string(),
-            homepage: "https://www.ebay.com".to_string(),
-            categories: vec![SearchCategory::General],
-            enabled: true,
-            timeout_ms: 3000,
-            weight: 0.8,
-        },
+                name: "ebay".to_string(),
+                display_name: "eBay".to_string(),
+                homepage: "https://www.ebay.com".to_string(),
+                categories: vec![SearchCategory::General],
+                enabled: true,
+                timeout_ms: 3000,
+                weight: 0.8,
+            },
             client,
             base_url: "https://www.ebay.com".to_string(),
         }
@@ -38,14 +38,14 @@ impl Ebay {
     pub fn with_base_url(client: Client, base_url: &str) -> Self {
         Self {
             metadata: EngineMetadata {
-            name: "ebay".to_string(),
-            display_name: "eBay".to_string(),
-            homepage: "https://www.ebay.com".to_string(),
-            categories: vec![SearchCategory::General],
-            enabled: true,
-            timeout_ms: 3000,
-            weight: 0.8,
-        },
+                name: "ebay".to_string(),
+                display_name: "eBay".to_string(),
+                homepage: "https://www.ebay.com".to_string(),
+                categories: vec![SearchCategory::General],
+                enabled: true,
+                timeout_ms: 3000,
+                weight: 0.8,
+            },
             client,
             base_url: base_url.to_string(),
         }

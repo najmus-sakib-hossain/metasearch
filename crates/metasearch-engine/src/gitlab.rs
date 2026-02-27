@@ -23,14 +23,14 @@ impl GitLab {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-            name: "gitlab".to_string(),
-            display_name: "GitLab".to_string(),
-            homepage: "https://gitlab.com".to_string(),
-            categories: vec![SearchCategory::IT],
-            enabled: true,
-            timeout_ms: 3000,
-            weight: 0.8,
-        },
+                name: "gitlab".to_string(),
+                display_name: "GitLab".to_string(),
+                homepage: "https://gitlab.com".to_string(),
+                categories: vec![SearchCategory::IT],
+                enabled: true,
+                timeout_ms: 3000,
+                weight: 0.8,
+            },
             client,
             base_url: "https://gitlab.com".to_string(),
         }
@@ -39,14 +39,14 @@ impl GitLab {
     pub fn with_base_url(client: Client, base_url: &str) -> Self {
         Self {
             metadata: EngineMetadata {
-            name: "gitlab".to_string(),
-            display_name: "GitLab".to_string(),
-            homepage: "https://gitlab.com".to_string(),
-            categories: vec![SearchCategory::IT],
-            enabled: true,
-            timeout_ms: 3000,
-            weight: 0.8,
-        },
+                name: "gitlab".to_string(),
+                display_name: "GitLab".to_string(),
+                homepage: "https://gitlab.com".to_string(),
+                categories: vec![SearchCategory::IT],
+                enabled: true,
+                timeout_ms: 3000,
+                weight: 0.8,
+            },
             client,
             base_url: base_url.to_string(),
         }

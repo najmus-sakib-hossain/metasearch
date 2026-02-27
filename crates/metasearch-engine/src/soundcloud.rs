@@ -27,29 +27,33 @@ impl SoundCloud {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-            name: "soundcloud".to_string(),
-            display_name: "SoundCloud".to_string(),
-            homepage: "https://soundcloud.com".to_string(),
-            categories: vec![SearchCategory::Music],
-            enabled: true,
-            timeout_ms: 3000,
-            weight: 1.0,
-        },
-             client, client_id: None }
+                name: "soundcloud".to_string(),
+                display_name: "SoundCloud".to_string(),
+                homepage: "https://soundcloud.com".to_string(),
+                categories: vec![SearchCategory::Music],
+                enabled: true,
+                timeout_ms: 3000,
+                weight: 1.0,
+            },
+            client,
+            client_id: None,
+        }
     }
 
     pub fn with_client_id(client: Client, client_id: String) -> Self {
         Self {
             metadata: EngineMetadata {
-            name: "soundcloud".to_string(),
-            display_name: "SoundCloud".to_string(),
-            homepage: "https://soundcloud.com".to_string(),
-            categories: vec![SearchCategory::Music],
-            enabled: true,
-            timeout_ms: 3000,
-            weight: 1.0,
-        },
-             client, client_id: Some(client_id) }
+                name: "soundcloud".to_string(),
+                display_name: "SoundCloud".to_string(),
+                homepage: "https://soundcloud.com".to_string(),
+                categories: vec![SearchCategory::Music],
+                enabled: true,
+                timeout_ms: 3000,
+                weight: 1.0,
+            },
+            client,
+            client_id: Some(client_id),
+        }
     }
 }
 

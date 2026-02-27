@@ -21,14 +21,14 @@ impl Mastodon {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-            name: "mastodon".to_string(),
-            display_name: "Mastodon".to_string(),
-            homepage: "https://mastodon.social".to_string(),
-            categories: vec![SearchCategory::SocialMedia],
-            enabled: true,
-            timeout_ms: 3000,
-            weight: 0.8,
-        },
+                name: "mastodon".to_string(),
+                display_name: "Mastodon".to_string(),
+                homepage: "https://mastodon.social".to_string(),
+                categories: vec![SearchCategory::SocialMedia],
+                enabled: true,
+                timeout_ms: 3000,
+                weight: 0.8,
+            },
             client,
             base_url: "https://mastodon.social".to_string(),
         }
@@ -37,14 +37,14 @@ impl Mastodon {
     pub fn with_base_url(client: Client, base_url: &str) -> Self {
         Self {
             metadata: EngineMetadata {
-            name: "mastodon".to_string(),
-            display_name: "Mastodon".to_string(),
-            homepage: "https://mastodon.social".to_string(),
-            categories: vec![SearchCategory::SocialMedia],
-            enabled: true,
-            timeout_ms: 3000,
-            weight: 0.8,
-        },
+                name: "mastodon".to_string(),
+                display_name: "Mastodon".to_string(),
+                homepage: "https://mastodon.social".to_string(),
+                categories: vec![SearchCategory::SocialMedia],
+                enabled: true,
+                timeout_ms: 3000,
+                weight: 0.8,
+            },
             client,
             base_url: base_url.to_string(),
         }

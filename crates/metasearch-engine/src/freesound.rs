@@ -24,14 +24,14 @@ impl Freesound {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-            name: "freesound".to_string(),
-            display_name: "Freesound".to_string(),
-            homepage: "https://freesound.org".to_string(),
-            categories: vec![SearchCategory::Music],
-            enabled: false,
-            timeout_ms: 3000, // Disabled by default — needs API key
-            weight: 0.8,
-        },
+                name: "freesound".to_string(),
+                display_name: "Freesound".to_string(),
+                homepage: "https://freesound.org".to_string(),
+                categories: vec![SearchCategory::Music],
+                enabled: false,
+                timeout_ms: 3000, // Disabled by default — needs API key
+                weight: 0.8,
+            },
             client,
             api_key: None,
         }
@@ -40,14 +40,14 @@ impl Freesound {
     pub fn with_api_key(client: Client, api_key: String) -> Self {
         Self {
             metadata: EngineMetadata {
-            name: "freesound".to_string(),
-            display_name: "Freesound".to_string(),
-            homepage: "https://freesound.org".to_string(),
-            categories: vec![SearchCategory::Music],
-            enabled: false,
-            timeout_ms: 3000, // Disabled by default — needs API key
-            weight: 0.8,
-        },
+                name: "freesound".to_string(),
+                display_name: "Freesound".to_string(),
+                homepage: "https://freesound.org".to_string(),
+                categories: vec![SearchCategory::Music],
+                enabled: false,
+                timeout_ms: 3000, // Disabled by default — needs API key
+                weight: 0.8,
+            },
             client,
             api_key: Some(api_key),
         }

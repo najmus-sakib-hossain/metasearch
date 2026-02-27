@@ -25,14 +25,14 @@ impl StackExchange {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-            name: "stackexchange".to_string(),
-            display_name: "StackExchange".to_string(),
-            homepage: "https://stackexchange.com".to_string(),
-            categories: vec![SearchCategory::IT],
-            enabled: true,
-            timeout_ms: 3000,
-            weight: 1.2,
-        },
+                name: "stackexchange".to_string(),
+                display_name: "StackExchange".to_string(),
+                homepage: "https://stackexchange.com".to_string(),
+                categories: vec![SearchCategory::IT],
+                enabled: true,
+                timeout_ms: 3000,
+                weight: 1.2,
+            },
             client,
             api_site: "stackoverflow".to_string(),
         }
@@ -41,14 +41,14 @@ impl StackExchange {
     pub fn with_site(client: Client, site: &str) -> Self {
         Self {
             metadata: EngineMetadata {
-            name: "stackexchange".to_string(),
-            display_name: "StackExchange".to_string(),
-            homepage: "https://stackexchange.com".to_string(),
-            categories: vec![SearchCategory::IT],
-            enabled: true,
-            timeout_ms: 3000,
-            weight: 1.2,
-        },
+                name: "stackexchange".to_string(),
+                display_name: "StackExchange".to_string(),
+                homepage: "https://stackexchange.com".to_string(),
+                categories: vec![SearchCategory::IT],
+                enabled: true,
+                timeout_ms: 3000,
+                weight: 1.2,
+            },
             client,
             api_site: site.to_string(),
         }

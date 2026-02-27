@@ -26,14 +26,14 @@ impl Spotify {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-            name: "spotify".to_string(),
-            display_name: "Spotify".to_string(),
-            homepage: "https://www.spotify.com".to_string(),
-            categories: vec![SearchCategory::Music],
-            enabled: false,
-            timeout_ms: 3000, // Disabled by default — needs API credentials
-            weight: 1.0,
-        },
+                name: "spotify".to_string(),
+                display_name: "Spotify".to_string(),
+                homepage: "https://www.spotify.com".to_string(),
+                categories: vec![SearchCategory::Music],
+                enabled: false,
+                timeout_ms: 3000, // Disabled by default — needs API credentials
+                weight: 1.0,
+            },
             client,
             client_id: None,
             client_secret: None,
@@ -43,14 +43,14 @@ impl Spotify {
     pub fn with_credentials(client: Client, client_id: String, client_secret: String) -> Self {
         Self {
             metadata: EngineMetadata {
-            name: "spotify".to_string(),
-            display_name: "Spotify".to_string(),
-            homepage: "https://www.spotify.com".to_string(),
-            categories: vec![SearchCategory::Music],
-            enabled: false,
-            timeout_ms: 3000, // Disabled by default — needs API credentials
-            weight: 1.0,
-        },
+                name: "spotify".to_string(),
+                display_name: "Spotify".to_string(),
+                homepage: "https://www.spotify.com".to_string(),
+                categories: vec![SearchCategory::Music],
+                enabled: false,
+                timeout_ms: 3000, // Disabled by default — needs API credentials
+                weight: 1.0,
+            },
             client,
             client_id: Some(client_id),
             client_secret: Some(client_secret),
