@@ -1,0 +1,187 @@
+/* Metasearch — Minimal, clean design */
+
+:root {
+    --bg: #1a1a2e;
+    --surface: #16213e;
+    --primary: #0f3460;
+    --accent: #e94560;
+    --text: #eee;
+    --text-muted: #aaa;
+    --link: #53a8b6;
+    --radius: 8px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 600px;
+    margin: 15vh auto;
+    text-align: center;
+    padding: 0 1rem;
+}
+
+h1 {
+    font-size: 3rem;
+    margin-bottom: 0.25rem;
+}
+
+.tagline {
+    color: var(--text-muted);
+    margin-bottom: 2rem;
+}
+
+.search-form {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.search-form input {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    border: 2px solid var(--primary);
+    border-radius: var(--radius);
+    background: var(--surface);
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.search-form input:focus {
+    border-color: var(--accent);
+}
+
+.search-form button {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.search-form button:hover {
+    opacity: 0.9;
+}
+
+.categories {
+    margin-top: 1.5rem;
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.categories a {
+    color: var(--link);
+    text-decoration: none;
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--radius);
+    transition: background 0.2s;
+}
+
+.categories a:hover {
+    background: var(--primary);
+}
+
+/* Results page */
+header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 2rem;
+    background: var(--surface);
+    border-bottom: 1px solid var(--primary);
+}
+
+.logo {
+    font-size: 1.5rem;
+    text-decoration: none;
+    color: var(--text);
+}
+
+.search-form-inline {
+    display: flex;
+    gap: 0.5rem;
+    flex: 1;
+    max-width: 500px;
+}
+
+.search-form-inline input {
+    flex: 1;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--primary);
+    border-radius: var(--radius);
+    background: var(--bg);
+    color: var(--text);
+    outline: none;
+}
+
+.search-form-inline button {
+    padding: 0.5rem 1rem;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+}
+
+main {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 1.5rem;
+}
+
+.results-info {
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    margin-bottom: 1.5rem;
+}
+
+.result {
+    margin-bottom: 1.5rem;
+}
+
+.result-title {
+    font-size: 1.125rem;
+    color: var(--link);
+    text-decoration: none;
+    display: block;
+}
+
+.result-title:hover {
+    text-decoration: underline;
+}
+
+.result-url {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    display: block;
+    margin: 0.1rem 0;
+}
+
+.result-snippet {
+    font-size: 0.9rem;
+    color: var(--text);
+}
+
+.result-engine {
+    font-size: 0.75rem;
+    color: var(--accent);
+    background: rgba(233, 69, 96, 0.1);
+    padding: 0.1rem 0.4rem;
+    border-radius: 4px;
+}

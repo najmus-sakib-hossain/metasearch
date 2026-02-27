@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> query  — Metasearch</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <header>
+        <a href="/" class="logo">🔍 Metasearch</a>
+        <form action="/search" method="get" class="search-form-inline">
+            <input type="text" name="q" value=" query ">
+            <button type="submit">Search</button>
+        </form>
+    </header>
+    <main>
+        <div class="results-info">
+             number_of_results  results in  search_time_ms ms
+            (engines:  engines_used | join(sep=", ") )
+        </div>
+        {% for result in results %}
+        <article class="result">
+            <a href=" result.url " class="result-title"> result.title </a>
+            <cite class="result-url"> result.url </cite>
+            <p class="result-snippet"> result.snippet </p>
+            <span class="result-engine"> result.engine </span>
+        </article>
+        {% endfor %}
+    </main>
+</body>
+</html>

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Metasearch</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Metasearch</h1>
+        <p class="tagline">Privacy-respecting metasearch, built in Rust.</p>
+        <form action="/search" method="get" class="search-form">
+            <input type="text" name="q" placeholder="Search the web..." autofocus>
+            <button type="submit">Search</button>
+        </form>
+        <div class="categories">
+            <a href="/search?categories=general">General</a>
+            <a href="/search?categories=images">Images</a>
+            <a href="/search?categories=news">News</a>
+            <a href="/search?categories=videos">Videos</a>
+            <a href="/search?categories=science">Science</a>
+        </div>
+    </div>
+</body>
+</html>
