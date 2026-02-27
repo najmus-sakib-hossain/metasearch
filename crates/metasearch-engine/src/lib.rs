@@ -26,9 +26,14 @@
 //! ## Batch 5 — More SearXNG translations (5):
 //! - 1337x, APKMirror, Arch Linux Wiki, ArtStation, F-Droid
 //!
-//! ## Batch 6 — More SearXNG translations (9):
-//! - AcFun, ANSA, BitChute, BPB, Chefkoch, Emojipedia,
-//!   FindThatMeme, Fyyd, Mixcloud
+//! ## Batch 6 — More SearXNG translations (5):
+//! - AcFun, ANSA, BitChute, Emojipedia, FindThatMeme
+//!
+//! ## Batch 7 — Orphan fix (4):
+//! - BPB, Chefkoch, Fyyd, Mixcloud
+//!
+//! ## Batch 8 — More SearXNG translations (5):
+//! - Imgur, lib.rs, Kickass Torrents, media.ccc.de, DeviantArt
 
 // Original engines
 pub mod google;
@@ -97,12 +102,21 @@ pub mod fdroid;
 pub mod acfun;
 pub mod ansa;
 pub mod bitchute;
-pub mod bpb;
-pub mod chefkoch;
 pub mod emojipedia;
 pub mod findthatmeme;
+
+// Batch 7 (orphan fix)
+pub mod bpb;
+pub mod chefkoch;
 pub mod fyyd;
 pub mod mixcloud;
+
+// Batch 8
+pub mod imgur;
+pub mod lib_rs;
+pub mod kickass;
+pub mod ccc_media;
+pub mod deviantart;
 
 pub mod registry;
 

@@ -64,12 +64,19 @@ use crate::{
     acfun::AcFun,
     ansa::Ansa,
     bitchute::BitChute,
-    bpb::Bpb,
-    chefkoch::Chefkoch,
     emojipedia::Emojipedia,
     findthatmeme::FindThatMeme,
+    // Batch 7 (orphan fix)
+    bpb::Bpb,
+    chefkoch::Chefkoch,
     fyyd::Fyyd,
     mixcloud::Mixcloud,
+    // Batch 8
+    imgur::Imgur,
+    lib_rs::LibRs,
+    kickass::Kickass,
+    ccc_media::CccMedia,
+    deviantart::DeviantArt,
 };
 
 /// Central registry of all search engines.
@@ -84,7 +91,7 @@ impl EngineRegistry {
         }
     }
 
-    /// Create a registry pre-loaded with all built-in engines (60 total).
+    /// Create a registry pre-loaded with all built-in engines (65 total).
     pub fn with_defaults(client: Client) -> Self {
         let mut registry = Self::new();
 
@@ -155,12 +162,21 @@ impl EngineRegistry {
         registry.register(Arc::new(AcFun::new(client.clone())));
         registry.register(Arc::new(Ansa::new(client.clone())));
         registry.register(Arc::new(BitChute::new(client.clone())));
-        registry.register(Arc::new(Bpb::new(client.clone())));
-        registry.register(Arc::new(Chefkoch::new(client.clone())));
         registry.register(Arc::new(Emojipedia::new(client.clone())));
         registry.register(Arc::new(FindThatMeme::new(client.clone())));
+
+        // ── Batch 7: Orphan fix ───────────────────────────
+        registry.register(Arc::new(Bpb::new(client.clone())));
+        registry.register(Arc::new(Chefkoch::new(client.clone())));
         registry.register(Arc::new(Fyyd::new(client.clone())));
         registry.register(Arc::new(Mixcloud::new(client.clone())));
+
+        // ── Batch 8: More SearXNG translations ────────────
+        registry.register(Arc::new(Imgur::new(client.clone())));
+        registry.register(Arc::new(LibRs::new(client.clone())));
+        registry.register(Arc::new(Kickass::new(client.clone())));
+        registry.register(Arc::new(CccMedia::new(client.clone())));
+        registry.register(Arc::new(DeviantArt::new(client.clone())));
 
         registry
     }
