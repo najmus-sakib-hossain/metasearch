@@ -1,0 +1,117 @@
+//! eBay engine — search product listings via HTML scraping.
+//! Translated from SearXNG `searx/engines/ebay.py`.
+
+use async_trait::async_trait;
+use reqwest::Client;
+use scraper::{Html, Selector};
+use metasearch_core::{
+    engine::{SearchEngine, EngineMetadata},
+    result::SearchResult,
+    query::SearchQuery,
+    category::SearchCategory,
+    error::MetasearchError,
+};
+
+pub struct Ebay {
+    client: Client,
+    base_url: String,
+}
+
+impl Ebay {
+    pub fn new(client: Client) -> Self {
+        Self {
+            client,
+            base_url: "https://www.ebay.com".to_string(),
+        }
+    }
+
+    pub fn with_base_url(client: Client, base_url: &str) -> Self {
+        Self {
+            client,
+            base_url: base_url.to_string(),
+        }
+    }
+}
+
+#[async_trait]
+impl SearchEngine for Ebay {
+    fn metadata(&self) -> EngineMetadata {
+        EngineMetadata {
+            name: "ebay".to_string(),
+            display_name: "eBay".to_string(),
+            categories: vec![SearchCategory::General],
+            enabled: true,
+            weight: 0.8,
+        }
+    }
+
+    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
+        let page = query.page.unwrap_or(1);
+        let url = format!(
+            "{}/sch/i.html?_nkw={}&_sacat={}",
+            self.base_url,
+            urlencoding::encode(&query.query),
+            page,
+        );
+
+        let resp = self.client
+            .get(&url)
+            .send()
+            .await
+            .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
+
+        let html_text = resp.text().await
+            .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
+
+        let document = Html::parse_document(&html_text);
+        let item_sel = Selector::parse("li.s-item").unwrap();
+        let link_sel = Selector::parse("a.s-item__link").unwrap();
+        let title_sel = Selector::parse("h3.s-item__title").unwrap();
+        let price_sel = Selector::parse("span.s-item__price").unwrap();
+        let thumb_sel = Selector::parse("img.s-item__image-img").unwrap();
+
+        let mut results = Vec::new();
+
+        for (i, item) in document.select(&item_sel).enumerate() {
+            let title = item.select(&title_sel).next()
+                .map(|e| e.text().collect::<String>())
+                .unwrap_or_default();
+
+            if title.is_empty() {
+                continue;
+            }
+
+            let item_url = item.select(&link_sel).next()
+                .and_then(|e| e.value().attr("href"))
+                .unwrap_or_default()
+                .to_string();
+
+            let price = item.select(&price_sel).next()
+                .map(|e| e.text().collect::<String>())
+                .unwrap_or_default();
+
+            let thumbnail = item.select(&thumb_sel).next()
+                .and_then(|e| e.value().attr("src"))
+                .map(|s| s.to_string());
+
+            let snippet = if price.is_empty() {
+                "eBay listing".to_string()
+            } else {
+                format!("Price: {}", price.trim())
+            };
+
+            let mut result = SearchResult::new(
+                title.trim().to_string(),
+                item_url,
+                snippet,
+                "ebay".to_string(),
+            );
+            result.engine_rank = Some(i + 1);
+            result.category = Some(SearchCategory::General);
+            result.thumbnail = thumbnail;
+            results.push(result);
+        }
+
+        Ok(results)
+    }
+}

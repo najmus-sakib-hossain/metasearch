@@ -22,6 +22,19 @@ use crate::{
     bilibili::Bilibili,
     artic::Artic,
     alpinelinux::AlpineLinux,
+    github_engine::GitHub,
+    hackernews::HackerNews,
+    docker_hub::DockerHub,
+    npm::Npm,
+    crates_io::CratesIo,
+    pypi::PyPI,
+    reddit::Reddit,
+    dailymotion::Dailymotion,
+    deezer::Deezer,
+    ebay::Ebay,
+    imdb::Imdb,
+    soundcloud::SoundCloud,
+    flickr::Flickr,
 };
 
 /// Central registry of all search engines.
@@ -36,17 +49,17 @@ impl EngineRegistry {
         }
     }
 
-    /// Create a registry pre-loaded with all built-in engines.
+    /// Create a registry pre-loaded with all built-in engines (27 total).
     pub fn with_defaults(client: Client) -> Self {
         let mut registry = Self::new();
 
-        // Original engines
+        // ── Original engines ──────────────────────────────
         registry.register(Arc::new(Google::new(client.clone())));
         registry.register(Arc::new(DuckDuckGo::new(client.clone())));
         registry.register(Arc::new(Brave::new(client.clone(), None)));
         registry.register(Arc::new(Wikipedia::new(client.clone())));
 
-        // Batch 1: Translated from SearXNG Python engines
+        // ── Batch 1: SearXNG translations ─────────────────
         registry.register(Arc::new(Bing::new(client.clone())));
         registry.register(Arc::new(Arxiv::new(client.clone())));
         registry.register(Arc::new(Ask::new(client.clone())));
@@ -57,6 +70,21 @@ impl EngineRegistry {
         registry.register(Arc::new(Bilibili::new(client.clone())));
         registry.register(Arc::new(Artic::new(client.clone())));
         registry.register(Arc::new(AlpineLinux::new(client.clone())));
+
+        // ── Batch 2: More SearXNG translations ────────────
+        registry.register(Arc::new(GitHub::new(client.clone())));
+        registry.register(Arc::new(HackerNews::new(client.clone())));
+        registry.register(Arc::new(DockerHub::new(client.clone())));
+        registry.register(Arc::new(Npm::new(client.clone())));
+        registry.register(Arc::new(CratesIo::new(client.clone())));
+        registry.register(Arc::new(PyPI::new(client.clone())));
+        registry.register(Arc::new(Reddit::new(client.clone())));
+        registry.register(Arc::new(Dailymotion::new(client.clone())));
+        registry.register(Arc::new(Deezer::new(client.clone())));
+        registry.register(Arc::new(Ebay::new(client.clone())));
+        registry.register(Arc::new(Imdb::new(client.clone())));
+        registry.register(Arc::new(SoundCloud::new(client.clone())));
+        registry.register(Arc::new(Flickr::new(client.clone())));
 
         registry
     }
