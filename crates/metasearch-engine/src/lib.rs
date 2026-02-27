@@ -22,6 +22,9 @@
 //! ## Batch 4 — Continuing SearXNG translations (7):
 //! - Yahoo, Qwant, Vimeo, Unsplash, Semantic Scholar,
 //!   StackExchange, Freesound
+//!
+//! ## Batch 5 — More SearXNG translations (5):
+//! - 1337x, APKMirror, Arch Linux Wiki, ArtStation, F-Droid
 
 // Original engines
 pub mod google;
@@ -78,6 +81,13 @@ pub mod unsplash;
 pub mod semantic_scholar;
 pub mod stackexchange;
 pub mod freesound;
+
+// Batch 5
+pub mod leet_x;
+pub mod apkmirror;
+pub mod archlinux;
+pub mod artstation;
+pub mod fdroid;
 
 pub mod registry;
 
