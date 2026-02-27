@@ -4,46 +4,24 @@
 //! Each engine scrapes or queries a search provider
 //! and returns normalized `SearchResult` items.
 //!
-//! ## Batch 1 — Engines translated from SearXNG Python source:
-//! - Bing (general, news, images) — HTML scraping
-//! - arXiv (science) — Atom XML API
-//! - Ask.com (general) — HTML scraping
-//! - Bandcamp (music) — HTML scraping
-//! - Baidu (general, Chinese) — JSON API
-//! - 9GAG (social media) — JSON API
-//! - Apple App Store (apps) — iTunes JSON API
-//! - Bilibili (videos, Chinese) — JSON API
-//! - Art Institute of Chicago (images) — JSON API
-//! - Alpine Linux (packages) — HTML scraping
+//! ## Original engines (4):
+//! - Google, DuckDuckGo, Brave, Wikipedia
 //!
-//! ## Batch 2 — More engines from SearXNG:
-//! - GitHub (repos) — REST JSON API
-//! - Hacker News (IT/news) — Algolia JSON API
-//! - Docker Hub (containers) — JSON API
-//! - npm (JS packages) — npms.io JSON API
-//! - crates.io (Rust packages) — JSON API
-//! - PyPI (Python packages) — HTML scraping
-//! - Reddit (social media) — JSON API
-//! - Dailymotion (videos) — JSON API
-//! - Deezer (music) — JSON API
-//! - eBay (shopping) — HTML scraping
-//! - IMDb (movies) — suggestion JSON API
-//! - SoundCloud (music) — JSON API v2
-//! - Flickr (images) — HTML/JSON scraping
+//! ## Batch 1 — SearXNG translations (10):
+//! - Bing, arXiv, Ask, Bandcamp, Baidu, 9GAG,
+//!   Apple App Store, Bilibili, Art Institute of Chicago, Alpine Linux
 //!
-//! ## Batch 3 — Even more engines from SearXNG:
-//! - YouTube (videos) — HTML scraping (no API key)
-//! - Spotify (music) — OAuth JSON API
-//! - Crossref (science/papers) — JSON API
-//! - Lemmy (social media) — JSON API
-//! - Mastodon (social media) — JSON API
-//! - Hugging Face (AI models) — JSON API
-//! - Goodreads (books) — HTML scraping
-//! - Bing News — HTML scraping
-//! - Bing Images — HTML scraping
-//! - Bing Videos — HTML scraping
-//! - Genius (music/lyrics) — JSON API
-//! - GitLab (repos) — JSON API
+//! ## Batch 2 — More SearXNG translations (13):
+//! - GitHub, Hacker News, Docker Hub, npm, crates.io, PyPI,
+//!   Reddit, Dailymotion, Deezer, eBay, IMDb, SoundCloud, Flickr
+//!
+//! ## Batch 3 — Even more SearXNG translations (12):
+//! - YouTube, Spotify, Crossref, Lemmy, Mastodon, Hugging Face,
+//!   Goodreads, Bing News, Bing Images, Bing Videos, Genius, GitLab
+//!
+//! ## Batch 4 — Continuing SearXNG translations (7):
+//! - Yahoo, Qwant, Vimeo, Unsplash, Semantic Scholar,
+//!   StackExchange, Freesound
 
 // Original engines
 pub mod google;
@@ -91,6 +69,15 @@ pub mod bing_images;
 pub mod bing_videos;
 pub mod genius;
 pub mod gitlab;
+
+// Batch 4
+pub mod yahoo;
+pub mod qwant;
+pub mod vimeo;
+pub mod unsplash;
+pub mod semantic_scholar;
+pub mod stackexchange;
+pub mod freesound;
 
 pub mod registry;
 

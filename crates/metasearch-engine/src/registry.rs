@@ -47,6 +47,13 @@ use crate::{
     bing_videos::BingVideos,
     genius::Genius,
     gitlab::GitLab,
+    yahoo::Yahoo,
+    qwant::Qwant,
+    vimeo::Vimeo,
+    unsplash::Unsplash,
+    semantic_scholar::SemanticScholar,
+    stackexchange::StackExchange,
+    freesound::Freesound,
 };
 
 /// Central registry of all search engines.
@@ -61,7 +68,7 @@ impl EngineRegistry {
         }
     }
 
-    /// Create a registry pre-loaded with all built-in engines (39 total).
+    /// Create a registry pre-loaded with all built-in engines (46 total).
     pub fn with_defaults(client: Client) -> Self {
         let mut registry = Self::new();
 
@@ -111,6 +118,15 @@ impl EngineRegistry {
         registry.register(Arc::new(BingVideos::new(client.clone())));
         registry.register(Arc::new(Genius::new(client.clone())));
         registry.register(Arc::new(GitLab::new(client.clone())));
+
+        // ── Batch 4: Continuing SearXNG translations ──────
+        registry.register(Arc::new(Yahoo::new(client.clone())));
+        registry.register(Arc::new(Qwant::new(client.clone())));
+        registry.register(Arc::new(Vimeo::new(client.clone())));
+        registry.register(Arc::new(Unsplash::new(client.clone())));
+        registry.register(Arc::new(SemanticScholar::new(client.clone())));
+        registry.register(Arc::new(StackExchange::new(client.clone())));
+        registry.register(Arc::new(Freesound::new(client.clone())));
 
         registry
     }
