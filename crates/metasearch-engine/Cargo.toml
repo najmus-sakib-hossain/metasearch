@@ -19,3 +19,6 @@ chrono = { version = "0.4", features = ["serde"] }
 urlencoding = "2.1"
 html-escape = "0.2"
 base64 = "0.22"
+
+[dev-dependencies]
+tokio.workspace = true

@@ -49,3 +49,16 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
       - run: cargo test --workspace
+
+  engine-probe:
+    name: Engine Probe (Integration)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    needs: [check, clippy]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Probe all search engines
+        run: cargo test -p metasearch-engine --test engine_probe -- --ignored --nocapture
+        timeout-minutes: 10
