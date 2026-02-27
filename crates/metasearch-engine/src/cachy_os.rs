@@ -14,12 +14,24 @@ use metasearch_core::{
 };
 
 pub struct CachyOs {
+    metadata: EngineMetadata,
     client: Client,
 }
 
 impl CachyOs {
     pub fn new(client: Client) -> Self {
-        Self { client }
+        Self {
+            metadata: EngineMetadata {
+                name: "cachy_os".to_string(),
+                display_name: "CachyOS".to_string(),
+                homepage: "https://packages.cachyos.org".to_string(),
+                categories: vec![SearchCategory::IT],
+                enabled: true,
+                timeout_ms: 5000,
+                weight: 0.6,
+            },
+            client,
+        }
     }
 }
 
@@ -39,18 +51,12 @@ struct Package {
 
 #[async_trait]
 impl SearchEngine for CachyOs {
-    fn metadata(&self) -> EngineMetadata {
-        EngineMetadata {
-            name: "cachy_os".to_string(),
-            display_name: "CachyOS".to_string(),
-            description: "CachyOS package search".to_string(),
-            categories: vec![SearchCategory::IT],
-            enabled: true,
-        }
+    fn metadata(&self) -> &EngineMetadata {
+        &self.metadata
     }
 
     async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
-        let page = query.page.unwrap_or(1);
+        let page = query.page;
         let url = format!(
             "https://packages.cachyos.org/api/search?search={}&page_size=15&current_page={}",
             urlencoding::encode(&query.query),
@@ -60,7 +66,7 @@ impl SearchEngine for CachyOs {
         let resp = self.client.get(&url)
             .send()
             .await
-            .map_err(|e| MetasearchError::RequestError(e.to_string()))?;
+            .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
 
         let api_resp: ApiResponse = resp.json().await
             .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
@@ -81,7 +87,7 @@ impl SearchEngine for CachyOs {
             let snippet = desc.to_string();
 
             let mut result = SearchResult::new(&title, &url, &snippet, "cachy_os");
-            result.category = Some(SearchCategory::IT);
+            result.category = SearchCategory::IT.to_string();
             results.push(result);
         }
 

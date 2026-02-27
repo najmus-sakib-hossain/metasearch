@@ -14,12 +14,24 @@ use metasearch_core::{
 };
 
 pub struct CccMedia {
+    metadata: EngineMetadata,
     client: Client,
 }
 
 impl CccMedia {
     pub fn new(client: Client) -> Self {
-        Self { client }
+        Self {
+            metadata: EngineMetadata {
+                name: "ccc_media".to_string(),
+                display_name: "CCC Media".to_string(),
+                homepage: "https://media.ccc.de".to_string(),
+                categories: vec![SearchCategory::Videos],
+                enabled: true,
+                timeout_ms: 5000,
+                weight: 0.6,
+            },
+            client,
+        }
     }
 }
 
@@ -46,18 +58,12 @@ struct Recording {
 
 #[async_trait]
 impl SearchEngine for CccMedia {
-    fn metadata(&self) -> EngineMetadata {
-        EngineMetadata {
-            name: "ccc_media".to_string(),
-            display_name: "CCC Media".to_string(),
-            description: "Chaos Computer Club media library".to_string(),
-            categories: vec![SearchCategory::Videos],
-            enabled: true,
-        }
+    fn metadata(&self) -> &EngineMetadata {
+        &self.metadata
     }
 
     async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
-        let page = query.page.unwrap_or(1);
+        let page = query.page;
         let url = format!(
             "https://api.media.ccc.de/public/events/search?q={}&page={}",
             urlencoding::encode(&query.query),
@@ -67,7 +73,7 @@ impl SearchEngine for CccMedia {
         let resp = self.client.get(&url)
             .send()
             .await
-            .map_err(|e| MetasearchError::RequestError(e.to_string()))?;
+            .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
 
         let api_resp: ApiResponse = resp.json().await
             .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
@@ -89,7 +95,7 @@ impl SearchEngine for CccMedia {
             };
 
             let mut result = SearchResult::new(&event.title, link, &snippet, "ccc_media");
-            result.category = Some(SearchCategory::Videos);
+            result.category = SearchCategory::Videos.to_string();
 
             if let Some(thumb) = &event.thumb_url {
                 result.thumbnail = Some(thumb.clone());

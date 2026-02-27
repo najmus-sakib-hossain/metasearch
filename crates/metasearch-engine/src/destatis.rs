@@ -14,29 +14,35 @@ use metasearch_core::{
 };
 
 pub struct Destatis {
+    metadata: EngineMetadata,
     client: Client,
 }
 
 impl Destatis {
     pub fn new(client: Client) -> Self {
-        Self { client }
+        Self {
+            metadata: EngineMetadata {
+                name: "destatis".to_string(),
+                display_name: "DeStatis".to_string(),
+                homepage: "https://www.destatis.de".to_string(),
+                categories: vec![SearchCategory::General],
+                enabled: true,
+                timeout_ms: 5000,
+                weight: 0.5,
+            },
+            client,
+        }
     }
 }
 
 #[async_trait]
 impl SearchEngine for Destatis {
-    fn metadata(&self) -> EngineMetadata {
-        EngineMetadata {
-            name: "destatis".to_string(),
-            display_name: "DeStatis".to_string(),
-            description: "German Federal Statistical Office".to_string(),
-            categories: vec![SearchCategory::General],
-            enabled: true,
-        }
+    fn metadata(&self) -> &EngineMetadata {
+        &self.metadata
     }
 
     async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
-        let page = query.page.unwrap_or(1);
+        let page = query.page;
         let url = format!(
             "https://www.destatis.de/SiteGlobals/Forms/Suche/Expertensuche_Formular.html?templateQueryString={}&gtp=474_list%3D{}",
             urlencoding::encode(&query.query),
@@ -46,10 +52,10 @@ impl SearchEngine for Destatis {
         let resp = self.client.get(&url)
             .send()
             .await
-            .map_err(|e| MetasearchError::RequestError(e.to_string()))?;
+            .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
 
         let body = resp.text().await
-            .map_err(|e| MetasearchError::RequestError(e.to_string()))?;
+            .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
 
         let document = Html::parse_document(&body);
         let result_sel = Selector::parse("div.c-result").unwrap();
@@ -106,7 +112,7 @@ impl SearchEngine for Destatis {
 
             if !title.is_empty() && !href.is_empty() {
                 let mut result = SearchResult::new(&title, &href, &snippet, "destatis");
-                result.category = Some(SearchCategory::General);
+                result.category = SearchCategory::General.to_string();
                 results.push(result);
             }
         }

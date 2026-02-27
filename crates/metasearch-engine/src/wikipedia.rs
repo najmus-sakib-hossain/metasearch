@@ -77,10 +77,9 @@ impl SearchEngine for Wikipedia {
             .await
             .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
 
-        let results = resp
-            .query
-            .map(|q| q.search)
-            .unwrap_or_default()
+        let search_items = resp.query.map(|q| q.search).unwrap_or_default();
+        let count = search_items.len();
+        let results = search_items
             .into_iter()
             .enumerate()
             .map(|(i, item)| {
@@ -96,7 +95,7 @@ impl SearchEngine for Wikipedia {
             })
             .collect();
 
-        info!(engine = "wikipedia", count = ?resp.query.as_ref().map(|q| q.search.len()), "Search complete");
+        info!(engine = "wikipedia", count, "Search complete");
         Ok(results)
     }
 }

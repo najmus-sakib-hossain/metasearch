@@ -16,6 +16,7 @@ use metasearch_core::{
 };
 
 pub struct StackExchange {
+    metadata: EngineMetadata,
     client: Client,
     api_site: String,
 }
@@ -23,6 +24,15 @@ pub struct StackExchange {
 impl StackExchange {
     pub fn new(client: Client) -> Self {
         Self {
+            metadata: EngineMetadata {
+                name: "stackexchange".to_string(),
+                display_name: "StackExchange".to_string(),
+                homepage: "https://stackoverflow.com".to_string(),
+                categories: vec![SearchCategory::IT],
+                enabled: true,
+                timeout_ms: 5000,
+                weight: 1.2,
+            },
             client,
             api_site: "stackoverflow".to_string(),
         }
@@ -30,6 +40,15 @@ impl StackExchange {
 
     pub fn with_site(client: Client, site: &str) -> Self {
         Self {
+            metadata: EngineMetadata {
+                name: "stackexchange".to_string(),
+                display_name: "StackExchange".to_string(),
+                homepage: format!("https://{}.com", site),
+                categories: vec![SearchCategory::IT],
+                enabled: true,
+                timeout_ms: 5000,
+                weight: 1.2,
+            },
             client,
             api_site: site.to_string(),
         }
@@ -38,18 +57,12 @@ impl StackExchange {
 
 #[async_trait]
 impl SearchEngine for StackExchange {
-    fn metadata(&self) -> EngineMetadata {
-        EngineMetadata {
-            name: "stackexchange".to_string(),
-            display_name: "StackExchange".to_string(),
-            categories: vec![SearchCategory::IT],
-            enabled: true,
-            weight: 1.2,
-        }
+    fn metadata(&self) -> &EngineMetadata {
+        &self.metadata
     }
 
     async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
-        let page = query.page.unwrap_or(1);
+        let page = query.page;
         let pagesize: u32 = 10;
 
         // StackExchange API v2.3 advanced search
@@ -123,8 +136,8 @@ impl SearchEngine for StackExchange {
                     snippet,
                     "stackexchange".to_string(),
                 );
-                sr.engine_rank = Some(i + 1);
-                sr.category = Some(SearchCategory::IT);
+                sr.engine_rank = (i + 1) as u32;
+                sr.category = SearchCategory::IT.to_string();
                 results.push(sr);
             }
         }

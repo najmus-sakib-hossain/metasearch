@@ -19,31 +19,38 @@ const SEARCH_URL: &str = "https://www.ansa.it/ricerca/ansait/search.shtml";
 const PAGE_SIZE: u32 = 12;
 
 pub struct Ansa {
+    metadata: EngineMetadata,
     client: Client,
 }
 
 impl Ansa {
     pub fn new(client: Client) -> Self {
-        Self { client }
+        Self {
+            metadata: EngineMetadata {
+                name: "ansa".to_string(),
+                display_name: "ANSA".to_string(),
+                homepage: BASE_URL.to_string(),
+                categories: vec![SearchCategory::News],
+                enabled: true,
+                timeout_ms: 5000,
+                weight: 0.7,
+            },
+            client,
+        }
     }
 }
 
 #[async_trait]
 impl SearchEngine for Ansa {
-    fn metadata(&self) -> EngineMetadata {
-        EngineMetadata {
-            name: "ANSA".to_string(),
-            base_url: BASE_URL.to_string(),
-            categories: vec![SearchCategory::News],
-            enabled: true,
-        }
+    fn metadata(&self) -> &EngineMetadata {
+        &self.metadata
     }
 
     async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
-        let page = query.page.unwrap_or(1);
-        let start = (page.saturating_sub(1) as u32) * PAGE_SIZE;
+        let page = query.page;
+        let start = (page.saturating_sub(1)) * PAGE_SIZE;
 
-        let mut url = Url::parse(SEARCH_URL).map_err(|e| MetasearchError::Request(e.to_string()))?;
+        let mut url = Url::parse(SEARCH_URL).map_err(|e| MetasearchError::ParseError(e.to_string()))?;
         url.query_pairs_mut()
             .append_pair("any", &query.query)
             .append_pair("start", &start.to_string())
@@ -54,10 +61,10 @@ impl SearchEngine for Ansa {
             .get(url.as_str())
             .send()
             .await
-            .map_err(|e| MetasearchError::Request(e.to_string()))?
+            .map_err(|e| MetasearchError::HttpError(e.to_string()))?
             .text()
             .await
-            .map_err(|e| MetasearchError::Request(e.to_string()))?;
+            .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
 
         let document = Html::parse_document(&resp);
         let article_sel = Selector::parse("div.article").unwrap();
@@ -86,13 +93,12 @@ impl SearchEngine for Ansa {
                 continue;
             }
 
-            results.push(SearchResult {
+            results.push(SearchResult::new(
                 title,
-                url: article_url,
+                article_url,
                 content,
-                engine: "ANSA".to_string(),
-                score: 1.0,
-            });
+                "ANSA",
+            ));
         }
 
         Ok(results)

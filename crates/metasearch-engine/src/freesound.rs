@@ -15,6 +15,7 @@ use metasearch_core::{
 };
 
 pub struct Freesound {
+    metadata: EngineMetadata,
     client: Client,
     api_key: Option<String>,
 }
@@ -22,6 +23,15 @@ pub struct Freesound {
 impl Freesound {
     pub fn new(client: Client) -> Self {
         Self {
+            metadata: EngineMetadata {
+                name: "freesound".to_string(),
+                display_name: "Freesound".to_string(),
+                homepage: "https://freesound.org".to_string(),
+                categories: vec![SearchCategory::Music],
+                enabled: false, // Disabled by default — needs API key
+                timeout_ms: 5000,
+                weight: 0.8,
+            },
             client,
             api_key: None,
         }
@@ -29,6 +39,15 @@ impl Freesound {
 
     pub fn with_api_key(client: Client, api_key: String) -> Self {
         Self {
+            metadata: EngineMetadata {
+                name: "freesound".to_string(),
+                display_name: "Freesound".to_string(),
+                homepage: "https://freesound.org".to_string(),
+                categories: vec![SearchCategory::Music],
+                enabled: false, // Disabled by default — needs API key
+                timeout_ms: 5000,
+                weight: 0.8,
+            },
             client,
             api_key: Some(api_key),
         }
@@ -37,14 +56,8 @@ impl Freesound {
 
 #[async_trait]
 impl SearchEngine for Freesound {
-    fn metadata(&self) -> EngineMetadata {
-        EngineMetadata {
-            name: "freesound".to_string(),
-            display_name: "Freesound".to_string(),
-            categories: vec![SearchCategory::Music],
-            enabled: false, // Disabled by default — needs API key
-            weight: 0.8,
-        }
+    fn metadata(&self) -> &EngineMetadata {
+        &self.metadata
     }
 
     async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
@@ -57,7 +70,7 @@ impl SearchEngine for Freesound {
             }
         };
 
-        let page = query.page.unwrap_or(1);
+        let page = query.page;
 
         let url = format!(
             "https://freesound.org/apiv2/search/text/?query={}&page={}&fields=name,url,download,created,description,type&token={}",
@@ -108,8 +121,8 @@ impl SearchEngine for Freesound {
                     snippet,
                     "freesound".to_string(),
                 );
-                sr.engine_rank = Some(i + 1);
-                sr.category = Some(SearchCategory::Music);
+                sr.engine_rank = (i + 1) as u32;
+                sr.category = SearchCategory::Music.to_string();
                 if !download_url.is_empty() {
                     sr.thumbnail = Some(download_url.to_string());
                 }

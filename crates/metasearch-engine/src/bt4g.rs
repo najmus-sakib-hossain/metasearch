@@ -13,30 +13,36 @@ use metasearch_core::{
 };
 
 pub struct Bt4g {
+    metadata: EngineMetadata,
     client: Client,
 }
 
 impl Bt4g {
     pub fn new(client: Client) -> Self {
-        Self { client }
+        Self {
+            metadata: EngineMetadata {
+                name: "bt4g".to_string(),
+                display_name: "BT4G".to_string(),
+                homepage: "https://bt4gprx.com".to_string(),
+                categories: vec![SearchCategory::Files],
+                enabled: true,
+                timeout_ms: 5000,
+                weight: 0.6,
+            },
+            client,
+        }
     }
 }
 
 #[async_trait]
 impl SearchEngine for Bt4g {
-    fn metadata(&self) -> EngineMetadata {
-        EngineMetadata {
-            name: "bt4g".to_string(),
-            display_name: "BT4G".to_string(),
-            description: "Torrent metadata search engine".to_string(),
-            categories: vec![SearchCategory::Files],
-            enabled: true,
-        }
+    fn metadata(&self) -> &EngineMetadata {
+        &self.metadata
     }
 
     async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
         let search_term = urlencoding::encode(&query.query);
-        let page = query.page.unwrap_or(1);
+        let page = query.page;
         let url = format!(
             "https://bt4gprx.com/search?q={}&orderby=relevance&category=all&p={}&page=rss",
             search_term, page
@@ -45,10 +51,10 @@ impl SearchEngine for Bt4g {
         let resp = self.client.get(&url)
             .send()
             .await
-            .map_err(|e| MetasearchError::RequestError(e.to_string()))?;
+            .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
 
         let body = resp.text().await
-            .map_err(|e| MetasearchError::RequestError(e.to_string()))?;
+            .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
 
         let mut results = Vec::new();
 
@@ -73,7 +79,7 @@ impl SearchEngine for Bt4g {
 
             if !title.is_empty() && !link.is_empty() {
                 let mut result = SearchResult::new(&title, &link, &snippet, "bt4g");
-                result.category = Some(SearchCategory::Files);
+                result.category = SearchCategory::Files.to_string();
                 results.push(result);
             }
 

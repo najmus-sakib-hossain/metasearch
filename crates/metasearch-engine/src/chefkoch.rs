@@ -12,31 +12,37 @@ use metasearch_core::{
 };
 
 pub struct Chefkoch {
+    metadata: EngineMetadata,
     client: Client,
 }
 
 impl Chefkoch {
     pub fn new(client: Client) -> Self {
-        Self { client }
+        Self {
+            metadata: EngineMetadata {
+                name: "chefkoch".to_string(),
+                display_name: "Chefkoch".to_string(),
+                homepage: "https://www.chefkoch.de".to_string(),
+                categories: vec![SearchCategory::General],
+                enabled: true,
+                timeout_ms: 5000,
+                weight: 0.5,
+            },
+            client,
+        }
     }
 }
 
 #[async_trait]
 impl SearchEngine for Chefkoch {
-    fn metadata(&self) -> EngineMetadata {
-        EngineMetadata {
-            name: "chefkoch".to_string(),
-            display_name: "Chefkoch".to_string(),
-            categories: vec![SearchCategory::General],
-            enabled: true,
-            weight: 0.5,
-        }
+    fn metadata(&self) -> &EngineMetadata {
+        &self.metadata
     }
 
     async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
-        let page = query.page.unwrap_or(1);
+        let page = query.page;
         let limit: u32 = 20;
-        let offset = (page as u32 - 1) * limit;
+        let offset = (page - 1) * limit;
 
         let url = format!(
             "https://api.chefkoch.de/v2/search-gateway/recipes?query={}&limit={}&offset={}",
@@ -94,8 +100,8 @@ impl SearchEngine for Chefkoch {
                     snippet,
                     "chefkoch".to_string(),
                 );
-                result.engine_rank = Some(i + 1);
-                result.category = Some(SearchCategory::General);
+                result.engine_rank = (i + 1) as u32;
+                result.category = SearchCategory::General.to_string();
                 result.thumbnail = thumbnail;
                 results.push(result);
             }

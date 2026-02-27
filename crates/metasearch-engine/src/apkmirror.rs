@@ -13,29 +13,35 @@ use metasearch_core::{
 };
 
 pub struct ApkMirror {
+    metadata: EngineMetadata,
     client: Client,
 }
 
 impl ApkMirror {
     pub fn new(client: Client) -> Self {
-        Self { client }
+        Self {
+            metadata: EngineMetadata {
+                name: "apkmirror".to_string(),
+                display_name: "APKMirror".to_string(),
+                homepage: "https://www.apkmirror.com".to_string(),
+                categories: vec![SearchCategory::Files],
+                enabled: true,
+                timeout_ms: 5000,
+                weight: 0.7,
+            },
+            client,
+        }
     }
 }
 
 #[async_trait]
 impl SearchEngine for ApkMirror {
-    fn metadata(&self) -> EngineMetadata {
-        EngineMetadata {
-            name: "apkmirror".to_string(),
-            display_name: "APKMirror".to_string(),
-            categories: vec![SearchCategory::Files],
-            enabled: true,
-            weight: 0.7,
-        }
+    fn metadata(&self) -> &EngineMetadata {
+        &self.metadata
     }
 
     async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
-        let page = query.page.unwrap_or(1);
+        let page = query.page;
         let url = format!(
             "https://www.apkmirror.com/?post_type=app_release&searchtype=apk&page={}&s={}",
             page,
@@ -83,8 +89,8 @@ impl SearchEngine for ApkMirror {
                 "APK release on APKMirror".to_string(),
                 "apkmirror".to_string(),
             );
-            result.engine_rank = Some(i + 1);
-            result.category = Some(SearchCategory::Files);
+            result.engine_rank = (i + 1) as u32;
+            result.category = SearchCategory::Files.to_string();
             result.thumbnail = thumbnail;
             results.push(result);
         }

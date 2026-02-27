@@ -18,12 +18,24 @@ const API_URL: &str = "https://api.bitchute.com/api/beta/search/videos";
 const RESULTS_PER_PAGE: u32 = 20;
 
 pub struct BitChute {
+    metadata: EngineMetadata,
     client: Client,
 }
 
 impl BitChute {
     pub fn new(client: Client) -> Self {
-        Self { client }
+        Self {
+            metadata: EngineMetadata {
+                name: "bitchute".to_string(),
+                display_name: "BitChute".to_string(),
+                homepage: "https://www.bitchute.com".to_string(),
+                categories: vec![SearchCategory::Videos],
+                enabled: true,
+                timeout_ms: 5000,
+                weight: 0.7,
+            },
+            client,
+        }
     }
 }
 
@@ -48,18 +60,13 @@ struct ChannelInfo {
 
 #[async_trait]
 impl SearchEngine for BitChute {
-    fn metadata(&self) -> EngineMetadata {
-        EngineMetadata {
-            name: "BitChute".to_string(),
-            base_url: "https://www.bitchute.com".to_string(),
-            categories: vec![SearchCategory::Videos],
-            enabled: true,
-        }
+    fn metadata(&self) -> &EngineMetadata {
+        &self.metadata
     }
 
     async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
-        let page = query.page.unwrap_or(1);
-        let offset = (page.saturating_sub(1) as u32) * RESULTS_PER_PAGE;
+        let page = query.page;
+        let offset = (page.saturating_sub(1)) * RESULTS_PER_PAGE;
 
         let body = json!({
             "query": query.query,
@@ -76,10 +83,10 @@ impl SearchEngine for BitChute {
             .json(&body)
             .send()
             .await
-            .map_err(|e| MetasearchError::Request(e.to_string()))?
+            .map_err(|e| MetasearchError::HttpError(e.to_string()))?
             .json::<ApiResponse>()
             .await
-            .map_err(|e| MetasearchError::Parse(e.to_string()))?;
+            .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
 
         let mut results = Vec::new();
 
@@ -92,30 +99,29 @@ impl SearchEngine for BitChute {
 
             let video_url = format!("https://www.bitchute.com/video/{}", video_id);
 
-            let mut content = html_escape::decode_html_entities(
+            let mut snippet = html_escape::decode_html_entities(
                 &item.description.unwrap_or_default(),
             )
             .to_string();
 
             // Strip HTML tags from description
             let tag_re = regex::Regex::new(r"<[^>]+>").unwrap();
-            content = tag_re.replace_all(&content, "").trim().to_string();
+            snippet = tag_re.replace_all(&snippet, "").trim().to_string();
 
             if let Some(channel) = item.channel.channel_name.as_deref() {
-                if !content.is_empty() {
-                    content = format!("{} — {}", channel, content);
+                if !snippet.is_empty() {
+                    snippet = format!("{} — {}", channel, snippet);
                 } else {
-                    content = channel.to_string();
+                    snippet = channel.to_string();
                 }
             }
 
-            results.push(SearchResult {
+            results.push(SearchResult::new(
                 title,
-                url: video_url,
-                content,
-                engine: "BitChute".to_string(),
-                score: 1.0,
-            });
+                video_url,
+                snippet,
+                "BitChute",
+            ));
         }
 
         Ok(results)

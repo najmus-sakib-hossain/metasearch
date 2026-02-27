@@ -14,39 +14,45 @@ use metasearch_core::{
 };
 
 pub struct Btdigg {
+    metadata: EngineMetadata,
     client: Client,
 }
 
 impl Btdigg {
     pub fn new(client: Client) -> Self {
-        Self { client }
+        Self {
+            metadata: EngineMetadata {
+                name: "btdigg".to_string(),
+                display_name: "BTDigg".to_string(),
+                homepage: "https://btdig.com".to_string(),
+                categories: vec![SearchCategory::Files],
+                enabled: true,
+                timeout_ms: 5000,
+                weight: 0.6,
+            },
+            client,
+        }
     }
 }
 
 #[async_trait]
 impl SearchEngine for Btdigg {
-    fn metadata(&self) -> EngineMetadata {
-        EngineMetadata {
-            name: "btdigg".to_string(),
-            display_name: "BTDigg".to_string(),
-            description: "BitTorrent DHT search engine".to_string(),
-            categories: vec![SearchCategory::Files],
-            enabled: true,
-        }
+    fn metadata(&self) -> &EngineMetadata {
+        &self.metadata
     }
 
     async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
         let search_term = urlencoding::encode(&query.query);
-        let page = query.page.unwrap_or(1) - 1; // 0-indexed
+        let page = query.page.saturating_sub(1); // 0-indexed
         let url = format!("https://btdig.com/search?q={}&p={}", search_term, page);
 
         let resp = self.client.get(&url)
             .send()
             .await
-            .map_err(|e| MetasearchError::RequestError(e.to_string()))?;
+            .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
 
         let body = resp.text().await
-            .map_err(|e| MetasearchError::RequestError(e.to_string()))?;
+            .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
 
         let document = Html::parse_document(&body);
         let result_sel = Selector::parse("div.one_result").unwrap();
@@ -90,7 +96,7 @@ impl SearchEngine for Btdigg {
 
             if !title.is_empty() && !href.is_empty() {
                 let mut result = SearchResult::new(&title, &href, &snippet, "btdigg");
-                result.category = Some(SearchCategory::Files);
+                result.category = SearchCategory::Files.to_string();
                 results.push(result);
             }
         }

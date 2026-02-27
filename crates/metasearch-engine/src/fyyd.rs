@@ -12,29 +12,35 @@ use metasearch_core::{
 };
 
 pub struct Fyyd {
+    metadata: EngineMetadata,
     client: Client,
 }
 
 impl Fyyd {
     pub fn new(client: Client) -> Self {
-        Self { client }
+        Self {
+            metadata: EngineMetadata {
+                name: "fyyd".to_string(),
+                display_name: "Fyyd".to_string(),
+                homepage: "https://fyyd.de".to_string(),
+                categories: vec![SearchCategory::Music],
+                enabled: true,
+                timeout_ms: 5000,
+                weight: 0.6,
+            },
+            client,
+        }
     }
 }
 
 #[async_trait]
 impl SearchEngine for Fyyd {
-    fn metadata(&self) -> EngineMetadata {
-        EngineMetadata {
-            name: "fyyd".to_string(),
-            display_name: "Fyyd".to_string(),
-            categories: vec![SearchCategory::Music],
-            enabled: true,
-            weight: 0.6,
-        }
+    fn metadata(&self) -> &EngineMetadata {
+        &self.metadata
     }
 
     async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
-        let page = query.page.unwrap_or(1);
+        let page = query.page;
         let page_index = (page as i32) - 1;
         let count = 10;
 
@@ -80,8 +86,8 @@ impl SearchEngine for Fyyd {
                     snippet,
                     "fyyd".to_string(),
                 );
-                result.engine_rank = Some(i + 1);
-                result.category = Some(SearchCategory::Music);
+                result.engine_rank = (i + 1) as u32;
+                result.category = SearchCategory::Music.to_string();
                 result.thumbnail = item["smallImageURL"].as_str().map(|s| s.to_string());
                 results.push(result);
             }

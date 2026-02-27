@@ -12,29 +12,35 @@ use metasearch_core::{
 };
 
 pub struct Bpb {
+    metadata: EngineMetadata,
     client: Client,
 }
 
 impl Bpb {
     pub fn new(client: Client) -> Self {
-        Self { client }
+        Self {
+            metadata: EngineMetadata {
+                name: "bpb".to_string(),
+                display_name: "BPB".to_string(),
+                homepage: "https://www.bpb.de".to_string(),
+                categories: vec![SearchCategory::General],
+                enabled: true,
+                timeout_ms: 5000,
+                weight: 0.5,
+            },
+            client,
+        }
     }
 }
 
 #[async_trait]
 impl SearchEngine for Bpb {
-    fn metadata(&self) -> EngineMetadata {
-        EngineMetadata {
-            name: "bpb".to_string(),
-            display_name: "BPB".to_string(),
-            categories: vec![SearchCategory::General],
-            enabled: true,
-            weight: 0.5,
-        }
+    fn metadata(&self) -> &EngineMetadata {
+        &self.metadata
     }
 
     async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
-        let page = query.page.unwrap_or(1);
+        let page = query.page;
         let page_index = (page as i32) - 1;
 
         let url = format!(
@@ -83,8 +89,8 @@ impl SearchEngine for Bpb {
                     snippet,
                     "bpb".to_string(),
                 );
-                result.engine_rank = Some(i + 1);
-                result.category = Some(SearchCategory::General);
+                result.engine_rank = (i + 1) as u32;
+                result.category = SearchCategory::General.to_string();
                 result.thumbnail = thumbnail;
                 results.push(result);
             }

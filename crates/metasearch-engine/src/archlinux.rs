@@ -16,29 +16,35 @@ use metasearch_core::{
 };
 
 pub struct ArchLinux {
+    metadata: EngineMetadata,
     client: Client,
 }
 
 impl ArchLinux {
     pub fn new(client: Client) -> Self {
-        Self { client }
+        Self {
+            metadata: EngineMetadata {
+                name: "archlinux".to_string(),
+                display_name: "Arch Linux Wiki".to_string(),
+                homepage: "https://wiki.archlinux.org".to_string(),
+                categories: vec![SearchCategory::IT],
+                enabled: true,
+                timeout_ms: 5000,
+                weight: 0.8,
+            },
+            client,
+        }
     }
 }
 
 #[async_trait]
 impl SearchEngine for ArchLinux {
-    fn metadata(&self) -> EngineMetadata {
-        EngineMetadata {
-            name: "archlinux".to_string(),
-            display_name: "Arch Linux Wiki".to_string(),
-            categories: vec![SearchCategory::IT],
-            enabled: true,
-            weight: 0.8,
-        }
+    fn metadata(&self) -> &EngineMetadata {
+        &self.metadata
     }
 
     async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
-        let page = query.page.unwrap_or(1);
+        let page = query.page;
         let offset = (page - 1) * 20;
 
         let url = format!(
@@ -89,8 +95,8 @@ impl SearchEngine for ArchLinux {
                 content.trim().to_string(),
                 "archlinux".to_string(),
             );
-            result.engine_rank = Some(i + 1);
-            result.category = Some(SearchCategory::IT);
+            result.engine_rank = (i + 1) as u32;
+            result.category = SearchCategory::IT.to_string();
             results.push(result);
         }
 
