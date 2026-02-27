@@ -30,6 +30,20 @@
 //! - IMDb (movies) — suggestion JSON API
 //! - SoundCloud (music) — JSON API v2
 //! - Flickr (images) — HTML/JSON scraping
+//!
+//! ## Batch 3 — Even more engines from SearXNG:
+//! - YouTube (videos) — HTML scraping (no API key)
+//! - Spotify (music) — OAuth JSON API
+//! - Crossref (science/papers) — JSON API
+//! - Lemmy (social media) — JSON API
+//! - Mastodon (social media) — JSON API
+//! - Hugging Face (AI models) — JSON API
+//! - Goodreads (books) — HTML scraping
+//! - Bing News — HTML scraping
+//! - Bing Images — HTML scraping
+//! - Bing Videos — HTML scraping
+//! - Genius (music/lyrics) — JSON API
+//! - GitLab (repos) — JSON API
 
 // Original engines
 pub mod google;
@@ -63,6 +77,20 @@ pub mod ebay;
 pub mod imdb;
 pub mod soundcloud;
 pub mod flickr;
+
+// Batch 3
+pub mod youtube;
+pub mod spotify;
+pub mod crossref;
+pub mod lemmy;
+pub mod mastodon;
+pub mod huggingface;
+pub mod goodreads;
+pub mod bing_news;
+pub mod bing_images;
+pub mod bing_videos;
+pub mod genius;
+pub mod gitlab;
 
 pub mod registry;
 

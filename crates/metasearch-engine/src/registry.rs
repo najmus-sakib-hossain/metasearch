@@ -35,6 +35,18 @@ use crate::{
     imdb::Imdb,
     soundcloud::SoundCloud,
     flickr::Flickr,
+    youtube::YouTube,
+    spotify::Spotify,
+    crossref::Crossref,
+    lemmy::Lemmy,
+    mastodon::Mastodon,
+    huggingface::HuggingFace,
+    goodreads::Goodreads,
+    bing_news::BingNews,
+    bing_images::BingImages,
+    bing_videos::BingVideos,
+    genius::Genius,
+    gitlab::GitLab,
 };
 
 /// Central registry of all search engines.
@@ -49,7 +61,7 @@ impl EngineRegistry {
         }
     }
 
-    /// Create a registry pre-loaded with all built-in engines (27 total).
+    /// Create a registry pre-loaded with all built-in engines (39 total).
     pub fn with_defaults(client: Client) -> Self {
         let mut registry = Self::new();
 
@@ -85,6 +97,20 @@ impl EngineRegistry {
         registry.register(Arc::new(Imdb::new(client.clone())));
         registry.register(Arc::new(SoundCloud::new(client.clone())));
         registry.register(Arc::new(Flickr::new(client.clone())));
+
+        // ── Batch 3: Even more SearXNG translations ───────
+        registry.register(Arc::new(YouTube::new(client.clone())));
+        registry.register(Arc::new(Spotify::new(client.clone())));
+        registry.register(Arc::new(Crossref::new(client.clone())));
+        registry.register(Arc::new(Lemmy::new(client.clone())));
+        registry.register(Arc::new(Mastodon::new(client.clone())));
+        registry.register(Arc::new(HuggingFace::new(client.clone())));
+        registry.register(Arc::new(Goodreads::new(client.clone())));
+        registry.register(Arc::new(BingNews::new(client.clone())));
+        registry.register(Arc::new(BingImages::new(client.clone())));
+        registry.register(Arc::new(BingVideos::new(client.clone())));
+        registry.register(Arc::new(Genius::new(client.clone())));
+        registry.register(Arc::new(GitLab::new(client.clone())));
 
         registry
     }

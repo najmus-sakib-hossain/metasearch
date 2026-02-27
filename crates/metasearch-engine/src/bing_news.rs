@@ -1,0 +1,91 @@
+//! Bing News engine — search news via Bing News HTML scraping.
+//! Translated from SearXNG `searx/engines/bing_news.py`.
+
+use async_trait::async_trait;
+use reqwest::Client;
+use scraper::{Html, Selector};
+use metasearch_core::{
+    engine::{SearchEngine, EngineMetadata},
+    result::SearchResult,
+    query::SearchQuery,
+    category::SearchCategory,
+    error::MetasearchError,
+};
+
+pub struct BingNews {
+    client: Client,
+}
+
+impl BingNews {
+    pub fn new(client: Client) -> Self {
+        Self { client }
+    }
+}
+
+#[async_trait]
+impl SearchEngine for BingNews {
+    fn metadata(&self) -> EngineMetadata {
+        EngineMetadata {
+            name: "bing_news".to_string(),
+            display_name: "Bing News".to_string(),
+            categories: vec![SearchCategory::News],
+            enabled: true,
+            weight: 1.0,
+        }
+    }
+
+    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
+        let page = query.page.unwrap_or(1) as u32;
+        let first = (page - 1) * 10 + 1;
+
+        let url = format!(
+            "https://www.bing.com/news/infinitescrollajax?q={}&InfiniteScroll=1&first={}&SFX={}&form=PTFTNR",
+            urlencoding::encode(&query.query),
+            first,
+            page - 1,
+        );
+
+        let resp = self.client
+            .get(&url)
+            .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
+            .send()
+            .await
+            .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
+
+        let html_text = resp.text().await
+            .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
+
+        let document = Html::parse_document(&html_text);
+        let news_sel = Selector::parse("div.newsitem").unwrap();
+        let title_link_sel = Selector::parse("a.title").unwrap();
+        let snippet_sel = Selector::parse("div.snippet").unwrap();
+
+        let mut results = Vec::new();
+
+        for (i, newsitem) in document.select(&news_sel).enumerate() {
+            let link = match newsitem.select(&title_link_sel).next() {
+                Some(el) => el,
+                None => continue,
+            };
+
+            let href = link.value().attr("href").unwrap_or_default();
+            let title = link.text().collect::<String>().trim().to_string();
+
+            let content = newsitem.select(&snippet_sel).next()
+                .map(|el| el.text().collect::<String>())
+                .unwrap_or_default();
+
+            let mut result = SearchResult::new(
+                title,
+                href.to_string(),
+                content.trim().to_string(),
+                "bing_news".to_string(),
+            );
+            result.engine_rank = Some(i + 1);
+            result.category = Some(SearchCategory::News);
+            results.push(result);
+        }
+
+        Ok(results)
+    }
+}
