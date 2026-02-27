@@ -3,7 +3,7 @@ name = "metasearch-engine"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
-description = "Search engine implementations (Google, DuckDuckGo, Brave, Wikipedia, etc.)"
+description = "Search engine implementations translated from SearXNG Python to Rust"
 
 [dependencies]
 metasearch-core = { path = "../metasearch-core" }
@@ -15,3 +15,6 @@ async-trait.workspace = true
 tracing.workspace = true
 url.workspace = true
 regex.workspace = true
+chrono = { version = "0.4", features = ["serde"] }
+urlencoding = "2.1"
+html-escape = "0.2"

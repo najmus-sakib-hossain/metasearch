@@ -5,6 +5,24 @@ use std::sync::Arc;
 
 use metasearch_core::engine::SearchEngine;
 use metasearch_core::category::SearchCategory;
+use reqwest::Client;
+
+use crate::{
+    google::Google,
+    duckduckgo::DuckDuckGo,
+    brave::Brave,
+    wikipedia::Wikipedia,
+    bing::Bing,
+    arxiv::Arxiv,
+    ask::Ask,
+    bandcamp::Bandcamp,
+    baidu::Baidu,
+    nine_gag::NineGag,
+    apple_app_store::AppleAppStore,
+    bilibili::Bilibili,
+    artic::Artic,
+    alpinelinux::AlpineLinux,
+};
 
 /// Central registry of all search engines.
 pub struct EngineRegistry {
@@ -16,6 +34,31 @@ impl EngineRegistry {
         Self {
             engines: HashMap::new(),
         }
+    }
+
+    /// Create a registry pre-loaded with all built-in engines.
+    pub fn with_defaults(client: Client) -> Self {
+        let mut registry = Self::new();
+
+        // Original engines
+        registry.register(Arc::new(Google::new(client.clone())));
+        registry.register(Arc::new(DuckDuckGo::new(client.clone())));
+        registry.register(Arc::new(Brave::new(client.clone(), None)));
+        registry.register(Arc::new(Wikipedia::new(client.clone())));
+
+        // Batch 1: Translated from SearXNG Python engines
+        registry.register(Arc::new(Bing::new(client.clone())));
+        registry.register(Arc::new(Arxiv::new(client.clone())));
+        registry.register(Arc::new(Ask::new(client.clone())));
+        registry.register(Arc::new(Bandcamp::new(client.clone())));
+        registry.register(Arc::new(Baidu::new(client.clone())));
+        registry.register(Arc::new(NineGag::new(client.clone())));
+        registry.register(Arc::new(AppleAppStore::new(client.clone())));
+        registry.register(Arc::new(Bilibili::new(client.clone())));
+        registry.register(Arc::new(Artic::new(client.clone())));
+        registry.register(Arc::new(AlpineLinux::new(client.clone())));
+
+        registry
     }
 
     /// Register a new engine.
