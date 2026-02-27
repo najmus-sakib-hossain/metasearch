@@ -1,0 +1,106 @@
+//! Chefkoch engine — search German recipes via Chefkoch JSON API.
+//! Translated from SearXNG `searx/engines/chefkoch.py`.
+
+use async_trait::async_trait;
+use reqwest::Client;
+use metasearch_core::{
+    engine::{SearchEngine, EngineMetadata},
+    result::SearchResult,
+    query::SearchQuery,
+    category::SearchCategory,
+    error::MetasearchError,
+};
+
+pub struct Chefkoch {
+    client: Client,
+}
+
+impl Chefkoch {
+    pub fn new(client: Client) -> Self {
+        Self { client }
+    }
+}
+
+#[async_trait]
+impl SearchEngine for Chefkoch {
+    fn metadata(&self) -> EngineMetadata {
+        EngineMetadata {
+            name: "chefkoch".to_string(),
+            display_name: "Chefkoch".to_string(),
+            categories: vec![SearchCategory::General],
+            enabled: true,
+            weight: 0.5,
+        }
+    }
+
+    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
+        let page = query.page.unwrap_or(1);
+        let limit: u32 = 20;
+        let offset = (page as u32 - 1) * limit;
+
+        let url = format!(
+            "https://api.chefkoch.de/v2/search-gateway/recipes?query={}&limit={}&offset={}",
+            urlencoding::encode(&query.query),
+            limit,
+            offset,
+        );
+
+        let resp = self.client
+            .get(&url)
+            .send()
+            .await
+            .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
+
+        let data: serde_json::Value = resp.json().await
+            .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
+
+        let mut results = Vec::new();
+
+        if let Some(items) = data["results"].as_array() {
+            for (i, item) in items.iter().enumerate() {
+                let recipe = &item["recipe"];
+
+                // Skip premium recipes
+                let is_premium = recipe["isPremium"].as_bool().unwrap_or(false);
+                let is_plus = recipe["isPlus"].as_bool().unwrap_or(false);
+                if is_premium || is_plus {
+                    continue;
+                }
+
+                let title = recipe["title"].as_str().unwrap_or_default();
+                let site_url = recipe["siteUrl"].as_str().unwrap_or_default();
+                let difficulty = recipe["difficulty"].as_u64().unwrap_or(0);
+                let prep_time = recipe["preparationTime"].as_u64().unwrap_or(0);
+                let ingredient_count = recipe["ingredientCount"].as_u64().unwrap_or(0);
+
+                let subtitle = recipe["subtitle"].as_str().unwrap_or_default();
+                let mut parts = Vec::new();
+                if !subtitle.is_empty() {
+                    parts.push(subtitle.to_string());
+                }
+                parts.push(format!("Difficulty: {}/3", difficulty));
+                parts.push(format!("Prep: {}min", prep_time));
+                parts.push(format!("{} ingredients", ingredient_count));
+
+                let snippet = parts.join(" | ");
+
+                let thumbnail = recipe["previewImageUrlTemplate"]
+                    .as_str()
+                    .map(|t| t.replace("<format>", "crop-240x300"));
+
+                let mut result = SearchResult::new(
+                    title.to_string(),
+                    site_url.to_string(),
+                    snippet,
+                    "chefkoch".to_string(),
+                );
+                result.engine_rank = Some(i + 1);
+                result.category = Some(SearchCategory::General);
+                result.thumbnail = thumbnail;
+                results.push(result);
+            }
+        }
+
+        Ok(results)
+    }
+}

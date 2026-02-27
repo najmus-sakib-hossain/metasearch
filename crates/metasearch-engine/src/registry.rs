@@ -60,6 +60,13 @@ use crate::{
     archlinux::ArchLinux,
     artstation::ArtStation,
     fdroid::Fdroid,
+    // Batch 6
+    emojipedia::Emojipedia,
+    fyyd::Fyyd,
+    mixcloud::Mixcloud,
+    bitchute::Bitchute,
+    bpb::Bpb,
+    chefkoch::Chefkoch,
 };
 
 /// Central registry of all search engines.
@@ -74,7 +81,7 @@ impl EngineRegistry {
         }
     }
 
-    /// Create a registry pre-loaded with all built-in engines (51 total).
+    /// Create a registry pre-loaded with all built-in engines (57 total).
     pub fn with_defaults(client: Client) -> Self {
         let mut registry = Self::new();
 
@@ -140,6 +147,14 @@ impl EngineRegistry {
         registry.register(Arc::new(ArchLinux::new(client.clone())));
         registry.register(Arc::new(ArtStation::new(client.clone())));
         registry.register(Arc::new(Fdroid::new(client.clone())));
+
+        // ── Batch 6: More SearXNG translations ────────────
+        registry.register(Arc::new(Emojipedia::new(client.clone())));
+        registry.register(Arc::new(Fyyd::new(client.clone())));
+        registry.register(Arc::new(Mixcloud::new(client.clone())));
+        registry.register(Arc::new(Bitchute::new(client.clone())));
+        registry.register(Arc::new(Bpb::new(client.clone())));
+        registry.register(Arc::new(Chefkoch::new(client.clone())));
 
         registry
     }

@@ -25,6 +25,9 @@
 //!
 //! ## Batch 5 — More SearXNG translations (5):
 //! - 1337x, APKMirror, Arch Linux Wiki, ArtStation, F-Droid
+//!
+//! ## Batch 6 — More SearXNG translations (6):
+//! - Emojipedia, Fyyd, Mixcloud, BitChute, BPB, Chefkoch
 
 // Original engines
 pub mod google;
@@ -88,6 +91,14 @@ pub mod apkmirror;
 pub mod archlinux;
 pub mod artstation;
 pub mod fdroid;
+
+// Batch 6
+pub mod emojipedia;
+pub mod fyyd;
+pub mod mixcloud;
+pub mod bitchute;
+pub mod bpb;
+pub mod chefkoch;
 
 pub mod registry;
 
