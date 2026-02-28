@@ -1,42 +1,50 @@
-//! Imgur engine — search images on Imgur.
-//! Translated from SearXNG `searx/engines/imgur.py`.
+//! Imgur — image search on Imgur.
+//!
+//! Scrapes HTML search results from imgur.com.
+//!
+//! Reference: <https://imgur.com>
 
 use async_trait::async_trait;
+use metasearch_core::{
+    category::SearchCategory,
+    engine::{EngineMetadata, SearchEngine},
+    error::{MetasearchError, Result},
+    query::SearchQuery,
+    result::SearchResult,
+};
 use reqwest::Client;
 use scraper::{Html, Selector};
-use metasearch_core::{
-    engine::{SearchEngine, EngineMetadata},
-    result::SearchResult,
-    query::SearchQuery,
-    category::SearchCategory,
-    error::MetasearchError,
-};
 
 pub struct Imgur {
+    metadata: EngineMetadata,
     client: Client,
 }
 
 impl Imgur {
     pub fn new(client: Client) -> Self {
-        Self { client }
+        Self {
+            metadata: EngineMetadata {
+                name: "imgur".to_string(),
+                display_name: "Imgur".to_string(),
+                homepage: "https://imgur.com".to_string(),
+                categories: vec![SearchCategory::Images],
+                enabled: true,
+                timeout_ms: 8000,
+                weight: 0.7,
+            },
+            client,
+        }
     }
 }
 
 #[async_trait]
 impl SearchEngine for Imgur {
-    fn metadata(&self) -> EngineMetadata {
-        EngineMetadata {
-            name: "imgur".to_string(),
-            display_name: "Imgur".to_string(),
-            categories: vec![SearchCategory::Images],
-            enabled: true,
-            weight: 0.7,
-        }
+    fn metadata(&self) -> &EngineMetadata {
+        &self.metadata
     }
 
-    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
-        let page = query.page.unwrap_or(1);
-        let page_index = (page as u32).saturating_sub(1);
+    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>> {
+        let page_index = query.page.saturating_sub(1);
 
         let url = format!(
             "https://imgur.com/search/score/all?q={}&qs=thumbs&p={}",
@@ -44,25 +52,33 @@ impl SearchEngine for Imgur {
             page_index,
         );
 
-        let resp = self.client
+        let resp = self
+            .client
             .get(&url)
-            .header("User-Agent", "Mozilla/5.0 (X11; Linux x86_64; rv:120.0) Gecko/20100101 Firefox/120.0")
+            .header("User-Agent", "Mozilla/5.0")
             .send()
             .await
             .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
 
-        let html_text = resp.text().await
-            .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
+        let body = resp
+            .text()
+            .await
+            .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
 
-        let document = Html::parse_document(&html_text);
-        let card_sel = Selector::parse("div.cards div.post, div.post").unwrap();
-        let link_sel = Selector::parse("a").unwrap();
-        let img_sel = Selector::parse("a img").unwrap();
+        let document = Html::parse_document(&body);
+        let card_sel = Selector::parse("div.cards div.post, div.post")
+            .map_err(|e| MetasearchError::ParseError(format!("{e:?}")))?;
+        let link_sel =
+            Selector::parse("a").map_err(|e| MetasearchError::ParseError(format!("{e:?}")))?;
+        let img_sel = Selector::parse("a img")
+            .map_err(|e| MetasearchError::ParseError(format!("{e:?}")))?;
 
         let mut results = Vec::new();
 
-        for (i, card) in document.select(&card_sel).enumerate() {
-            let link = card.select(&link_sel).next()
+        for (rank, card) in document.select(&card_sel).enumerate() {
+            let link = card
+                .select(&link_sel)
+                .next()
                 .and_then(|a| a.value().attr("href"));
             let img = card.select(&img_sel).next();
 
@@ -84,16 +100,10 @@ impl SearchEngine for Imgur {
                 None => continue,
             };
 
-            let mut result = SearchResult::new(
-                title,
-                page_url,
-                String::new(),
-                "imgur".to_string(),
-            );
-            result.engine_rank = Some(i + 1);
-            result.category = Some(SearchCategory::Images);
-            result.thumbnail = Some(thumbnail_src);
-            result.image_src = Some(img_src);
+            let mut result =
+                SearchResult::new(title, page_url, String::new(), self.metadata.name.clone());
+            result.engine_rank = (rank + 1) as u32;
+            result.thumbnail = Some(img_src);
             results.push(result);
         }
 

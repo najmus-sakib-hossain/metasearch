@@ -57,6 +57,10 @@
 //!
 //! ## Batch 15 — More SearXNG translations (4):
 //! - Openverse, Tootfinder, Searchcode, Tokyo Toshokan
+//!
+//! ## Batch 16 — Wired orphans + new engines (6):
+//! - Imgur, lib.rs, Kickass Torrents, DeviantArt,
+//!   360 Search Videos, SourceHut
 
 // Original engines
 pub mod brave;
@@ -200,6 +204,14 @@ pub mod openverse;
 pub mod searchcode;
 pub mod tokyotoshokan;
 pub mod tootfinder;
+
+// Batch 16 (wired orphans + new)
+pub mod deviantart;
+pub mod imgur;
+pub mod kickass;
+pub mod lib_rs;
+pub mod sourcehut;
+pub mod three_sixty_search_videos;
 
 pub mod registry;
 

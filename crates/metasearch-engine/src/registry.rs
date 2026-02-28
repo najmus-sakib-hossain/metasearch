@@ -41,6 +41,7 @@ use crate::{
     dailymotion::Dailymotion,
     deezer::Deezer,
     destatis::Destatis,
+    deviantart::DeviantArt,
     devicons::Devicons,
     digbt::Digbt,
     docker_hub::DockerHub,
@@ -67,12 +68,15 @@ use crate::{
     huggingface::HuggingFace,
     il_post::IlPost,
     imdb::Imdb,
+    imgur::Imgur,
     ina::Ina,
     ipernity::Ipernity,
     iqiyi::Iqiyi,
     jisho::Jisho,
+    kickass::Kickass,
     leet_x::LeetX,
     lemmy::Lemmy,
+    lib_rs::LibRs,
     livespace::LiveSpace,
     loc::Loc,
     lucide::Lucide,
@@ -104,11 +108,13 @@ use crate::{
     sepiasearch::SepiaSearch,
     solidtorrents::SolidTorrents,
     soundcloud::SoundCloud,
+    sourcehut::Sourcehut,
     spotify::Spotify,
     stackexchange::StackExchange,
     stract::Stract,
     svgrepo::SvgRepo,
     tagesschau::Tagesschau,
+    three_sixty_search_videos::ThreeSixtySearchVideos,
     tokyotoshokan::TokyoToshokan,
     tootfinder::Tootfinder,
     unsplash::Unsplash,
@@ -133,7 +139,7 @@ impl EngineRegistry {
         }
     }
 
-    /// Create a registry pre-loaded with all built-in engines (111 total).
+    /// Create a registry pre-loaded with all built-in engines (117 total).
     pub fn with_defaults(client: Client) -> Self {
         let mut registry = Self::new();
 
@@ -279,6 +285,14 @@ impl EngineRegistry {
         registry.register(Arc::new(Tootfinder::new(client.clone())));
         registry.register(Arc::new(Searchcode::new(client.clone())));
         registry.register(Arc::new(TokyoToshokan::new(client.clone())));
+
+        // ── Batch 16: Wired orphans + new engines ─────────
+        registry.register(Arc::new(Imgur::new(client.clone())));
+        registry.register(Arc::new(LibRs::new(client.clone())));
+        registry.register(Arc::new(Kickass::new(client.clone())));
+        registry.register(Arc::new(DeviantArt::new(client.clone())));
+        registry.register(Arc::new(ThreeSixtySearchVideos::new(client.clone())));
+        registry.register(Arc::new(Sourcehut::new(client.clone())));
 
         registry
     }
