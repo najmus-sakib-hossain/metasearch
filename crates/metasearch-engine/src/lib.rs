@@ -67,6 +67,9 @@
 //!
 //! ## Batch 18 — More SearXNG translations (3):
 //! - Mojeek, Google Play, Yandex
+//!
+//! ## Batch 19 — Wired orphans (2):
+//! - PirateBay, OpenAlex
 
 // Original engines
 pub mod brave;
@@ -230,6 +233,10 @@ pub mod radio_browser;
 pub mod google_play;
 pub mod mojeek;
 pub mod yandex;
+
+// Batch 19 (wired orphans)
+pub mod openalex;
+pub mod piratebay;
 
 pub mod registry;
 
