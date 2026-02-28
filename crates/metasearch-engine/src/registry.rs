@@ -88,6 +88,7 @@ use crate::{
     nyaa::Nyaa,
     odysee::Odysee,
     openlibrary::OpenLibrary,
+    openverse::Openverse,
     peertube::PeerTube,
     photon::Photon,
     pinterest::Pinterest,
@@ -98,6 +99,7 @@ use crate::{
     reddit::Reddit,
     rottentomatoes::RottenTomatoes,
     rumble::Rumble,
+    searchcode::Searchcode,
     semantic_scholar::SemanticScholar,
     sepiasearch::SepiaSearch,
     solidtorrents::SolidTorrents,
@@ -107,6 +109,8 @@ use crate::{
     stract::Stract,
     svgrepo::SvgRepo,
     tagesschau::Tagesschau,
+    tokyotoshokan::TokyoToshokan,
+    tootfinder::Tootfinder,
     unsplash::Unsplash,
     vimeo::Vimeo,
     voidlinux::VoidLinux,
@@ -129,7 +133,7 @@ impl EngineRegistry {
         }
     }
 
-    /// Create a registry pre-loaded with all built-in engines (107 total).
+    /// Create a registry pre-loaded with all built-in engines (111 total).
     pub fn with_defaults(client: Client) -> Self {
         let mut registry = Self::new();
 
@@ -269,6 +273,12 @@ impl EngineRegistry {
         registry.register(Arc::new(SolidTorrents::new(client.clone())));
         registry.register(Arc::new(RottenTomatoes::new(client.clone())));
         registry.register(Arc::new(SepiaSearch::new(client.clone())));
+
+        // ── Batch 15: More SearXNG translations ───────────
+        registry.register(Arc::new(Openverse::new(client.clone())));
+        registry.register(Arc::new(Tootfinder::new(client.clone())));
+        registry.register(Arc::new(Searchcode::new(client.clone())));
+        registry.register(Arc::new(TokyoToshokan::new(client.clone())));
 
         registry
     }
