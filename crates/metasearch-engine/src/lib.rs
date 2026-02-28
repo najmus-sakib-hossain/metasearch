@@ -73,6 +73,10 @@
 //!
 //! ## Batch 20 — More SearXNG translations (3):
 //! - Sogou, Quark, Wikimedia Commons
+//!
+//! ## Batch 21 — API key + multi-module engines (8):
+//! - Brave API, CORE, Springer Nature, NASA ADS, Marginalia,
+//!   DuckDuckGo Definitions, Google Images, Google Scholar
 
 // Original engines
 pub mod brave;
@@ -245,6 +249,16 @@ pub mod piratebay;
 pub mod quark;
 pub mod sogou;
 pub mod wikicommons;
+
+// Batch 21 (API key + multi-module engines)
+pub mod ads;
+pub mod braveapi;
+pub mod core_engine;
+pub mod duckduckgo_definitions;
+pub mod google_images;
+pub mod google_scholar;
+pub mod marginalia;
+pub mod springer;
 
 pub mod registry;
 

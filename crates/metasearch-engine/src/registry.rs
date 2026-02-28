@@ -10,6 +10,7 @@ use reqwest::Client;
 use crate::{
     acfun::AcFun,
     adobe_stock::AdobeStock,
+    ads::Ads,
     ahmia::Ahmia,
     alpinelinux::AlpineLinux,
     annas_archive::AnnasArchive,
@@ -32,12 +33,14 @@ use crate::{
     bitchute::BitChute,
     bpb::Bpb,
     brave::Brave,
+    braveapi::BraveApi,
     bt4g::Bt4g,
     btdigg::Btdigg,
     cachy_os::CachyOs,
     ccc_media::CccMedia,
     chefkoch::Chefkoch,
     chinaso::Chinaso,
+    core_engine::CoreEngine,
     crates_io::CratesIo,
     crossref::Crossref,
     dailymotion::Dailymotion,
@@ -47,8 +50,9 @@ use crate::{
     devicons::Devicons,
     digbt::Digbt,
     docker_hub::DockerHub,
-    duden::Duden,
     duckduckgo::DuckDuckGo,
+    duckduckgo_definitions::DuckDuckGoDefinitions,
+    duden::Duden,
     ebay::Ebay,
     emojipedia::Emojipedia,
     fdroid::Fdroid,
@@ -65,7 +69,9 @@ use crate::{
     gitlab::GitLab,
     goodreads::Goodreads,
     google::Google,
+    google_images::GoogleImages,
     google_play::GooglePlay,
+    google_scholar::GoogleScholar,
     grokipedia::Grokipedia,
     hackernews::HackerNews,
     hex::Hex,
@@ -84,6 +90,7 @@ use crate::{
     livespace::LiveSpace,
     loc::Loc,
     lucide::Lucide,
+    marginalia::Marginalia,
     mastodon::Mastodon,
     material_icons::MaterialIcons,
     mediathekviewweb::MediathekViewWeb,
@@ -120,6 +127,7 @@ use crate::{
     solidtorrents::SolidTorrents,
     soundcloud::SoundCloud,
     sourcehut::Sourcehut,
+    springer::Springer,
     spotify::Spotify,
     stackexchange::StackExchange,
     stract::Stract,
@@ -152,7 +160,7 @@ impl EngineRegistry {
         }
     }
 
-    /// Create a registry pre-loaded with all built-in engines (130 total).
+    /// Create a registry pre-loaded with all built-in engines (138 total).
     pub fn with_defaults(client: Client) -> Self {
         let mut registry = Self::new();
 
@@ -327,6 +335,16 @@ impl EngineRegistry {
         registry.register(Arc::new(Sogou::new(client.clone())));
         registry.register(Arc::new(Quark::new(client.clone())));
         registry.register(Arc::new(WikiCommons::new(client.clone())));
+
+        // ── Batch 21: API key + multi-module engines ──────
+        registry.register(Arc::new(BraveApi::new(client.clone(), None)));
+        registry.register(Arc::new(CoreEngine::new(client.clone(), None)));
+        registry.register(Arc::new(Springer::new(client.clone(), None)));
+        registry.register(Arc::new(Ads::new(client.clone(), None)));
+        registry.register(Arc::new(Marginalia::new(client.clone(), None)));
+        registry.register(Arc::new(DuckDuckGoDefinitions::new(client.clone())));
+        registry.register(Arc::new(GoogleImages::new(client.clone())));
+        registry.register(Arc::new(GoogleScholar::new(client.clone())));
 
         registry
     }
