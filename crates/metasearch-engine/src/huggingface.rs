@@ -73,7 +73,7 @@ impl SearchEngine for HuggingFace {
             )
             .send()
             .await
-            .map_err(|e| MetasearchError::HttpError(e.to_string()))?;;
+            .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
 
         let data: serde_json::Value = resp
             .json()

@@ -45,7 +45,7 @@ impl SearchEngine for BaseSearch {
     async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>> {
         let page = query.page;
         let hits: u32 = 10;
-        let offset = (page as u32 - 1) * hits;
+        let offset = (page - 1) * hits;
 
         let url = format!(
             "https://api.base-search.net/cgi-bin/BaseHttpSearchInterface.fcgi?func=PerformSearch&query={}&boost=oa&hits={}&offset={}",

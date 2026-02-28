@@ -11,6 +11,7 @@ use metasearch_core::{
 use reqwest::Client;
 use tracing::warn;
 
+#[allow(dead_code)]
 pub struct Brave {
     metadata: EngineMetadata,
     client: Client,

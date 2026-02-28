@@ -11,6 +11,9 @@ use metasearch_core::{
 };
 use reqwest::Client;
 
+static HTML_TAG_RE: std::sync::LazyLock<regex::Regex> =
+    std::sync::LazyLock::new(|| regex::Regex::new(r"<[^>]+>").unwrap());
+
 pub struct Mastodon {
     metadata: EngineMetadata,
     client: Client,
@@ -87,12 +90,9 @@ impl SearchEngine for Mastodon {
                 let note = account["note"].as_str().unwrap_or("");
 
                 // Strip HTML from note
-                let clean_note = html_escape::decode_html_entities(
-                    &regex::Regex::new(r"<[^>]+>")
-                        .unwrap()
-                        .replace_all(note, " "),
-                )
-                .to_string();
+                let clean_note =
+                    html_escape::decode_html_entities(&HTML_TAG_RE.replace_all(note, " "))
+                        .to_string();
 
                 let title = format!("{} ({} followers)", username, followers);
 

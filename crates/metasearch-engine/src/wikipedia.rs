@@ -47,6 +47,7 @@ struct WikiQuery {
 }
 
 #[derive(Deserialize)]
+#[allow(dead_code)]
 struct WikiSearchItem {
     title: String,
     snippet: String,

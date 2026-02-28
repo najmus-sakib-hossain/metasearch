@@ -14,6 +14,9 @@ use metasearch_core::error::MetasearchError;
 use metasearch_core::query::SearchQuery;
 use metasearch_core::result::SearchResult;
 
+static HTML_TAG_RE: std::sync::LazyLock<regex::Regex> =
+    std::sync::LazyLock::new(|| regex::Regex::new(r"<[^>]+>").unwrap());
+
 const API_URL: &str = "https://api.bitchute.com/api/beta/search/videos";
 const RESULTS_PER_PAGE: u32 = 20;
 
@@ -104,8 +107,7 @@ impl SearchEngine for BitChute {
                     .to_string();
 
             // Strip HTML tags from description
-            let tag_re = regex::Regex::new(r"<[^>]+>").unwrap();
-            snippet = tag_re.replace_all(&snippet, "").trim().to_string();
+            snippet = HTML_TAG_RE.replace_all(&snippet, "").trim().to_string();
 
             if let Some(channel) = item.channel.channel_name.as_deref() {
                 if !snippet.is_empty() {

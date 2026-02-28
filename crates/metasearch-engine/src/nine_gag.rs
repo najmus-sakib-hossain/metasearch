@@ -45,6 +45,7 @@ struct GagResponse {
 }
 
 #[derive(Deserialize, Debug)]
+#[allow(dead_code)]
 struct GagData {
     posts: Vec<GagPost>,
     #[serde(default)]
@@ -52,6 +53,7 @@ struct GagData {
 }
 
 #[derive(Deserialize, Debug)]
+#[allow(dead_code)]
 struct GagPost {
     #[serde(rename = "type")]
     post_type: String,
@@ -79,6 +81,7 @@ struct GagImage {
 }
 
 #[derive(Deserialize, Debug)]
+#[allow(dead_code)]
 struct GagTag {
     key: String,
 }

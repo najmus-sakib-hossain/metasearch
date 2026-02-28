@@ -41,6 +41,7 @@ struct ApiResponse {
 }
 
 #[derive(Deserialize)]
+#[allow(dead_code)]
 struct Event {
     title: String,
     description: Option<String>,
@@ -51,6 +52,7 @@ struct Event {
 }
 
 #[derive(Deserialize)]
+#[allow(dead_code)]
 struct Recording {
     mime_type: Option<String>,
     recording_url: Option<String>,

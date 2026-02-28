@@ -1,53 +1,176 @@
-# SearXNG Engine Source Code Catalog
+# Metasearch Engines
 
+A catalog of all **74 search engines** supported by Metasearch, organized by category.
 
-                            f" {data['subscriptionId']}, Resource Group: {data['resourceGroup']}"
-                            f"/providers/{data['type']}/{data['name']}/overview"
-                            f"/subscriptions/{data['subscriptionId']}/resourceGroups/{data['name']}/overview"
-                            f"/subscriptions/{data['subscriptionId']}/resourceGroups/{data['resourceGroup']}"
-                            f"https://portal.azure.com/#@/resource"
-                            f"Resource of type {data['type']} in Subscription:"
-                        "attributes": attributes,
-                        "content": content,
-                        "content": f"Base color: {result['color']}",
-                        "engine_data": next_page_token,
-                        "id": infobox_id,
-                        "img_format": "SVG",
-                        "img_src": image,
-                        "img_src": img_src,
-                        "infobox": heading,
-                        "key": "next_page_token",
-                        "relatedTopics": relatedTopics,
-                        "template": "images.html",
-                        "title": result["name"],
-                        "url": img_src,
-                        "urls": urls,
-                        # coordinate NOT on Earth
-                        # coordinate on Earth
-                        # get the zoom information from the area
-                        'author': author,
-                        'cached_url': cached_url + cached,
-                        'city', properties.get('town', properties.get('village'))  # noqa
-                        'content': content,
-                        'iframe_src': 'https://www.youtube-nocookie.com/embed/' + videoid,
-                        'iframe_src': get_embeded_stream_url(res_url),
-                        'image': {'src': image[0].xpath(img_src_xpath)[0], 'alt': image[0].xpath(img_alt_xpath)[0]},
-                        'img_format': item.get('thumb_type'),
-                        'img_src': img_src,
-                        'is_onion': is_onion,
-                        'label': pod_title,
-                        'length': length,
-                        'publishedDate': pub_date,
-                        'resolution': f"{item['width']} x {item['height']}",
-                        'template': 'images.html',
-                        'template': 'videos.html',
-                        'thumbnail': thumbnail,
-                        'thumbnail_src': thumbnail,
-                        'title',
-                        'title': title,
-                        'topic',
-                        'url': res_url,
-                        'url': url,
+## Status Legend
+
+| Symbol | Meaning |
+|--------|---------|
+| ✅ | Returns results reliably |
+| ⚠️ | Works with limitations (geo-restricted, rate-limited, query-sensitive) |
+| 🔑 | Requires an API key in `config/default.toml` |
+| 🚧 | Stub — implementation in progress |
+| ❌ | Currently blocked (bot detection, Cloudflare, JS-only SPA) |
+
+---
+
+## General Web
+
+| Engine | Homepage | Status | Notes |
+|--------|----------|--------|-------|
+| Ask | <https://www.ask.com> | ❌ | JavaScript-rendered SPA |
+| Baidu | <https://www.baidu.com> | ✅ | Chinese web search |
+| Bing | <https://www.bing.com> | ✅ | |
+| Brave Search | <https://search.brave.com> | 🚧 | Stub — API key integration pending |
+| DuckDuckGo | <https://duckduckgo.com> | ⚠️ | HTML scraping; may be rate-limited |
+| Google | <https://www.google.com> | 🚧 | Stub — scraping blocked |
+| Qwant | <https://www.qwant.com> | ❌ | Cloudflare challenge |
+| Yahoo | <https://search.yahoo.com> | ✅ | |
+
+## Images
+
+| Engine | Homepage | Status | Notes |
+|--------|----------|--------|-------|
+| Adobe Stock | <https://stock.adobe.com> | ✅ | |
+| ArtStation | <https://www.artstation.com> | ✅ | |
+| Artic (Art Institute of Chicago) | <https://www.artic.edu> | ✅ | |
+| Bing Images | <https://www.bing.com/images> | ✅ | |
+| DevIcons | <https://devicon.dev> | ✅ | Tech logo icons |
+| FindThatMeme | <https://findthatmeme.com> | ✅ | |
+| Flickr | <https://www.flickr.com> | ✅ | |
+| Frinkiac | <https://frinkiac.com> | ✅ | Simpsons screencaps |
+| Ipernity | <https://www.ipernity.com> | ✅ | |
+| Unsplash | <https://unsplash.com> | ✅ | |
+
+## Videos
+
+| Engine | Homepage | Status | Notes |
+|--------|----------|--------|-------|
+| ACFun | <https://www.acfun.cn> | ⚠️ | Chinese video; geo-restricted |
+| Bilibili | <https://www.bilibili.com> | ❌ | Requires session cookies (412) |
+| Bing Videos | <https://www.bing.com/videos> | ✅ | |
+| BitChute | <https://www.bitchute.com> | ✅ | |
+| CCC Media | <https://media.ccc.de> | ✅ | Chaos Computer Club talks |
+| Dailymotion | <https://www.dailymotion.com> | ✅ | |
+| INA | <https://www.ina.fr> | ❌ | Migrated to JS-rendered SPA |
+| Vimeo | <https://vimeo.com> | ❌ | 403 Forbidden |
+| YouTube | <https://www.youtube.com> | ✅ | |
+
+## News
+
+| Engine | Homepage | Status | Notes |
+|--------|----------|--------|-------|
+| ANSA | <https://www.ansa.it> | ⚠️ | Italian news agency |
+| Bing News | <https://www.bing.com/news> | ✅ | |
+| Hacker News | <https://news.ycombinator.com> | ✅ | |
+
+## Music & Audio
+
+| Engine | Homepage | Status | Notes |
+|--------|----------|--------|-------|
+| Bandcamp | <https://bandcamp.com> | ✅ | |
+| Deezer | <https://www.deezer.com> | ⚠️ | IP rate-limited |
+| Freesound | <https://freesound.org> | 🔑 | Requires `freesound.api_key` |
+| Fyyd | <https://fyyd.de> | ❌ | 500 Internal Server Error |
+| Genius | <https://genius.com> | ❌ | Cloudflare challenge |
+| Mixcloud | <https://www.mixcloud.com> | ✅ | |
+| SoundCloud | <https://soundcloud.com> | ✅ | |
+| Spotify | <https://www.spotify.com> | 🔑 | Requires `spotify.client_id` + `client_secret` |
+
+## Science & Academia
+
+| Engine | Homepage | Status | Notes |
+|--------|----------|--------|-------|
+| arXiv | <https://arxiv.org> | ✅ | |
+| BASE Search | <https://www.base-search.net> | ⚠️ | Access restricted by IP |
+| CrossRef | <https://www.crossref.org> | ✅ | DOI metadata |
+| Semantic Scholar | <https://www.semanticscholar.org> | ⚠️ | Rate-limited without API key |
+
+## Technology & Code
+
+| Engine | Homepage | Status | Notes |
+|--------|----------|--------|-------|
+| APKMirror | <https://www.apkmirror.com> | ⚠️ | Android app mirror |
+| Apple App Store | <https://apps.apple.com> | ✅ | |
+| CachyOS Packages | <https://packages.cachyos.org> | ⚠️ | Rolling release packages |
+| Crates.io | <https://crates.io> | ✅ | Rust packages |
+| Docker Hub | <https://hub.docker.com> | ✅ | |
+| F-Droid | <https://f-droid.org> | ⚠️ | Android FOSS packages |
+| GitHub | <https://github.com> | ✅ | |
+| GitLab | <https://gitlab.com> | ✅ | |
+| Hex | <https://hex.pm> | ✅ | Elixir/Erlang packages |
+| HuggingFace | <https://huggingface.co> | ✅ | ML models & datasets |
+| npm | <https://www.npmjs.com> | ✅ | JavaScript packages |
+| PyPI | <https://pypi.org> | ❌ | Migrated to JS-rendered SPA |
+
+## Q&A & Communities
+
+| Engine | Homepage | Status | Notes |
+|--------|----------|--------|-------|
+| Lemmy | <https://lemmy.ml> | ✅ | Federated forum |
+| Mastodon | <https://mastodon.social> | ✅ | Federated social |
+| Reddit | <https://www.reddit.com> | ❌ | Bot detection (returns HTML) |
+| Stack Exchange | <https://stackexchange.com> | ✅ | |
+
+## Books & Files
+
+| Engine | Homepage | Status | Notes |
+|--------|----------|--------|-------|
+| Anna's Archive | <https://annas-archive.org> | ❌ | Connection refused from most IPs |
+| DigBT | <https://digbt.org> | ❌ | Site down |
+| Goodreads | <https://www.goodreads.com> | ✅ | |
+
+## Torrents
+
+| Engine | Homepage | Status | Notes |
+|--------|----------|--------|-------|
+| BT4G | <https://bt4g.org> | ❌ | 403 Forbidden |
+| BTDigg | <https://btdig.com> | ❌ | 429 Too Many Requests |
+| KickAss Torrents | <https://kickasstorrents.to> | ⚠️ | |
+| Leet-X (1337x) | <https://1337x.to> | ⚠️ | Selector may be outdated |
+
+## Lifestyle & Shopping
+
+| Engine | Homepage | Status | Notes |
+|--------|----------|--------|-------|
+| Chefkoch | <https://www.chefkoch.de> | ✅ | German recipes |
+| eBay | <https://www.ebay.com> | ❌ | Bot detection |
+| IMDB | <https://www.imdb.com> | ✅ | Films & TV |
+
+## Reference & Culture
+
+| Engine | Homepage | Status | Notes |
+|--------|----------|--------|-------|
+| Alpine Linux Packages | <https://pkgs.alpinelinux.org> | ✅ | Returns empty for generic queries |
+| Arch Linux Wiki | <https://wiki.archlinux.org> | ⚠️ | Bot detection on some IPs |
+| BPB | <https://www.bpb.de> | ✅ | German political education |
+| Destatis | <https://www.destatis.de> | ✅ | German federal statistics |
+| DeviantArt | <https://www.deviantart.com> | ✅ | |
+| Emojipedia | <https://emojipedia.org> | ✅ | |
+| NineGag | <https://9gag.com> | ✅ | |
+| Wikipedia | <https://www.wikipedia.org> | ✅ | |
+
+---
+
+## Running the Engine Probe
+
+To test all engines against live external APIs:
+
+```bash
+cargo test -p metasearch-engine --test engine_probe -- --ignored --nocapture
+```
+
+The test queries every engine with `"rust programming"` and asserts that at least
+30 % return results. Engines blocked in CI environments (bot detection, geo-fencing,
+Cloudflare) are expected failures and do not affect the pass threshold.
+
+## Adding a New Engine
+
+1. Create `crates/metasearch-engine/src/<name>.rs` implementing the `SearchEngine` trait.
+2. Expose the module in `crates/metasearch-engine/src/lib.rs`.
+3. Register it in `EngineRegistry::with_defaults()` inside `src/registry.rs`.
+4. Add a row to this file.
+
                         (attribute.language == 'en' and infobox_id_lang is None) or attribute.language != 'en'
                         ),
                         attributes.append({"label": data_label, "value": data_value, "entity": "P625"})

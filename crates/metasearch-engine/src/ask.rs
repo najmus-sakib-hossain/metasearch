@@ -47,7 +47,7 @@ impl SearchEngine for Ask {
 
     async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>> {
         // Ask.com has at max 5 pages
-        let page = query.page.min(5).max(1);
+        let page = query.page.clamp(1, 5);
         let encoded = urlencoding::encode(&query.query);
 
         let url = format!("https://www.ask.com/web?q={}&page={}", encoded, page);

@@ -46,6 +46,7 @@ struct ArticResponse {
 }
 
 #[derive(Deserialize, Debug)]
+#[allow(dead_code)]
 struct ArticItem {
     id: u64,
     title: String,

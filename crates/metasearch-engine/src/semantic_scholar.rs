@@ -15,6 +15,8 @@ use metasearch_core::{
 };
 use reqwest::Client;
 
+static HTML_TAG_RE: std::sync::LazyLock<regex::Regex> =
+    std::sync::LazyLock::new(|| regex::Regex::new(r"<[^>]+>").unwrap());
 const SEARCH_URL: &str = "https://www.semanticscholar.org/api/1/search";
 const BASE_URL: &str = "https://www.semanticscholar.org";
 
@@ -114,10 +116,7 @@ impl SearchEngine for SemanticScholar {
                 // Abstract
                 let abstract_text = item["paperAbstract"]["text"].as_str().unwrap_or("");
                 // Strip any residual HTML tags from the abstract
-                let clean_abstract = regex::Regex::new(r"<[^>]+>")
-                    .unwrap()
-                    .replace_all(abstract_text, "")
-                    .to_string();
+                let clean_abstract = HTML_TAG_RE.replace_all(abstract_text, "").to_string();
 
                 // Authors (array of [[{"name": "..."}]])
                 let authors: Vec<String> = item["authors"]

@@ -6,7 +6,6 @@
 //! This test is `#[ignore]` by default because it hits real external APIs.
 //! The CI workflow runs it explicitly in a dedicated job.
 
-use metasearch_core::engine::SearchEngine;
 use metasearch_core::query::SearchQuery;
 use metasearch_engine::registry::EngineRegistry;
 use reqwest::Client;

@@ -127,7 +127,7 @@ impl SearchEngine for YouTube {
     }
 }
 
-fn extract_between<'a>(text: &'a str, start: &str, end: &str) -> Option<String> {
+fn extract_between(text: &str, start: &str, end: &str) -> Option<String> {
     let start_idx = text.find(start)? + start.len();
     let remaining = &text[start_idx..];
     let end_idx = remaining.find(end)?;

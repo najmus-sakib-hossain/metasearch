@@ -8,9 +8,9 @@
 
 - 🦀 **Built in Rust** — memory-safe, fearlessly concurrent, blazing fast
 - 🔒 **Privacy-first** — no user tracking, no profiling, no cookies
-- 🔌 **Pluggable engines** — Google, DuckDuckGo, Brave, Wikipedia, and more
+- 🔌 **74 search engines** — web, images, news, videos, science, code, music, and more
 - 📊 **Smart ranking** — result aggregation, deduplication, and weighted scoring
-- 🗂️ **Categories** — General, Images, News, Videos, Science, Maps
+- 🗂️ **Categories** — General, Images, News, Videos, Science, Files, Music
 - ⚡ **Async everywhere** — Tokio + Axum for maximum throughput
 - 🧩 **JSON API** — programmatic access at `/api/v1/search`
 - 🐳 **Docker-ready** — single command deployment
@@ -27,21 +27,27 @@ metasearch/
 │   │   └── src/
 │   │       ├── lib.rs
 │   │       ├── config.rs         # Application settings
-│   │       ├── engine.rs         # SearchEngine trait
+│   │       ├── engine.rs         # SearchEngine trait + EngineMetadata
 │   │       ├── error.rs          # Unified errors (thiserror)
-│   │       ├── query.rs          # Search query model
+│   │       ├── query.rs          # SearchQuery model
 │   │       ├── result.rs         # SearchResult + SearchResponse
 │   │       ├── ranking.rs        # Aggregation & deduplication
-│   │       └── category.rs       # Search categories
+│   │       └── category.rs       # SearchCategory enum
 │   │
-│   ├── metasearch-engine/        # Engine implementations
+│   ├── metasearch-engine/        # 74 engine implementations
 │   │   └── src/
 │   │       ├── lib.rs
-│   │       ├── google.rs         # Google search
-│   │       ├── duckduckgo.rs     # DuckDuckGo search
-│   │       ├── brave.rs          # Brave Search (API)
-│   │       ├── wikipedia.rs      # Wikipedia (fully implemented)
-│   │       └── registry.rs       # Engine registry
+│   │       ├── registry.rs       # EngineRegistry::with_defaults()
+│   │       ├── bing.rs           # Bing web search
+│   │       ├── duckduckgo.rs     # DuckDuckGo (HTML scraping)
+│   │       ├── wikipedia.rs      # Wikipedia OpenSearch API
+│   │       ├── youtube.rs        # YouTube (JSON scraping)
+│   │       ├── arxiv.rs          # arXiv papers
+│   │       ├── github_engine.rs  # GitHub repositories
+│   │       ├── ...               # 68 more engines
+│   │   └── tests/
+│   │       ├── engine_registry.rs  # Unit tests — no network
+│   │       └── engine_probe.rs     # Integration tests — live network (#[ignore])
 │   │
 │   ├── metasearch-server/        # Axum web server
 │   │   └── src/
@@ -49,7 +55,6 @@ metasearch/
 │   │       ├── app.rs            # Router & startup
 │   │       ├── state.rs          # Shared AppState
 │   │       ├── cache.rs          # Moka result cache
-│   │       ├── templates/        # Tera template management
 │   │       ├── middleware/
 │   │       │   ├── rate_limit.rs  # Governor rate limiter
 │   │       │   └── bot_detection.rs
@@ -69,10 +74,10 @@ metasearch/
 │   └── results.html
 ├── static/
 │   └── css/style.css             # Dark-theme UI
-├── .github/workflows/ci.yml      # CI: check, fmt, clippy, test
+├── ENGINES.md                    # Full engine catalog with status
+├── .github/workflows/ci.yml      # CI: fmt, clippy, build, test, probe
 ├── Dockerfile                    # Multi-stage Docker build
-├── docker-compose.yml
-└── README.md
+└── docker-compose.yml
 ```
 
 ## 🚀 Quick Start
@@ -119,21 +124,54 @@ curl "http://localhost:8888/api/v1/engines"
 curl "http://localhost:8888/health"
 ```
 
+## 🧪 Testing
+
+```bash
+# Unit tests (no network)
+cargo test --workspace
+
+# Engine registry smoke tests (validates all 74 engines register correctly)
+cargo test --package metasearch-engine -- --nocapture
+
+# Live engine probe (hits real external APIs — requires network)
+cargo test --package metasearch-engine --test engine_probe -- --ignored --nocapture
+```
+
+The engine probe queries every engine with a real search term and asserts that at
+least 30 % return results. Engines that are blocked in CI environments (bot detection,
+Cloudflare, geo-fencing) are expected failures. See [ENGINES.md](ENGINES.md) for the
+full status of each engine.
+
 ## 🧰 Tech Stack
 
 | Crate | Version | Purpose |
 |-------|---------|----------|
 | `axum` | 0.8 | Web framework |
 | `tokio` | 1.48 | Async runtime |
-| `reqwest` | 0.12 | HTTP client |
+| `reqwest` | 0.12 | HTTP client (rustls, gzip, brotli) |
 | `serde` | 1.0 | Serialization |
+| `scraper` | 0.22 | HTML parsing (CSS selectors) |
+| `regex` | 1.11 | Text extraction |
 | `tera` | 1.20 | HTML templates |
-| `scraper` | 0.22 | HTML parsing |
-| `moka` | 0.12 | In-memory cache |
+| `moka` | 0.12 | In-memory result cache |
 | `governor` | 0.8 | Rate limiting |
 | `tracing` | 0.1 | Structured logging |
 | `clap` | 4.5 | CLI framework |
 | `thiserror` | 2.0 | Error types |
+| `urlencoding` | 2.1 | URL encoding |
+
+## 🔧 Configuration
+
+Copy `config/default.toml` and set optional API keys:
+
+```toml
+[freesound]
+api_key = "your_freesound_key"
+
+[spotify]
+api_client_id = "your_client_id"
+api_client_secret = "your_client_secret"
+```
 
 ## 📜 License
 
@@ -142,3 +180,4 @@ AGPL-3.0 — Same as SearXNG. Free as in freedom.
 ## 🙏 Acknowledgements
 
 Inspired by [SearXNG](https://github.com/searxng/searxng) — the OG privacy-respecting metasearch engine.
+

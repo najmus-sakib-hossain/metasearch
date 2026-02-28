@@ -40,6 +40,7 @@ impl FindThatMeme {
 }
 
 #[derive(Deserialize)]
+#[allow(dead_code)]
 struct MemeItem {
     image_path: Option<String>,
     source_page_url: Option<String>,

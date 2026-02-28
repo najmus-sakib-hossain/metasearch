@@ -66,6 +66,7 @@ struct BiliData {
 }
 
 #[derive(Deserialize, Debug)]
+#[allow(dead_code)]
 struct BiliItem {
     title: String,
     arcurl: String,

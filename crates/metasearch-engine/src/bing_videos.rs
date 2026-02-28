@@ -119,12 +119,8 @@ impl SearchEngine for BingVideos {
                 .collect();
             let snippet = info.join(" · ");
 
-            let mut result = SearchResult::new(
-                title,
-                video_url,
-                snippet,
-                "bing_videos".to_string(),
-            );
+            let mut result =
+                SearchResult::new(title, video_url, snippet, "bing_videos".to_string());
             result.engine_rank = (i + 1) as u32;
             result.category = SearchCategory::Videos.to_string();
             result.thumbnail = thumbnail;
