@@ -65,6 +65,7 @@ use crate::{
     gitlab::GitLab,
     goodreads::Goodreads,
     google::Google,
+    google_play::GooglePlay,
     grokipedia::Grokipedia,
     hackernews::HackerNews,
     hex::Hex,
@@ -88,6 +89,7 @@ use crate::{
     mediathekviewweb::MediathekViewWeb,
     metacpan::MetaCpan,
     mixcloud::Mixcloud,
+    mojeek::Mojeek,
     moviepilot::Moviepilot,
     mwmbl::Mwmbl,
     naver::Naver,
@@ -95,13 +97,11 @@ use crate::{
     npm::Npm,
     nyaa::Nyaa,
     odysee::Odysee,
-    openalex::OpenAlex,
     openlibrary::OpenLibrary,
     openverse::Openverse,
     peertube::PeerTube,
     photon::Photon,
     pinterest::Pinterest,
-    piratebay::PirateBay,
     pkg_go_dev::PkgGoDev,
     podcastindex::PodcastIndex,
     pypi::PyPI,
@@ -130,6 +130,7 @@ use crate::{
     wallhaven::Wallhaven,
     wikipedia::Wikipedia,
     yahoo::Yahoo,
+    yandex::Yandex,
     yep::Yep,
     youtube::YouTube,
 };
@@ -146,7 +147,7 @@ impl EngineRegistry {
         }
     }
 
-    /// Create a registry pre-loaded with all built-in engines (124 total).
+    /// Create a registry pre-loaded with all built-in engines (125 total).
     pub fn with_defaults(client: Client) -> Self {
         let mut registry = Self::new();
 
@@ -309,8 +310,9 @@ impl EngineRegistry {
         registry.register(Arc::new(RadioBrowser::new(client.clone())));
 
         // ── Batch 18: More SearXNG translations ───────────
-        registry.register(Arc::new(PirateBay::new(client.clone())));
-        registry.register(Arc::new(OpenAlex::new(client.clone())));
+        registry.register(Arc::new(Mojeek::new(client.clone())));
+        registry.register(Arc::new(GooglePlay::new(client.clone())));
+        registry.register(Arc::new(Yandex::new(client.clone())));
 
         registry
     }
