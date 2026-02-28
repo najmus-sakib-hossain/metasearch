@@ -54,8 +54,8 @@ struct ApiResult {
 
 #[async_trait]
 impl SearchEngine for Mwmbl {
-    fn metadata(&self) -> &EngineMetadata {
-        &self.metadata
+    fn metadata(&self) -> EngineMetadata {
+        self.metadata.clone()
     }
 
     async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>> {

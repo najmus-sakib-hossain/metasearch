@@ -72,8 +72,8 @@ fn parse_url(url_string: &str) -> String {
 
 #[async_trait]
 impl SearchEngine for Yahoo {
-    fn metadata(&self) -> &EngineMetadata {
-        &self.metadata
+    fn metadata(&self) -> EngineMetadata {
+        self.metadata.clone()
     }
 
     async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {

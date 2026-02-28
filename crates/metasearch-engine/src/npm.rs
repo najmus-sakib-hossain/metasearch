@@ -37,8 +37,8 @@ impl Npm {
 
 #[async_trait]
 impl SearchEngine for Npm {
-    fn metadata(&self) -> &EngineMetadata {
-        &self.metadata
+    fn metadata(&self) -> EngineMetadata {
+        self.metadata.clone()
     }
 
     async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {

@@ -37,8 +37,8 @@ impl Digbt {
 
 #[async_trait]
 impl SearchEngine for Digbt {
-    fn metadata(&self) -> &EngineMetadata {
-        &self.metadata
+    fn metadata(&self) -> EngineMetadata {
+        self.metadata.clone()
     }
 
     async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>> {

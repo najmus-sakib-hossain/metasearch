@@ -65,8 +65,8 @@ fn clean_url(raw_url: &str) -> String {
 
 #[async_trait]
 impl SearchEngine for Unsplash {
-    fn metadata(&self) -> &EngineMetadata {
-        &self.metadata
+    fn metadata(&self) -> EngineMetadata {
+        self.metadata.clone()
     }
 
     async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {

@@ -88,8 +88,8 @@ struct GagTag {
 
 #[async_trait]
 impl SearchEngine for NineGag {
-    fn metadata(&self) -> &EngineMetadata {
-        &self.metadata
+    fn metadata(&self) -> EngineMetadata {
+        self.metadata.clone()
     }
 
     async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>> {
