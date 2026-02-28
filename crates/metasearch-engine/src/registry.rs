@@ -47,6 +47,35 @@ use crate::{
     voidlinux::VoidLinux, wallhaven::Wallhaven, wikicommons::WikiCommons, wikipedia::Wikipedia,
     wordnik::Wordnik, yahoo::Yahoo, yandex::Yandex, yep::Yep, youtube::YouTube,
 };
+use crate::{
+    microsoft_learn::MicrosoftLearn, mrs::Mrs, nvd::Nvd, openclipart::Openclipart,
+    pdbe::Pdbe, repology::Repology, reuters::Reuters, scanr_structures::ScanrStructures,
+    searchcode_code::SearchcodeCode, selfhst::Selfhst, senscritique::SensCritique,
+    sogou_images::SogouImages, sogou_videos::SogouVideos, sogou_wechat::SogouWechat,
+    steam::SteamStore, uxwing::Uxwing, www1x::Www1x, yahoo_news::YahooNews,
+};
+use crate::{
+    astrophysics_data_system::AstrophysicsDataSystem, presearch::Presearch,
+    wolframalpha_api::WolframAlphaApi, wolframalpha_noapi::WolframAlphaNoapi,
+    youtube_api::YoutubeApi, youtube_noapi::YoutubeNoapi,
+};
+use crate::{
+    github_code::GithubCode, niconico::Niconico, pixabay::Pixabay, pubmed::Pubmed,
+    yandex_music::YandexMusic, zlibrary::Zlibrary,
+};
+use crate::{
+    mozhi::Mozhi, open_meteo::OpenMeteo, seznam::Seznam, startpage::Startpage,
+    translated::Translated, wttr::Wttr,
+};
+use crate::{
+    duckduckgo_extra::DuckDuckGoExtra, pexels::Pexels, pixiv::Pixiv,
+    three_sixty_search::ThreeSixtySearch, torznab::Torznab, yacy::Yacy,
+};
+use crate::{
+    opensemantic::OpenSemantic, public_domain_image_archive::PublicDomainImageArchive,
+    searx_engine::SearxEngine, solr::Solr, tubearchivist::TubeArchivist, wikidata::Wikidata,
+};
+use crate::{azure::Azure, cloudflareai::CloudflareAi, ollama::Ollama};
 
 /// Central registry of all search engines.
 pub struct EngineRegistry {
@@ -60,7 +89,7 @@ impl EngineRegistry {
         }
     }
 
-    /// Create a registry pre-loaded with all built-in engines (158 total).
+    /// Create a registry pre-loaded with all built-in engines (209 total).
     pub fn with_defaults(client: Client) -> Self {
         let mut registry = Self::new();
 
@@ -287,6 +316,75 @@ impl EngineRegistry {
         registry.register(Arc::new(AppleMaps::new(client.clone())));
         // Weather
         registry.register(Arc::new(DuckDuckGoWeather::new(client.clone())));
+
+        // ── Batch 24: New engines ─────────────────────────
+        registry.register(Arc::new(SteamStore::new(client.clone())));
+        registry.register(Arc::new(Nvd::new(client.clone())));
+        registry.register(Arc::new(MicrosoftLearn::new(client.clone())));
+        registry.register(Arc::new(SearchcodeCode::new(client.clone())));
+        registry.register(Arc::new(Repology::new(client.clone())));
+        registry.register(Arc::new(Selfhst::new(client.clone())));
+
+        // ── Batch 25: Sogou variants, Reuters, ScanR, PDBe ──
+        registry.register(Arc::new(SogouVideos::new(client.clone())));
+        registry.register(Arc::new(SogouImages::new(client.clone())));
+        registry.register(Arc::new(SogouWechat::new(client.clone())));
+        registry.register(Arc::new(Reuters::new(client.clone())));
+        registry.register(Arc::new(ScanrStructures::new(client.clone())));
+        registry.register(Arc::new(Pdbe::new(client.clone())));
+
+        // ── Batch 26: MRS, SensCritique, Yahoo News, OpenClipart, UXWing, 1x ──
+        registry.register(Arc::new(Mrs::new(client.clone(), "")));
+        registry.register(Arc::new(SensCritique::new(client.clone())));
+        registry.register(Arc::new(YahooNews::new(client.clone())));
+        registry.register(Arc::new(Openclipart::new(client.clone())));
+        registry.register(Arc::new(Uxwing::new(client.clone())));
+        registry.register(Arc::new(Www1x::new(client.clone())));
+
+        // ── Batch 29: YouTube/Wolfram variants, ADS, Presearch ──
+        registry.register(Arc::new(YoutubeApi::new(client.clone(), None)));
+        registry.register(Arc::new(YoutubeNoapi::new(client.clone())));
+        registry.register(Arc::new(WolframAlphaApi::new(client.clone(), None)));
+        registry.register(Arc::new(WolframAlphaNoapi::new(client.clone())));
+        registry.register(Arc::new(AstrophysicsDataSystem::new(client.clone(), None)));
+        registry.register(Arc::new(Presearch::new(client.clone())));
+
+        // ── Batch 27: Yandex Music, Pixabay, Niconico, PubMed, GitHub Code, Z-Library ──
+        registry.register(Arc::new(YandexMusic::new(client.clone())));
+        registry.register(Arc::new(Pixabay::new(client.clone())));
+        registry.register(Arc::new(Niconico::new(client.clone())));
+        registry.register(Arc::new(Pubmed::new(client.clone())));
+        registry.register(Arc::new(GithubCode::new(client.clone(), None)));
+        registry.register(Arc::new(Zlibrary::new(client.clone())));
+
+        // ── Batch 28: Translation, weather, search engines ──
+        registry.register(Arc::new(Translated::new(client.clone())));
+        registry.register(Arc::new(Mozhi::new(client.clone(), "")));
+        registry.register(Arc::new(Wttr::new(client.clone())));
+        registry.register(Arc::new(OpenMeteo::new(client.clone())));
+        registry.register(Arc::new(Seznam::new(client.clone())));
+        registry.register(Arc::new(Startpage::new(client.clone())));
+
+        // ── Batch 30: Pexels, Pixiv, DDG Extra, 360 Search, YaCy, Torznab ──
+        registry.register(Arc::new(DuckDuckGoExtra::new(client.clone())));
+        registry.register(Arc::new(Pexels::new(client.clone(), None)));
+        registry.register(Arc::new(Pixiv::new(client.clone())));
+        registry.register(Arc::new(ThreeSixtySearch::new(client.clone())));
+        registry.register(Arc::new(Yacy::new(client.clone(), "")));
+        registry.register(Arc::new(Torznab::new(client.clone(), "", None)));
+
+        // ── Batch 31: Self-hosted, Wikidata, PDIA, SearXNG federation ──
+        registry.register(Arc::new(Wikidata::new(client.clone())));
+        registry.register(Arc::new(PublicDomainImageArchive::new(client.clone())));
+        registry.register(Arc::new(Solr::new(client.clone(), "")));
+        registry.register(Arc::new(OpenSemantic::new(client.clone(), "")));
+        registry.register(Arc::new(SearxEngine::new(client.clone(), "")));
+        registry.register(Arc::new(TubeArchivist::new(client.clone(), "", None)));
+
+        // ── Batch 32: AI/Cloud: Ollama, Cloudflare AI, Azure Search ──
+        registry.register(Arc::new(Ollama::new(client.clone(), "", None)));
+        registry.register(Arc::new(CloudflareAi::new(client.clone(), None, None, None)));
+        registry.register(Arc::new(Azure::new(client.clone(), "", None, None)));
 
         registry
     }

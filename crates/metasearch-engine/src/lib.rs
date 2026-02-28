@@ -292,6 +292,75 @@ pub mod openstreetmap;
 pub mod tineye;
 pub mod wordnik;
 
+// Batch 24 (new engines)
+pub mod microsoft_learn;
+pub mod nvd;
+pub mod repology;
+pub mod searchcode_code;
+pub mod selfhst;
+pub mod steam;
+
+// Batch 25 (Sogou variants, Reuters, ScanR, PDBe)
+pub mod pdbe;
+pub mod reuters;
+pub mod scanr_structures;
+pub mod sogou_images;
+pub mod sogou_videos;
+pub mod sogou_wechat;
+
+// Batch 26 (MRS, SensCritique, Yahoo News, OpenClipart, UXWing, 1x)
+pub mod mrs;
+pub mod openclipart;
+pub mod senscritique;
+pub mod uxwing;
+pub mod www1x;
+pub mod yahoo_news;
+
+// Batch 27 (Yandex Music, Pixabay, Niconico, PubMed, GitHub Code, Z-Library)
+pub mod github_code;
+pub mod niconico;
+pub mod pixabay;
+pub mod pubmed;
+pub mod yandex_music;
+pub mod zlibrary;
+
+// Batch 28 (Translation, weather, search engines)
+pub mod mozhi;
+pub mod open_meteo;
+pub mod seznam;
+pub mod startpage;
+pub mod translated;
+pub mod wttr;
+
+// Batch 29 (YouTube/Wolfram variants, ADS, Presearch)
+pub mod astrophysics_data_system;
+pub mod presearch;
+pub mod wolframalpha_api;
+pub mod wolframalpha_noapi;
+pub mod youtube_api;
+pub mod youtube_noapi;
+
+// Batch 30 (Pexels, Pixiv, DDG Extra, 360 Search, YaCy, Torznab)
+pub mod duckduckgo_extra;
+pub mod pexels;
+pub mod pixiv;
+pub mod three_sixty_search;
+pub mod torznab;
+pub mod yacy;
+
+// Batch 31 (Self-hosted, Wikidata, PDIA, SearXNG federation)
+pub mod opensemantic;
+pub mod public_domain_image_archive;
+pub mod searx_engine;
+pub mod solr;
+pub mod tubearchivist;
+pub mod wikidata;
+
+// Batch 32 (AI/Cloud: Ollama, Cloudflare AI, Azure Search)
+pub mod azure;
+pub mod cloudflareai;
+pub mod ollama;
+
 pub mod registry;
 
 pub use registry::EngineRegistry;
