@@ -51,6 +51,9 @@
 //! ## Batch 13 — More SearXNG translations (9):
 //! - PeerTube, pkg.go.dev, Stract, Tagesschau, Void Linux,
 //!   Rumble, Pinterest, Podcast Index, Photon
+//!
+//! ## Batch 14 — More SearXNG translations (5):
+//! - Moviepilot, Open Library, SolidTorrents, Rotten Tomatoes, SepiaSearch
 
 // Original engines
 pub mod brave;
@@ -181,6 +184,13 @@ pub mod rumble;
 pub mod stract;
 pub mod tagesschau;
 pub mod voidlinux;
+
+// Batch 14
+pub mod moviepilot;
+pub mod openlibrary;
+pub mod rottentomatoes;
+pub mod sepiasearch;
+pub mod solidtorrents;
 
 pub mod registry;
 

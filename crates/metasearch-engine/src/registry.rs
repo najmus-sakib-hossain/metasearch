@@ -81,11 +81,13 @@ use crate::{
     mediathekviewweb::MediathekViewWeb,
     metacpan::MetaCpan,
     mixcloud::Mixcloud,
+    moviepilot::Moviepilot,
     mwmbl::Mwmbl,
     nine_gag::NineGag,
     npm::Npm,
     nyaa::Nyaa,
     odysee::Odysee,
+    openlibrary::OpenLibrary,
     peertube::PeerTube,
     photon::Photon,
     pinterest::Pinterest,
@@ -94,8 +96,11 @@ use crate::{
     pypi::PyPI,
     qwant::Qwant,
     reddit::Reddit,
+    rottentomatoes::RottenTomatoes,
     rumble::Rumble,
     semantic_scholar::SemanticScholar,
+    sepiasearch::SepiaSearch,
+    solidtorrents::SolidTorrents,
     soundcloud::SoundCloud,
     spotify::Spotify,
     stackexchange::StackExchange,
@@ -124,7 +129,7 @@ impl EngineRegistry {
         }
     }
 
-    /// Create a registry pre-loaded with all built-in engines (102 total).
+    /// Create a registry pre-loaded with all built-in engines (107 total).
     pub fn with_defaults(client: Client) -> Self {
         let mut registry = Self::new();
 
@@ -257,6 +262,13 @@ impl EngineRegistry {
         registry.register(Arc::new(Pinterest::new(client.clone())));
         registry.register(Arc::new(PodcastIndex::new(client.clone())));
         registry.register(Arc::new(Photon::new(client.clone())));
+
+        // ── Batch 14: More SearXNG translations ───────────
+        registry.register(Arc::new(Moviepilot::new(client.clone())));
+        registry.register(Arc::new(OpenLibrary::new(client.clone())));
+        registry.register(Arc::new(SolidTorrents::new(client.clone())));
+        registry.register(Arc::new(RottenTomatoes::new(client.clone())));
+        registry.register(Arc::new(SepiaSearch::new(client.clone())));
 
         registry
     }
