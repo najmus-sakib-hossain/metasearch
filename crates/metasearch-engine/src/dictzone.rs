@@ -1,0 +1,97 @@
+//! DictZone — online dictionary (HTML scraping)
+//!
+//! Scrapes translation results from dictzone.com.
+//! URL pattern: `https://dictzone.com/{from}-{to}-dictionary/{query}`
+//!
+//! Reference: <https://github.com/searxng/searxng/blob/master/searx/engines/dictzone.py>
+
+use async_trait::async_trait;
+use reqwest::Client;
+use scraper::{Html, Selector};
+
+use metasearch_core::{
+    engine::{EngineMetadata, SearchEngine},
+    error::MetasearchError,
+    query::SearchQuery,
+    result::SearchResult,
+};
+
+pub struct DictZone {
+    client: Client,
+}
+
+impl DictZone {
+    pub fn new(client: Client) -> Self {
+        Self { client }
+    }
+}
+
+#[async_trait]
+impl SearchEngine for DictZone {
+    fn metadata(&self) -> EngineMetadata {
+        EngineMetadata {
+            name: "DictZone".to_string(),
+            base_url: "https://dictzone.com".to_string(),
+            categories: vec!["translate".to_string(), "general".to_string()],
+            enabled: true,
+        }
+    }
+
+    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
+        // Default: English to German (matching SearXNG defaults)
+        let url = format!(
+            "https://dictzone.com/english-german-dictionary/{}",
+            urlencoding::encode(&query.query)
+        );
+
+        let resp = self
+            .client
+            .get(&url)
+            .send()
+            .await
+            .map_err(|e| MetasearchError::Engine(format!("DictZone request error: {e}")))?;
+
+        if !resp.status().is_success() {
+            return Ok(vec![]);
+        }
+
+        let html = resp
+            .text()
+            .await
+            .map_err(|e| MetasearchError::Engine(format!("DictZone read error: {e}")))?;
+
+        let document = Html::parse_document(&html);
+        let row_sel = Selector::parse("table#r tr").unwrap();
+        let td_sel = Selector::parse("td").unwrap();
+
+        let mut results = Vec::new();
+
+        for (i, row) in document.select(&row_sel).enumerate() {
+            let tds: Vec<_> = row.select(&td_sel).collect();
+            if tds.len() != 2 {
+                continue;
+            }
+
+            let from_text: String = tds[0].text().collect::<Vec<_>>().join(" ").trim().to_string();
+            let to_text: String = tds[1].text().collect::<Vec<_>>().join(" ").trim().to_string();
+
+            if from_text.is_empty() && to_text.is_empty() {
+                continue;
+            }
+
+            results.push(SearchResult {
+                title: format!("{} → {}", from_text, to_text),
+                url: url.clone(),
+                content: format!("{}: {}", from_text, to_text),
+                engine: "dictzone".to_string(),
+                engine_rank: (i + 1) as u32,
+            });
+
+            if results.len() >= 10 {
+                break;
+            }
+        }
+
+        Ok(results)
+    }
+}
