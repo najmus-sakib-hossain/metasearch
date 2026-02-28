@@ -11,9 +11,10 @@ use scraper::{Html, Selector};
 
 use metasearch_core::{
     category::SearchCategory,
-    engine::{EngineFetcher, EngineMetadata, SearchEngine},
+    engine::{EngineMetadata, SearchEngine},
     error::MetasearchError,
-    schema::{SearchQuery, SearchResult},
+    query::SearchQuery,
+    result::SearchResult,
 };
 
 pub struct TokyoToshokan {
@@ -111,4 +112,3 @@ impl SearchEngine for TokyoToshokan {
     }
 }
 
-impl EngineFetcher for TokyoToshokan {}

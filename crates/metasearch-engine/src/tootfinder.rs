@@ -11,9 +11,10 @@ use serde::Deserialize;
 
 use metasearch_core::{
     category::SearchCategory,
-    engine::{EngineFetcher, EngineMetadata, SearchEngine},
+    engine::{EngineMetadata, SearchEngine},
     error::MetasearchError,
-    schema::{SearchQuery, SearchResult},
+    query::SearchQuery,
+    result::SearchResult,
 };
 
 pub struct Tootfinder {
@@ -103,4 +104,3 @@ impl SearchEngine for Tootfinder {
     }
 }
 
-impl EngineFetcher for Tootfinder {}

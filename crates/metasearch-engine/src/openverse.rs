@@ -11,9 +11,10 @@ use serde::Deserialize;
 
 use metasearch_core::{
     category::SearchCategory,
-    engine::{EngineFetcher, EngineMetadata, SearchEngine},
+    engine::{EngineMetadata, SearchEngine},
     error::MetasearchError,
-    schema::{SearchQuery, SearchResult},
+    query::SearchQuery,
+    result::SearchResult,
 };
 
 pub struct Openverse {
@@ -87,4 +88,3 @@ impl SearchEngine for Openverse {
     }
 }
 
-impl EngineFetcher for Openverse {}
