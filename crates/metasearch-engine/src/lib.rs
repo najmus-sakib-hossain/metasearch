@@ -32,6 +32,9 @@
 //!
 //! ## Batch 7 — More SearXNG translations (5):
 //! - BT4G, BTDigg, CachyOS, CCC Media, DeStatis
+//!
+//! ## Batch 8 — More SearXNG translations (5):
+//! - Frinkiac, Hex.pm, INA, Ipernity, Devicons
 
 // Original engines
 pub mod google;
@@ -113,6 +116,13 @@ pub mod btdigg;
 pub mod cachy_os;
 pub mod ccc_media;
 pub mod destatis;
+
+// Batch 8
+pub mod frinkiac;
+pub mod hex;
+pub mod ina;
+pub mod ipernity;
+pub mod devicons;
 
 pub mod registry;
 

@@ -76,6 +76,12 @@ use crate::{
     cachy_os::CachyOs,
     ccc_media::CccMedia,
     destatis::Destatis,
+    // Batch 8
+    frinkiac::Frinkiac,
+    hex::Hex,
+    ina::Ina,
+    ipernity::Ipernity,
+    devicons::Devicons,
 };
 
 /// Central registry of all search engines.
@@ -90,7 +96,7 @@ impl EngineRegistry {
         }
     }
 
-    /// Create a registry pre-loaded with all built-in engines (65 total).
+    /// Create a registry pre-loaded with all built-in engines (70 total).
     pub fn with_defaults(client: Client) -> Self {
         let mut registry = Self::new();
 
@@ -174,6 +180,13 @@ impl EngineRegistry {
         registry.register(Arc::new(CachyOs::new(client.clone())));
         registry.register(Arc::new(CccMedia::new(client.clone())));
         registry.register(Arc::new(Destatis::new(client.clone())));
+
+        // ── Batch 8: More SearXNG translations ────────────
+        registry.register(Arc::new(Frinkiac::new(client.clone())));
+        registry.register(Arc::new(Hex::new(client.clone())));
+        registry.register(Arc::new(Ina::new(client.clone())));
+        registry.register(Arc::new(Ipernity::new(client.clone())));
+        registry.register(Arc::new(Devicons::new(client.clone())));
 
         registry
     }
