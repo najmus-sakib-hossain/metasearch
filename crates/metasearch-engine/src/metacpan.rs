@@ -6,7 +6,7 @@ use async_trait::async_trait;
 use metasearch_core::{
     category::SearchCategory,
     engine::{EngineMetadata, SearchEngine},
-    error::MetasearchError,
+    error::{MetasearchError, Result},
     query::SearchQuery,
     result::SearchResult,
 };
@@ -72,8 +72,8 @@ impl SearchEngine for MetaCpan {
         &self.metadata
     }
 
-    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
-        let page = query.page.unwrap_or(1);
+    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>> {
+        let page = query.page;
         let from = (page.saturating_sub(1)) * 10;
 
         let body = json!({
@@ -130,7 +130,7 @@ impl SearchEngine for MetaCpan {
                     snippet,
                     self.metadata.name.clone(),
                 );
-                result.engine_rank = Some(i + 1);
+                result.engine_rank = (i + 1) as u32;
                 Some(result)
             })
             .collect();

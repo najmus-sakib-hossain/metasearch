@@ -6,7 +6,7 @@ use async_trait::async_trait;
 use metasearch_core::{
     category::SearchCategory,
     engine::{EngineMetadata, SearchEngine},
-    error::MetasearchError,
+    error::{MetasearchError, Result},
     query::SearchQuery,
     result::SearchResult,
 };
@@ -56,8 +56,8 @@ impl SearchEngine for Loc {
         &self.metadata
     }
 
-    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
-        let page = query.page.unwrap_or(1);
+    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>> {
+        let page = query.page;
 
         let url = format!(
             "https://www.loc.gov/photos/?q={}&sp={}&fo=json",
@@ -103,7 +103,7 @@ impl SearchEngine for Loc {
                     snippet,
                     self.metadata.name.clone(),
                 );
-                result.engine_rank = Some(i + 1);
+                result.engine_rank = (i + 1) as u32;
                 result.thumbnail = thumbnail;
                 Some(result)
             })

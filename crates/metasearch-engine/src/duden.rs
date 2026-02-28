@@ -1,6 +1,6 @@
-//! Geizhals — European price-comparison search engine.
+//! Duden — German dictionary search.
 //!
-//! Scrapes HTML results from geizhals.de.
+//! Scrapes HTML results from duden.de.
 
 use async_trait::async_trait;
 use metasearch_core::{
@@ -13,21 +13,21 @@ use metasearch_core::{
 use reqwest::Client;
 use scraper::{Html, Selector};
 
-pub struct Geizhals {
+pub struct Duden {
     metadata: EngineMetadata,
     client: Client,
 }
 
-impl Geizhals {
+impl Duden {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "geizhals".to_string(),
-                display_name: "Geizhals".to_string(),
-                homepage: "https://geizhals.de".to_string(),
+                name: "duden".to_string(),
+                display_name: "Duden".to_string(),
+                homepage: "https://www.duden.de".to_string(),
                 categories: vec![SearchCategory::General],
                 enabled: true,
-                timeout_ms: 8000,
+                timeout_ms: 5000,
                 weight: 1.0,
             },
             client,
@@ -36,16 +36,25 @@ impl Geizhals {
 }
 
 #[async_trait]
-impl SearchEngine for Geizhals {
+impl SearchEngine for Duden {
     fn metadata(&self) -> &EngineMetadata {
         &self.metadata
     }
 
     async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>> {
-        let url = format!(
-            "https://geizhals.de/?fs={}&hloc=at&hloc=de&in=",
-            urlencoding::encode(&query.query)
-        );
+        let page = query.page;
+        let url = if page <= 1 {
+            format!(
+                "https://www.duden.de/suchen/dudenonline/{}",
+                urlencoding::encode(&query.query)
+            )
+        } else {
+            format!(
+                "https://www.duden.de/suchen/dudenonline/{}?search_api_fulltext=&page={}",
+                urlencoding::encode(&query.query),
+                page - 1
+            )
+        };
 
         let resp = self
             .client
@@ -61,56 +70,42 @@ impl SearchEngine for Geizhals {
             .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
 
         let document = Html::parse_document(&body);
-        let item_sel = Selector::parse("div.listview__item, article.listview__item")
+        let section_sel = Selector::parse("section:not(.essay)")
             .map_err(|e| MetasearchError::ParseError(format!("{e:?}")))?;
-        let link_sel = Selector::parse("a.listview__name-link")
+        let link_sel = Selector::parse("h2 a")
             .map_err(|e| MetasearchError::ParseError(format!("{e:?}")))?;
-        let price_sel = Selector::parse("span.price")
-            .map_err(|e| MetasearchError::ParseError(format!("{e:?}")))?;
-        let img_sel = Selector::parse("img")
+        let content_sel = Selector::parse("p")
             .map_err(|e| MetasearchError::ParseError(format!("{e:?}")))?;
 
         let mut results = Vec::new();
 
-        for (rank, item) in document.select(&item_sel).enumerate() {
-            let link_el = match item.select(&link_sel).next() {
+        for (rank, section) in document.select(&section_sel).enumerate() {
+            let link_el = match section.select(&link_sel).next() {
                 Some(el) => el,
                 None => continue,
             };
 
             let title = link_el.text().collect::<String>().trim().to_string();
-            if title.is_empty() {
-                continue;
-            }
-
             let href = match link_el.value().attr("href") {
                 Some(h) => {
                     if h.starts_with("http") {
                         h.to_string()
                     } else {
-                        format!("https://geizhals.de{h}")
+                        format!("https://www.duden.de{h}")
                     }
                 }
                 None => continue,
             };
 
-            let price = item
-                .select(&price_sel)
+            if title.is_empty() {
+                continue;
+            }
+
+            let snippet = section
+                .select(&content_sel)
                 .next()
                 .map(|el| el.text().collect::<String>().trim().to_string())
                 .unwrap_or_default();
-
-            let snippet = if price.is_empty() {
-                String::new()
-            } else {
-                format!("Price: {price}")
-            };
-
-            let thumbnail = item
-                .select(&img_sel)
-                .next()
-                .and_then(|el| el.value().attr("src"))
-                .map(|s| s.to_string());
 
             let mut result = SearchResult::new(
                 title,
@@ -119,7 +114,6 @@ impl SearchEngine for Geizhals {
                 self.metadata.name.clone(),
             );
             result.engine_rank = (rank + 1) as u32;
-            result.thumbnail = thumbnail;
             results.push(result);
         }
 

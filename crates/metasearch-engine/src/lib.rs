@@ -41,6 +41,9 @@
 //!
 //! ## Batch 10 — More SearXNG translations (5):
 //! - Geizhals, Grokipedia, Il Post, Library of Congress, MetaCPAN
+//!
+//! ## Batch 11 — More SearXNG translations (5):
+//! - Duden, Gitea, LiveSpace, Material Icons, MediathekViewWeb
 
 // Original engines
 pub mod brave;
@@ -142,6 +145,13 @@ pub mod grokipedia;
 pub mod il_post;
 pub mod loc;
 pub mod metacpan;
+
+// Batch 11
+pub mod duden;
+pub mod gitea;
+pub mod livespace;
+pub mod material_icons;
+pub mod mediathekviewweb;
 
 pub mod registry;
 

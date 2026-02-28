@@ -47,6 +47,8 @@ use crate::{
     devicons::Devicons,
     digbt::Digbt,
     docker_hub::DockerHub,
+    // Batch 11
+    duden::Duden,
     duckduckgo::DuckDuckGo,
     ebay::Ebay,
     emojipedia::Emojipedia,
@@ -60,6 +62,7 @@ use crate::{
     // Batch 10
     geizhals::Geizhals,
     genius::Genius,
+    gitea::Gitea,
     github_engine::GitHub,
     gitlab::GitLab,
     goodreads::Goodreads,
@@ -75,8 +78,11 @@ use crate::{
     // Batch 5
     leet_x::LeetX,
     lemmy::Lemmy,
+    livespace::LiveSpace,
     loc::Loc,
     mastodon::Mastodon,
+    material_icons::MaterialIcons,
+    mediathekviewweb::MediathekViewWeb,
     metacpan::MetaCpan,
     mixcloud::Mixcloud,
     nine_gag::NineGag,
@@ -107,7 +113,7 @@ impl EngineRegistry {
         }
     }
 
-    /// Create a registry pre-loaded with all built-in engines (79 total).
+    /// Create a registry pre-loaded with all built-in engines (84 total).
     pub fn with_defaults(client: Client) -> Self {
         let mut registry = Self::new();
 
@@ -211,6 +217,13 @@ impl EngineRegistry {
         registry.register(Arc::new(IlPost::new(client.clone())));
         registry.register(Arc::new(Loc::new(client.clone())));
         registry.register(Arc::new(MetaCpan::new(client.clone())));
+
+        // ── Batch 11: More SearXNG translations ───────────
+        registry.register(Arc::new(Duden::new(client.clone())));
+        registry.register(Arc::new(Gitea::new(client.clone())));
+        registry.register(Arc::new(LiveSpace::new(client.clone())));
+        registry.register(Arc::new(MaterialIcons::new(client.clone())));
+        registry.register(Arc::new(MediathekViewWeb::new(client.clone())));
 
         registry
     }
