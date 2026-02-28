@@ -70,6 +70,9 @@
 //!
 //! ## Batch 19 — Wired orphans (2):
 //! - PirateBay, OpenAlex
+//!
+//! ## Batch 20 — More SearXNG translations (3):
+//! - Sogou, Quark, Wikimedia Commons
 
 // Original engines
 pub mod brave;
@@ -237,6 +240,11 @@ pub mod yandex;
 // Batch 19 (wired orphans)
 pub mod openalex;
 pub mod piratebay;
+
+// Batch 20
+pub mod quark;
+pub mod sogou;
+pub mod wikicommons;
 
 pub mod registry;
 

@@ -107,6 +107,7 @@ use crate::{
     pkg_go_dev::PkgGoDev,
     podcastindex::PodcastIndex,
     pypi::PyPI,
+    quark::Quark,
     qwant::Qwant,
     radio_browser::RadioBrowser,
     reddit::Reddit,
@@ -115,6 +116,7 @@ use crate::{
     searchcode::Searchcode,
     semantic_scholar::SemanticScholar,
     sepiasearch::SepiaSearch,
+    sogou::Sogou,
     solidtorrents::SolidTorrents,
     soundcloud::SoundCloud,
     sourcehut::Sourcehut,
@@ -130,6 +132,7 @@ use crate::{
     vimeo::Vimeo,
     voidlinux::VoidLinux,
     wallhaven::Wallhaven,
+    wikicommons::WikiCommons,
     wikipedia::Wikipedia,
     yahoo::Yahoo,
     yandex::Yandex,
@@ -149,7 +152,7 @@ impl EngineRegistry {
         }
     }
 
-    /// Create a registry pre-loaded with all built-in engines (127 total).
+    /// Create a registry pre-loaded with all built-in engines (130 total).
     pub fn with_defaults(client: Client) -> Self {
         let mut registry = Self::new();
 
@@ -319,6 +322,11 @@ impl EngineRegistry {
         // ── Batch 19: Wired orphans ───────────────────────
         registry.register(Arc::new(PirateBay::new(client.clone())));
         registry.register(Arc::new(OpenAlex::new(client.clone())));
+
+        // ── Batch 20: More SearXNG translations ───────────
+        registry.register(Arc::new(Sogou::new(client.clone())));
+        registry.register(Arc::new(Quark::new(client.clone())));
+        registry.register(Arc::new(WikiCommons::new(client.clone())));
 
         registry
     }
