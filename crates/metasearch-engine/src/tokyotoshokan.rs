@@ -48,8 +48,8 @@ impl SearchEngine for TokyoToshokan {
             query.page
         );
 
-        let resp = self.client.get(&url).send().await?;
-        let text = resp.text().await?;
+        let resp = self.client.get(&url).send().await.map_err(|e| MetasearchError::Engine(e.to_string()))?;
+        let text = resp.text().await.map_err(|e| MetasearchError::Engine(e.to_string()))?;
         let document = Html::parse_document(&text);
 
         let row_sel = Selector::parse("table.listing tr.category_0").unwrap();

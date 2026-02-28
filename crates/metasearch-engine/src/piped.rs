@@ -59,7 +59,6 @@ impl SearchEngine for Piped {
             name: "Piped".to_string(),
             display_name: "Piped".to_string(),
             homepage: "https://Piped.com".to_string(),
-            description: "Piped (alt YouTube frontend) video search — configurable instance URLs"
                 .to_string(),
             categories: vec![metasearch_core::category::SearchCategory::Videos],
             enabled: !self.backend_url.is_empty(),

@@ -12,6 +12,7 @@ use regex::Regex;
 use reqwest::Client;
 
 use metasearch_core::{
+    category::SearchCategory,
     engine::{EngineMetadata, SearchEngine},
     error::MetasearchError,
     query::SearchQuery,

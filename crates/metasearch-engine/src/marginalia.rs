@@ -94,7 +94,7 @@ impl SearchEngine for Marginalia {
                     "marginalia",
                 );
                 r.engine_rank = (i + 1) as u32;
-                r.category = SearchCategory::General;
+                r.category = SearchCategory::General.to_string();
                 results.push(r);
             }
         }

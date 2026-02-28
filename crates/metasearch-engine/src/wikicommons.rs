@@ -163,7 +163,7 @@ impl SearchEngine for WikiCommons {
 
                     let mut r = SearchResult::new(title, description_url, &content, "wikicommons");
                     r.engine_rank = i as u32;
-                    r.category = SearchCategory::Images;
+                    r.category = SearchCategory::Images.to_string();
 
                     // Set thumbnail if available
                     if let Some(thumb) = &imageinfo.thumburl {

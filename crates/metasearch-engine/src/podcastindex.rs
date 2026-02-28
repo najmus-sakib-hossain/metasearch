@@ -102,7 +102,7 @@ impl SearchEngine for PodcastIndex {
                 Some(SearchResult {
                     title,
                     url: result_url,
-                    snippet,
+                    content,
                     engine: "podcastindex".to_string(),
                     engine_rank: (i + 1) as u32,
                     thumbnail,

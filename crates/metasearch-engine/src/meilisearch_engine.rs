@@ -41,7 +41,6 @@ impl SearchEngine for MeilisearchEngine {
             name: "MeiliSearch".to_string(),
             display_name: "MeiliSearch".to_string(),
             homepage: "https://MeiliSearch.com".to_string(),
-            description: "MeiliSearch search — configurable instance URL, index, auth key"
                 .to_string(),
             categories: vec![metasearch_core::category::SearchCategory::General],
             enabled: !self.base_url.is_empty() && !self.index.is_empty(),

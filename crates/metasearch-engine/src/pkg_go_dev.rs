@@ -101,7 +101,7 @@ impl SearchEngine for PkgGoDev {
                 results.push(SearchResult {
                     title,
                     url: result_url,
-                    snippet,
+                    content,
                     engine: "pkg_go_dev".to_string(),
                     engine_rank: (i + 1) as u32,
                     thumbnail: None,

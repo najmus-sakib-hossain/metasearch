@@ -105,7 +105,7 @@ impl SearchEngine for Rumble {
                 results.push(SearchResult {
                     title,
                     url: result_url,
-                    snippet,
+                    content,
                     engine: "rumble".to_string(),
                     engine_rank: (i + 1) as u32,
                     thumbnail,

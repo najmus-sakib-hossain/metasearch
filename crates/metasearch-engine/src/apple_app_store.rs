@@ -106,7 +106,7 @@ impl SearchEngine for AppleAppStore {
                 "apple_app_store",
             );
             r.engine_rank = i as u32;
-            r.category = SearchCategory::Files;
+            r.category = SearchCategory::Files.to_string();
             if !item.artwork_url.is_empty() {
                 r.thumbnail = Some(item.artwork_url.clone());
             }

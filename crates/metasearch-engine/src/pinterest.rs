@@ -99,7 +99,7 @@ impl SearchEngine for Pinterest {
                 Some(SearchResult {
                     title,
                     url: result_url,
-                    snippet,
+                    content,
                     engine: "pinterest".to_string(),
                     engine_rank: (i + 1) as u32,
                     thumbnail,

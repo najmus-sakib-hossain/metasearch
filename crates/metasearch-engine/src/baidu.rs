@@ -151,7 +151,7 @@ impl SearchEngine for Baidu {
 
                     let mut r = SearchResult::new(&title, &entry_url, &snippet, "baidu");
                     r.engine_rank = i as u32;
-                    r.category = SearchCategory::General;
+                    r.category = SearchCategory::General.to_string();
 
                     // Parse published date from unix timestamp
                     if let Some(ts) = entry.time {

@@ -151,7 +151,7 @@ impl SearchEngine for Sogou {
 
                 let mut r = SearchResult::new(&title, &item_url, &content, "sogou");
                 r.engine_rank = rank;
-                r.category = SearchCategory::General;
+                r.category = SearchCategory::General.to_string();
 
                 // Try to parse date from cite element
                 if let Some(cite_el) = item.select(&cite_sel).next() {
@@ -206,7 +206,7 @@ impl SearchEngine for Sogou {
 
                 let mut r = SearchResult::new(&title, &item_url, &content, "sogou");
                 r.engine_rank = rank;
-                r.category = SearchCategory::General;
+                r.category = SearchCategory::General.to_string();
                 results.push(r);
                 rank += 1;
             }

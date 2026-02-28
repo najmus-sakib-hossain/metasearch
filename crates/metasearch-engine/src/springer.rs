@@ -159,7 +159,7 @@ impl SearchEngine for Springer {
 
                 let mut r = SearchResult::new(&title, &result_url, snippet, "springer");
                 r.engine_rank = (i + 1) as u32;
-                r.category = SearchCategory::General;
+                r.category = SearchCategory::General.to_string();
 
                 // Parse publication date (YYYY-MM-DD format)
                 if let Some(date_str) = &record.publication_date {

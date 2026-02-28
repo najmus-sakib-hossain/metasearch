@@ -23,7 +23,7 @@ impl Photon {
                 name: "photon".to_string(),
                 display_name: "Photon".to_string(),
                 homepage: "https://photon.komoot.io".to_string(),
-                categories: vec![SearchCategory::Map],
+                categories: vec![SearchCategory::Maps],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 1.0,
@@ -158,7 +158,7 @@ impl SearchEngine for Photon {
                 Some(SearchResult {
                     title,
                     url: result_url,
-                    snippet,
+                    content,
                     engine: "photon".to_string(),
                     engine_rank: (i + 1) as u32,
                     thumbnail: None,

@@ -33,4 +33,16 @@ pub enum MetasearchError {
     Other(String),
 }
 
+impl From<serde_json::Error> for MetasearchError {
+    fn from(e: serde_json::Error) -> Self {
+        MetasearchError::ParseError(e.to_string())
+    }
+}
+
+impl From<url::ParseError> for MetasearchError {
+    fn from(e: url::ParseError) -> Self {
+        MetasearchError::ParseError(e.to_string())
+    }
+}
+
 pub type Result<T> = std::result::Result<T, MetasearchError>;

@@ -11,6 +11,7 @@ use std::sync::Mutex;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use metasearch_core::{
+    category::SearchCategory,
     engine::{EngineMetadata, SearchEngine},
     error::MetasearchError,
     query::SearchQuery,

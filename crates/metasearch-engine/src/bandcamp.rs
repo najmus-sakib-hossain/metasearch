@@ -117,7 +117,7 @@ impl SearchEngine for Bandcamp {
             if !title.is_empty() && !result_url.is_empty() {
                 let mut r = SearchResult::new(&title, &result_url, &snippet, "bandcamp");
                 r.engine_rank = i as u32;
-                r.category = SearchCategory::Music;
+                r.category = SearchCategory::Music.to_string();
                 r.thumbnail = thumbnail;
                 results.push(r);
             }

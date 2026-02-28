@@ -97,7 +97,7 @@ impl Quark {
             .unwrap_or_default();
 
         let mut r = SearchResult::new(&title_str, &url_str, &content_str, "quark");
-        r.category = SearchCategory::General;
+        r.category = SearchCategory::General.to_string();
 
         // Try to parse published date from sourceProps.time or source.time
         let timestamp = data
@@ -156,7 +156,7 @@ impl Quark {
                     &html_escape::decode_html_entities(&content),
                     "quark",
                 );
-                r.category = SearchCategory::General;
+                r.category = SearchCategory::General.to_string();
 
                 let timestamp = item.pointer("/source/time").and_then(|v| {
                     v.as_i64()
@@ -196,7 +196,7 @@ impl Quark {
                     &html_escape::decode_html_entities(content),
                     "quark",
                 );
-                r.category = SearchCategory::General;
+                r.category = SearchCategory::General.to_string();
                 results.push(r);
             }
         }

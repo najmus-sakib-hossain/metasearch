@@ -60,8 +60,8 @@ impl SearchEngine for Tootfinder {
             urlencoding::encode(&query.query)
         );
 
-        let resp = self.client.get(&url).send().await?;
-        let text = resp.text().await?;
+        let resp = self.client.get(&url).send().await.map_err(|e| MetasearchError::Engine(e.to_string()))?;
+        let text = resp.text().await.map_err(|e| MetasearchError::Engine(e.to_string()))?;
 
         // Tootfinder sometimes appends HTML error messages to the JSON;
         // only parse lines that start with '[{' (the actual JSON data).

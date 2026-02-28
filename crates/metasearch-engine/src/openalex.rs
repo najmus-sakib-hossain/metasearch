@@ -112,8 +112,8 @@ impl SearchEngine for OpenAlex {
             query.page
         );
 
-        let resp = self.client.get(&url).send().await?;
-        let data: ApiResponse = resp.json().await?;
+        let resp = self.client.get(&url).send().await.map_err(|e| MetasearchError::Engine(e.to_string()))?;
+        let data: ApiResponse = resp.json().await.map_err(|e| MetasearchError::Engine(e.to_string()))?;
 
         let results = data
             .results

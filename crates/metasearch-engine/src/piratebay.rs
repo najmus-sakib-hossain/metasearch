@@ -67,8 +67,8 @@ impl SearchEngine for PirateBay {
             urlencoding::encode(&query.query)
         );
 
-        let resp = self.client.get(&url).send().await?;
-        let data: Vec<TorrentResult> = resp.json().await?;
+        let resp = self.client.get(&url).send().await.map_err(|e| MetasearchError::Engine(e.to_string()))?;
+        let data: Vec<TorrentResult> = resp.json().await.map_err(|e| MetasearchError::Engine(e.to_string()))?;
 
         let results = data
             .into_iter()

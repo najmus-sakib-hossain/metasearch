@@ -94,7 +94,7 @@ impl SearchEngine for Tagesschau {
                 Some(SearchResult {
                     title,
                     url: result_url,
-                    snippet,
+                    content,
                     engine: "tagesschau".to_string(),
                     engine_rank: (i + 1) as u32,
                     thumbnail: None,

@@ -89,7 +89,7 @@ impl SearchEngine for VoidLinux {
                 Some(SearchResult {
                     title,
                     url: result_url,
-                    snippet,
+                    content,
                     engine: "voidlinux".to_string(),
                     engine_rank: (i + 1) as u32,
                     thumbnail: None,

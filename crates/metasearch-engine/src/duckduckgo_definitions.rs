@@ -120,7 +120,7 @@ impl SearchEngine for DuckDuckGoDefinitions {
                     SearchResult::new(heading, abstract_url, &content, "duckduckgo_definitions");
                 r.engine_rank = rank;
                 rank += 1;
-                r.category = SearchCategory::General;
+                r.category = SearchCategory::General.to_string();
                 results.push(r);
             }
         }
@@ -134,7 +134,7 @@ impl SearchEngine for DuckDuckGoDefinitions {
                         let mut r = SearchResult::new(title, url, text, "duckduckgo_definitions");
                         r.engine_rank = rank;
                         rank += 1;
-                        r.category = SearchCategory::General;
+                        r.category = SearchCategory::General.to_string();
                         results.push(r);
                     }
                 }
@@ -153,7 +153,7 @@ impl SearchEngine for DuckDuckGoDefinitions {
                         let mut r = SearchResult::new(text, url, "", "duckduckgo_definitions");
                         r.engine_rank = rank;
                         rank += 1;
-                        r.category = SearchCategory::General;
+                        r.category = SearchCategory::General.to_string();
                         results.push(r);
                     }
                 }

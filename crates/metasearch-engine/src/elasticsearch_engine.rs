@@ -49,7 +49,6 @@ impl SearchEngine for ElasticsearchEngine {
             name: "Elasticsearch".to_string(),
             display_name: "Elasticsearch".to_string(),
             homepage: "https://Elasticsearch.com".to_string(),
-            description: "Elasticsearch search — configurable instance URL, index, credentials"
                 .to_string(),
             categories: vec![metasearch_core::category::SearchCategory::General],
             enabled: !self.base_url.is_empty() && !self.index.is_empty(),

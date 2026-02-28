@@ -10,6 +10,7 @@ use reqwest::Client;
 use serde_json::json;
 
 use metasearch_core::{
+    category::SearchCategory,
     engine::{EngineMetadata, SearchEngine},
     error::MetasearchError,
     query::SearchQuery,

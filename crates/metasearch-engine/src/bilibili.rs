@@ -134,7 +134,7 @@ impl SearchEngine for Bilibili {
 
                     let mut r = SearchResult::new(&title, &item.arcurl, &snippet, "bilibili");
                     r.engine_rank = i as u32;
-                    r.category = SearchCategory::Videos;
+                    r.category = SearchCategory::Videos.to_string();
                     r.thumbnail = Some(thumbnail);
 
                     if item.pubdate > 0 {

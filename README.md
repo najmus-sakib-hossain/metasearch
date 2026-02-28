@@ -1,5 +1,7 @@
 # 🔍 Metasearch
 
+Awesome! Now please look at the integration searchXNG folder and in there you can find all 219 search engine providers in Python. We already have most of the search engines but still need some more to compete against the open source project in Rust. Please create all the other search engine providers in our Rust, learning from the actual code of the open source search engine Python, and convert it in our Rust code and support all the providers that the open source project supports. And make sure we don't have any clippy warnings and errors!!!
+
 **A blazing-fast, privacy-respecting metasearch engine written in Rust** — inspired by [SearXNG](https://github.com/searxng/searxng).
 
 > No tracking. No profiling. No ads. Just results.

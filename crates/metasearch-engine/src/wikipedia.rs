@@ -95,7 +95,7 @@ impl SearchEngine for Wikipedia {
                     "wikipedia",
                 );
                 r.engine_rank = i as u32;
-                r.category = SearchCategory::General;
+                r.category = SearchCategory::General.to_string();
                 r
             })
             .collect();

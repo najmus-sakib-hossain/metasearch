@@ -53,7 +53,6 @@ impl SearchEngine for Invidious {
             name: "Invidious".to_string(),
             display_name: "Invidious".to_string(),
             homepage: "https://Invidious.com".to_string(),
-            description:
                 "Invidious (alt YouTube frontend) video search — configurable instance URL"
                     .to_string(),
             categories: vec![metasearch_core::category::SearchCategory::Videos],
