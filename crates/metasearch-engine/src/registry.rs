@@ -8,9 +8,7 @@ use metasearch_core::engine::SearchEngine;
 use reqwest::Client;
 
 use crate::{
-    // Batch 6
     acfun::AcFun,
-    // Batch 9
     adobe_stock::AdobeStock,
     alpinelinux::AlpineLinux,
     annas_archive::AnnasArchive,
@@ -33,7 +31,6 @@ use crate::{
     bitchute::BitChute,
     bpb::Bpb,
     brave::Brave,
-    // Batch 7
     bt4g::Bt4g,
     btdigg::Btdigg,
     cachy_os::CachyOs,
@@ -47,7 +44,6 @@ use crate::{
     devicons::Devicons,
     digbt::Digbt,
     docker_hub::DockerHub,
-    // Batch 11
     duden::Duden,
     duckduckgo::DuckDuckGo,
     ebay::Ebay,
@@ -56,10 +52,8 @@ use crate::{
     findthatmeme::FindThatMeme,
     flickr::Flickr,
     freesound::Freesound,
-    // Batch 8
     frinkiac::Frinkiac,
     fyyd::Fyyd,
-    // Batch 10
     geizhals::Geizhals,
     genius::Genius,
     gitea::Gitea,
@@ -75,18 +69,23 @@ use crate::{
     imdb::Imdb,
     ina::Ina,
     ipernity::Ipernity,
-    // Batch 5
+    iqiyi::Iqiyi,
+    jisho::Jisho,
     leet_x::LeetX,
     lemmy::Lemmy,
     livespace::LiveSpace,
     loc::Loc,
+    lucide::Lucide,
     mastodon::Mastodon,
     material_icons::MaterialIcons,
     mediathekviewweb::MediathekViewWeb,
     metacpan::MetaCpan,
     mixcloud::Mixcloud,
+    mwmbl::Mwmbl,
     nine_gag::NineGag,
     npm::Npm,
+    nyaa::Nyaa,
+    odysee::Odysee,
     pypi::PyPI,
     qwant::Qwant,
     reddit::Reddit,
@@ -94,10 +93,13 @@ use crate::{
     soundcloud::SoundCloud,
     spotify::Spotify,
     stackexchange::StackExchange,
+    svgrepo::SvgRepo,
     unsplash::Unsplash,
     vimeo::Vimeo,
+    wallhaven::Wallhaven,
     wikipedia::Wikipedia,
     yahoo::Yahoo,
+    yep::Yep,
     youtube::YouTube,
 };
 
@@ -113,7 +115,7 @@ impl EngineRegistry {
         }
     }
 
-    /// Create a registry pre-loaded with all built-in engines (84 total).
+    /// Create a registry pre-loaded with all built-in engines (93 total).
     pub fn with_defaults(client: Client) -> Self {
         let mut registry = Self::new();
 
@@ -224,6 +226,17 @@ impl EngineRegistry {
         registry.register(Arc::new(LiveSpace::new(client.clone())));
         registry.register(Arc::new(MaterialIcons::new(client.clone())));
         registry.register(Arc::new(MediathekViewWeb::new(client.clone())));
+
+        // ── Batch 12: More SearXNG translations ───────────
+        registry.register(Arc::new(Iqiyi::new(client.clone())));
+        registry.register(Arc::new(Jisho::new(client.clone())));
+        registry.register(Arc::new(Lucide::new(client.clone())));
+        registry.register(Arc::new(Mwmbl::new(client.clone())));
+        registry.register(Arc::new(Nyaa::new(client.clone())));
+        registry.register(Arc::new(Odysee::new(client.clone())));
+        registry.register(Arc::new(SvgRepo::new(client.clone())));
+        registry.register(Arc::new(Wallhaven::new(client.clone())));
+        registry.register(Arc::new(Yep::new(client.clone())));
 
         registry
     }

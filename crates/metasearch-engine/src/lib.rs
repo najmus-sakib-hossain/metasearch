@@ -44,6 +44,9 @@
 //!
 //! ## Batch 11 — More SearXNG translations (5):
 //! - Duden, Gitea, LiveSpace, Material Icons, MediathekViewWeb
+//!
+//! ## Batch 12 — More SearXNG translations (9):
+//! - iQiyi, Jisho, Lucide, Mwmbl, Nyaa, Odysee, SVG Repo, Wallhaven, Yep
 
 // Original engines
 pub mod brave;
@@ -152,6 +155,17 @@ pub mod gitea;
 pub mod livespace;
 pub mod material_icons;
 pub mod mediathekviewweb;
+
+// Batch 12
+pub mod iqiyi;
+pub mod jisho;
+pub mod lucide;
+pub mod mwmbl;
+pub mod nyaa;
+pub mod odysee;
+pub mod svgrepo;
+pub mod wallhaven;
+pub mod yep;
 
 pub mod registry;
 
