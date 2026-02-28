@@ -17,6 +17,7 @@ use crate::{
     ansa::Ansa,
     apkmirror::ApkMirror,
     apple_app_store::AppleAppStore,
+    apple_maps::AppleMaps,
     archlinux::ArchLinux,
     artic::Artic,
     artstation::ArtStation,
@@ -43,17 +44,21 @@ use crate::{
     core_engine::CoreEngine,
     crates_io::CratesIo,
     crossref::Crossref,
+    currency_convert::CurrencyConvert,
     dailymotion::Dailymotion,
     deezer::Deezer,
+    deepl::DeepL,
     destatis::Destatis,
     deviantart::DeviantArt,
     devicons::Devicons,
+    dictzone::DictZone,
     digbt::Digbt,
     discourse::Discourse,
     docker_hub::DockerHub,
     doku::Doku,
     duckduckgo::DuckDuckGo,
     duckduckgo_definitions::DuckDuckGoDefinitions,
+    duckduckgo_weather::DuckDuckGoWeather,
     duden::Duden,
     ebay::Ebay,
     elasticsearch_engine::ElasticsearchEngine,
@@ -93,6 +98,8 @@ use crate::{
     leet_x::LeetX,
     lemmy::Lemmy,
     lib_rs::LibRs,
+    libretranslate::LibreTranslate,
+    lingva::Lingva,
     livespace::LiveSpace,
     loc::Loc,
     lucide::Lucide,
@@ -114,6 +121,7 @@ use crate::{
     odysee::Odysee,
     openalex::OpenAlex,
     openlibrary::OpenLibrary,
+    openstreetmap::OpenStreetMap,
     openverse::Openverse,
     peertube::PeerTube,
     photon::Photon,
@@ -144,6 +152,7 @@ use crate::{
     svgrepo::SvgRepo,
     tagesschau::Tagesschau,
     three_sixty_search_videos::ThreeSixtySearchVideos,
+    tineye::TinEye,
     tokyotoshokan::TokyoToshokan,
     tootfinder::Tootfinder,
     unsplash::Unsplash,
@@ -152,6 +161,7 @@ use crate::{
     wallhaven::Wallhaven,
     wikicommons::WikiCommons,
     wikipedia::Wikipedia,
+    wordnik::Wordnik,
     yahoo::Yahoo,
     yandex::Yandex,
     yep::Yep,
@@ -170,7 +180,7 @@ impl EngineRegistry {
         }
     }
 
-    /// Create a registry pre-loaded with all built-in engines (148 total).
+    /// Create a registry pre-loaded with all built-in engines (158 total).
     pub fn with_defaults(client: Client) -> Self {
         let mut registry = Self::new();
 
@@ -369,6 +379,23 @@ impl EngineRegistry {
         registry.register(Arc::new(MeilisearchEngine::new(client.clone(), "", "", None)));
         registry.register(Arc::new(Doku::new(client.clone(), "")));
         registry.register(Arc::new(RecollEngine::new(client.clone(), "", "", "")));
+
+        // ── Batch 23: Translation, dictionary, weather, maps, currency ─
+        // Translation engines (configurable, disabled by default)
+        registry.register(Arc::new(LibreTranslate::new(client.clone(), "", None)));
+        registry.register(Arc::new(Lingva::new(client.clone(), "")));
+        registry.register(Arc::new(DeepL::new(client.clone(), None)));
+        // Dictionary & general engines (always enabled)
+        registry.register(Arc::new(DictZone::new(client.clone())));
+        registry.register(Arc::new(Wordnik::new(client.clone())));
+        registry.register(Arc::new(CurrencyConvert::new(client.clone())));
+        // Reverse image search
+        registry.register(Arc::new(TinEye::new(client.clone())));
+        // Map engines
+        registry.register(Arc::new(OpenStreetMap::new(client.clone())));
+        registry.register(Arc::new(AppleMaps::new(client.clone())));
+        // Weather
+        registry.register(Arc::new(DuckDuckGoWeather::new(client.clone())));
 
         registry
     }
