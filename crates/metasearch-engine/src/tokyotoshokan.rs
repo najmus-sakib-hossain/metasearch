@@ -1,0 +1,119 @@
+//! Tokyo Toshokan — BitTorrent library for Japanese media
+//!
+//! Tokyo Toshokan is a torrent listing site focused on Japanese media.
+//! Results are scraped from HTML since there is no official API.
+//!
+//! Reference: <https://www.tokyotosho.info/>
+
+use async_trait::async_trait;
+use reqwest::Client;
+use scraper::{Html, Selector};
+
+use metasearch_core::{
+    engine::{EngineFetcher, EngineMetadata, SearchEngine},
+    schema::{SearchQuery, SearchResult},
+    error::MetasearchError,
+    category::SearchCategory,
+};
+
+pub struct TokyoToshokan {
+    client: Client,
+}
+
+impl TokyoToshokan {
+    pub fn new(client: Client) -> Self {
+        Self { client }
+    }
+}
+
+#[async_trait]
+impl SearchEngine for TokyoToshokan {
+    fn metadata(&self) -> EngineMetadata {
+        EngineMetadata {
+            name: "Tokyo Toshokan".to_string(),
+            description: "BitTorrent library for Japanese media".to_string(),
+            categories: vec![SearchCategory::Files],
+            enabled: true,
+        }
+    }
+
+    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
+        let url = format!(
+            "https://www.tokyotosho.info/search.php?terms={}&page={}",
+            urlencoding::encode(&query.query),
+            query.page
+        );
+
+        let resp = self.client.get(&url).send().await?;
+        let text = resp.text().await?;
+        let document = Html::parse_document(&text);
+
+        let row_sel = Selector::parse("table.listing tr.category_0").unwrap();
+        let link_sel = Selector::parse("td.desc-top a").unwrap();
+        let info_sel = Selector::parse("td.desc-bot").unwrap();
+
+        let rows: Vec<_> = document.select(&row_sel).collect();
+        let mut results = Vec::new();
+        let mut rank: u32 = 1;
+
+        // Results come in pairs of rows: name row + info row
+        let mut i = 0;
+        while i + 1 < rows.len() {
+            let name_row = rows[i];
+            let info_row = rows[i + 1];
+            i += 2;
+
+            // Get the last link in desc-top (the title/URL link)
+            let links: Vec<_> = name_row.select(&link_sel).collect();
+            let title_link = match links.last() {
+                Some(l) => l,
+                None => continue,
+            };
+
+            let title = title_link.text().collect::<String>().trim().to_string();
+            let href = match title_link.value().attr("href") {
+                Some(h) => {
+                    if h.starts_with("http") {
+                        h.to_string()
+                    } else {
+                        format!("https://www.tokyotosho.info{}", h)
+                    }
+                }
+                None => continue,
+            };
+
+            // Extract info from desc-bot
+            let content = info_row
+                .select(&info_sel)
+                .next()
+                .map(|el| {
+                    el.text()
+                        .collect::<String>()
+                        .trim()
+                        .to_string()
+                })
+                .unwrap_or_default();
+
+            // Truncate overly long content
+            let content = if content.len() > 300 {
+                format!("{}…", &content[..300])
+            } else {
+                content
+            };
+
+            results.push(SearchResult {
+                title,
+                url: href,
+                content,
+                engine: "Tokyo Toshokan".to_string(),
+                engine_rank: rank,
+                thumbnail: None,
+            });
+            rank += 1;
+        }
+
+        Ok(results)
+    }
+}
+
+impl EngineFetcher for TokyoToshokan {}
