@@ -285,4 +285,127 @@ impl EngineRegistry {
         // ── Batch 12: More SearXNG translations ───────────
         registry.register(Arc::new(Iqiyi::new(client.clone())));
         registry.register(Arc::new(Jisho::new(client.clone())));
-        registry.register(Arc::new(
+        registry.register(Arc::new(Lucide::new(client.clone())));
+        registry.register(Arc::new(Mwmbl::new(client.clone())));
+        registry.register(Arc::new(Nyaa::new(client.clone())));
+        registry.register(Arc::new(Odysee::new(client.clone())));
+        registry.register(Arc::new(SvgRepo::new(client.clone())));
+        registry.register(Arc::new(Wallhaven::new(client.clone())));
+        registry.register(Arc::new(Yep::new(client.clone())));
+
+        // ── Batch 13: More SearXNG translations ───────────
+        registry.register(Arc::new(PeerTube::new(client.clone())));
+        registry.register(Arc::new(PkgGoDev::new(client.clone())));
+        registry.register(Arc::new(Stract::new(client.clone())));
+        registry.register(Arc::new(Tagesschau::new(client.clone())));
+        registry.register(Arc::new(VoidLinux::new(client.clone())));
+        registry.register(Arc::new(Rumble::new(client.clone())));
+        registry.register(Arc::new(Pinterest::new(client.clone())));
+        registry.register(Arc::new(PodcastIndex::new(client.clone())));
+        registry.register(Arc::new(Photon::new(client.clone())));
+
+        // ── Batch 14: More SearXNG translations ───────────
+        registry.register(Arc::new(Moviepilot::new(client.clone())));
+        registry.register(Arc::new(OpenLibrary::new(client.clone())));
+        registry.register(Arc::new(SolidTorrents::new(client.clone())));
+        registry.register(Arc::new(RottenTomatoes::new(client.clone())));
+        registry.register(Arc::new(SepiaSearch::new(client.clone())));
+
+        // ── Batch 15: More SearXNG translations ───────────
+        registry.register(Arc::new(Openverse::new(client.clone())));
+        registry.register(Arc::new(Tootfinder::new(client.clone())));
+        registry.register(Arc::new(Searchcode::new(client.clone())));
+        registry.register(Arc::new(TokyoToshokan::new(client.clone())));
+
+        // ── Batch 16: Wired orphans + new engines ─────────
+        registry.register(Arc::new(Imgur::new(client.clone())));
+        registry.register(Arc::new(LibRs::new(client.clone())));
+        registry.register(Arc::new(Kickass::new(client.clone())));
+        registry.register(Arc::new(DeviantArt::new(client.clone())));
+        registry.register(Arc::new(ThreeSixtySearchVideos::new(client.clone())));
+        registry.register(Arc::new(Sourcehut::new(client.clone())));
+
+        // ── Batch 17: More SearXNG translations ───────────
+        registry.register(Arc::new(Chinaso::new(client.clone())));
+        registry.register(Arc::new(FlickrNoapi::new(client.clone())));
+        registry.register(Arc::new(Ahmia::new(client.clone())));
+        registry.register(Arc::new(Naver::new(client.clone())));
+        registry.register(Arc::new(RadioBrowser::new(client.clone())));
+
+        // ── Batch 18: More SearXNG translations ───────────
+        registry.register(Arc::new(Mojeek::new(client.clone())));
+        registry.register(Arc::new(GooglePlay::new(client.clone())));
+        registry.register(Arc::new(Yandex::new(client.clone())));
+
+        // ── Batch 19: Wired orphans ───────────────────────
+        registry.register(Arc::new(PirateBay::new(client.clone())));
+        registry.register(Arc::new(OpenAlex::new(client.clone())));
+
+        // ── Batch 20: More SearXNG translations ───────────
+        registry.register(Arc::new(Sogou::new(client.clone())));
+        registry.register(Arc::new(Quark::new(client.clone())));
+        registry.register(Arc::new(WikiCommons::new(client.clone())));
+
+        // ── Batch 21: API key + multi-module engines ──────
+        registry.register(Arc::new(BraveApi::new(client.clone(), None)));
+        registry.register(Arc::new(CoreEngine::new(client.clone(), None)));
+        registry.register(Arc::new(Springer::new(client.clone(), None)));
+        registry.register(Arc::new(Ads::new(client.clone(), None)));
+        registry.register(Arc::new(Marginalia::new(client.clone(), None)));
+        registry.register(Arc::new(DuckDuckGoDefinitions::new(client.clone())));
+        registry.register(Arc::new(GoogleImages::new(client.clone())));
+        registry.register(Arc::new(GoogleScholar::new(client.clone())));
+
+        // ── Batch 22: Instance-URL + multi-module engines ─
+        // Google multi-module engines (no config needed)
+        registry.register(Arc::new(GoogleVideos::new(client.clone())));
+        registry.register(Arc::new(GoogleNews::new(client.clone())));
+        // Instance-URL engines (disabled by default, need base_url configuration)
+        registry.register(Arc::new(Discourse::new(client.clone(), "", None, None)));
+        registry.register(Arc::new(Invidious::new(client.clone(), "")));
+        registry.register(Arc::new(Piped::new(client.clone(), "", "")));
+        registry.register(Arc::new(MediaWikiEngine::new(client.clone(), "")));
+        registry.register(Arc::new(ElasticsearchEngine::new(client.clone(), "", "", None, None)));
+        registry.register(Arc::new(MeilisearchEngine::new(client.clone(), "", "", None)));
+        registry.register(Arc::new(Doku::new(client.clone(), "")));
+        registry.register(Arc::new(RecollEngine::new(client.clone(), "", "", "")));
+
+        registry
+    }
+
+    /// Register a new engine.
+    pub fn register(&mut self, engine: Arc<dyn SearchEngine>) {
+        let name = engine.metadata().name.clone();
+        self.engines.insert(name, engine);
+    }
+
+    /// Get an engine by name.
+    pub fn get(&self, name: &str) -> Option<&Arc<dyn SearchEngine>> {
+        self.engines.get(name)
+    }
+
+    /// Get all enabled engines for a given category.
+    pub fn engines_for_category(&self, category: &SearchCategory) -> Vec<Arc<dyn SearchEngine>> {
+        self.engines
+            .values()
+            .filter(|e| e.metadata().enabled && e.metadata().categories.contains(category))
+            .cloned()
+            .collect()
+    }
+
+    /// List all registered engine names.
+    pub fn engine_names(&self) -> Vec<String> {
+        self.engines.keys().cloned().collect()
+    }
+
+    /// Number of registered engines.
+    pub fn count(&self) -> usize {
+        self.engines.len()
+    }
+}
+
+impl Default for EngineRegistry {
+    fn default() -> Self {
+        Self::new()
+    }
+}
