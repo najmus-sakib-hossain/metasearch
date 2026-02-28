@@ -46,6 +46,7 @@ impl SearchEngine for Openverse {
         EngineMetadata {
             name: "Openverse".to_string(),
             display_name: "Openverse".to_string(),
+            homepage: "https://Openverse.com".to_string(),
             categories: vec![SearchCategory::Images],
             enabled: true,
             timeout_ms: 5000,

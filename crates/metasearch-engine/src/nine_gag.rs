@@ -134,7 +134,7 @@ impl SearchEngine for NineGag {
 
             let mut r = SearchResult::new(&post.title, &post.url, &post.description, "9gag");
             r.engine_rank = i as u32;
-            r.category = "social_media".to_string();
+            r.category = SearchCategory::SocialMedia;
             r.thumbnail = Some(thumbnail_url);
 
             if let Some(ts) = post.creation_ts {

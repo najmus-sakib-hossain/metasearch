@@ -145,7 +145,7 @@ impl SearchEngine for Ads {
                     let mut r =
                         SearchResult::new(&title, &result_url, snippet, "astrophysics_data_system");
                     r.engine_rank = (i + 1) as u32;
-                    r.category = "general".to_string();
+                    r.category = SearchCategory::General;
 
                     // Parse date — ADS returns ISO format
                     if let Some(date_str) = &doc.date {

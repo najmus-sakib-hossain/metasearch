@@ -137,7 +137,7 @@ impl SearchEngine for Arxiv {
             if !title.is_empty() && !entry_url.is_empty() {
                 let mut r = SearchResult::new(&title, &entry_url, &snippet, "arxiv");
                 r.engine_rank = i as u32;
-                r.category = "science".to_string();
+                r.category = SearchCategory::Science;
 
                 // Try to extract published date
                 if let Some(date_str) = Self::extract_tag_text(entry, "published") {

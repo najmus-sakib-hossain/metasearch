@@ -32,6 +32,7 @@ impl SearchEngine for RottenTomatoes {
         EngineMetadata {
             name: "rottentomatoes".to_string(),
             display_name: "rottentomatoes".to_string(),
+            homepage: "https://rottentomatoes.com".to_string(),
             categories: vec![SearchCategory::General],
             enabled: true,
             timeout_ms: 5000,

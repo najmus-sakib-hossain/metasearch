@@ -122,7 +122,7 @@ impl SearchEngine for BraveApi {
                         "braveapi",
                     );
                     r.engine_rank = (i + 1) as u32;
-                    r.category = "general".to_string();
+                    r.category = SearchCategory::General;
                     results.push(r);
                 }
             }

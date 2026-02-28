@@ -115,7 +115,7 @@ impl SearchEngine for GoogleScholar {
 
             let mut r = SearchResult::new(&title, href, snippet, "google_scholar");
             r.engine_rank = (i + 1) as u32;
-            r.category = "general".to_string();
+            r.category = SearchCategory::General;
 
             // Try to extract year from metadata (e.g., "Author - Journal, 2024 - Publisher")
             if let Some(caps) = regex::Regex::new(r"\b(19|20)\d{2}\b")

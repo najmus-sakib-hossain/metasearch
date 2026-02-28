@@ -32,6 +32,7 @@ impl SearchEngine for SolidTorrents {
         EngineMetadata {
             name: "solidtorrents".to_string(),
             display_name: "solidtorrents".to_string(),
+            homepage: "https://solidtorrents.com".to_string(),
             categories: vec![SearchCategory::Files],
             enabled: true,
             timeout_ms: 5000,

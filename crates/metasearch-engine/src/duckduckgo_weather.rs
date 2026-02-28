@@ -54,7 +54,7 @@ impl SearchEngine for DuckDuckGoWeather {
             name: "DuckDuckGoWeather".to_string(),
             display_name: "DuckDuckGoWeather".to_string(),
             homepage: "https://duckduckgo.com".to_string(),
-            categories: vec!["weather".to_string()],
+            categories: vec![SearchCategory::General],
             enabled: true,
             timeout_ms: 5000,
             weight: 1.0,

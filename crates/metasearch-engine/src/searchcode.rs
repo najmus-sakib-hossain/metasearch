@@ -47,6 +47,7 @@ impl SearchEngine for Searchcode {
         EngineMetadata {
             name: "Searchcode".to_string(),
             display_name: "Searchcode".to_string(),
+            homepage: "https://Searchcode.com".to_string(),
             categories: vec![SearchCategory::IT],
             enabled: true,
             timeout_ms: 5000,

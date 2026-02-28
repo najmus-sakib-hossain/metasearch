@@ -133,7 +133,7 @@ impl SearchEngine for Bing {
 
             let mut r = SearchResult::new(&title, &result_url, &snippet, "bing");
             r.engine_rank = i as u32;
-            r.category = "general".to_string();
+            r.category = SearchCategory::General;
             results.push(r);
         }
 

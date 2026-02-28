@@ -73,6 +73,7 @@ impl SearchEngine for Discourse {
         EngineMetadata {
             name: "Discourse".to_string(),
             display_name: "Discourse".to_string(),
+            homepage: "https://Discourse.com".to_string(),
             categories: vec![metasearch_core::category::SearchCategory::General],
             enabled: !self.base_url.is_empty(),
         }

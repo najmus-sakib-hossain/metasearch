@@ -110,7 +110,7 @@ impl SearchEngine for AppleMaps {
             name: "AppleMaps".to_string(),
             display_name: "AppleMaps".to_string(),
             homepage: "https://www.apple.com/maps/".to_string(),
-            categories: vec!["map".to_string()],
+            categories: vec![SearchCategory::Maps],
             enabled: true,
             timeout_ms: 5000,
             weight: 1.0,

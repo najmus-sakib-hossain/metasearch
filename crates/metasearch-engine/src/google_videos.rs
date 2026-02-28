@@ -29,6 +29,7 @@ impl SearchEngine for GoogleVideos {
         EngineMetadata {
             name: "Google Videos".to_string(),
             display_name: "Google Videos".to_string(),
+            homepage: "https://Google Videos.com".to_string(),
             categories: vec![metasearch_core::category::SearchCategory::Videos],
             enabled: true,
             timeout_ms: 5000,

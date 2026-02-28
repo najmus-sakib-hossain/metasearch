@@ -33,7 +33,7 @@ impl SearchEngine for DictZone {
             name: "DictZone".to_string(),
             display_name: "DictZone".to_string(),
             homepage: "https://dictzone.com".to_string(),
-            categories: vec!["translate".to_string(), "general".to_string()],
+            categories: vec![SearchCategory::General, SearchCategory::General],
             enabled: true,
             timeout_ms: 5000,
             weight: 1.0,

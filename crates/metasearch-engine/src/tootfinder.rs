@@ -46,6 +46,7 @@ impl SearchEngine for Tootfinder {
         EngineMetadata {
             name: "Tootfinder".to_string(),
             display_name: "Tootfinder".to_string(),
+            homepage: "https://Tootfinder.com".to_string(),
             categories: vec![SearchCategory::SocialMedia],
             enabled: true,
             timeout_ms: 5000,

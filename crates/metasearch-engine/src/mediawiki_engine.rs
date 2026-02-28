@@ -59,6 +59,7 @@ impl SearchEngine for MediaWikiEngine {
         EngineMetadata {
             name: "MediaWiki".to_string(),
             display_name: "MediaWiki".to_string(),
+            homepage: "https://MediaWiki.com".to_string(),
             categories: vec![metasearch_core::category::SearchCategory::General],
             enabled: !self.base_url.is_empty(),
         }

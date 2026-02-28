@@ -36,6 +36,7 @@ impl SearchEngine for Doku {
         EngineMetadata {
             name: "DokuWiki".to_string(),
             display_name: "DokuWiki".to_string(),
+            homepage: "https://DokuWiki.com".to_string(),
             categories: vec![metasearch_core::category::SearchCategory::General],
             enabled: !self.base_url.is_empty(),
         }

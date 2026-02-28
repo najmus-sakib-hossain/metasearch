@@ -53,6 +53,7 @@ impl SearchEngine for PirateBay {
         EngineMetadata {
             name: "The Pirate Bay".to_string(),
             display_name: "The Pirate Bay".to_string(),
+            homepage: "https://The Pirate Bay.com".to_string(),
             categories: vec![SearchCategory::Files],
             enabled: true,
             timeout_ms: 5000,

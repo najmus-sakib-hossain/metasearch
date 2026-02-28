@@ -58,6 +58,7 @@ impl SearchEngine for GoogleNews {
         EngineMetadata {
             name: "Google News".to_string(),
             display_name: "Google News".to_string(),
+            homepage: "https://Google News.com".to_string(),
             categories: vec![metasearch_core::category::SearchCategory::News],
             enabled: true,
             timeout_ms: 5000,

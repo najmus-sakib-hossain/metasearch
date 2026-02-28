@@ -40,7 +40,7 @@ impl SearchEngine for Lingva {
             } else {
                 self.url.clone()
             },
-            categories: vec!["translate".to_string(), "general".to_string()],
+            categories: vec![SearchCategory::General, SearchCategory::General],
             enabled: !self.url.is_empty(),
         }
     }

@@ -33,7 +33,7 @@ impl SearchEngine for DeepL {
             name: "DeepL".to_string(),
             display_name: "DeepL".to_string(),
             homepage: "https://api-free.deepl.com".to_string(),
-            categories: vec!["translate".to_string(), "general".to_string()],
+            categories: vec![SearchCategory::General, SearchCategory::General],
             enabled: self.api_key.is_some(),
         }
     }

@@ -108,7 +108,7 @@ impl SearchEngine for Ask {
             if !title.is_empty() && !result_url.is_empty() {
                 let mut r = SearchResult::new(&title, &result_url, &snippet, "ask");
                 r.engine_rank = i as u32;
-                r.category = "general".to_string();
+                r.category = SearchCategory::General;
                 results.push(r);
             }
         }

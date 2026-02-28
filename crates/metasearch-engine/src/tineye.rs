@@ -32,7 +32,7 @@ impl SearchEngine for TinEye {
             name: "TinEye".to_string(),
             display_name: "TinEye".to_string(),
             homepage: "https://tineye.com".to_string(),
-            categories: vec!["images".to_string(), "general".to_string()],
+            categories: vec![SearchCategory::Images, SearchCategory::General],
             enabled: true,
             timeout_ms: 5000,
             weight: 1.0,

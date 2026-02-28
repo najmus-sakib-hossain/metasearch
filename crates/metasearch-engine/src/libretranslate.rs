@@ -43,7 +43,7 @@ impl SearchEngine for LibreTranslate {
             } else {
                 self.base_url.clone()
             },
-            categories: vec!["translate".to_string(), "general".to_string()],
+            categories: vec![SearchCategory::General, SearchCategory::General],
             enabled: !self.base_url.is_empty(),
         }
     }

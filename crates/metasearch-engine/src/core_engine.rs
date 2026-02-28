@@ -143,7 +143,7 @@ impl SearchEngine for CoreEngine {
 
                 let mut r = SearchResult::new(&title, &result_url, snippet, "core");
                 r.engine_rank = (i + 1) as u32;
-                r.category = "general".to_string();
+                r.category = SearchCategory::General;
 
                 // Parse published date
                 if let Some(date_str) = &item.published_date {

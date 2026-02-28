@@ -56,6 +56,7 @@ impl SearchEngine for RecollEngine {
         EngineMetadata {
             name: "Recoll".to_string(),
             display_name: "Recoll".to_string(),
+            homepage: "https://Recoll.com".to_string(),
             description:
                 "Recoll desktop full-text search via recoll-webui — configurable instance URL"
                     .to_string(),

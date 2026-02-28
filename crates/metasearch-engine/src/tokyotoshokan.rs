@@ -33,6 +33,7 @@ impl SearchEngine for TokyoToshokan {
         EngineMetadata {
             name: "Tokyo Toshokan".to_string(),
             display_name: "Tokyo Toshokan".to_string(),
+            homepage: "https://Tokyo Toshokan.com".to_string(),
             categories: vec![SearchCategory::Files],
             enabled: true,
             timeout_ms: 5000,

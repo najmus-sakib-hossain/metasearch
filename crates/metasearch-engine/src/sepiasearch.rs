@@ -67,6 +67,7 @@ impl SearchEngine for SepiaSearch {
         EngineMetadata {
             name: "sepiasearch".to_string(),
             display_name: "sepiasearch".to_string(),
+            homepage: "https://sepiasearch.com".to_string(),
             categories: vec![SearchCategory::Videos],
             enabled: true,
             timeout_ms: 5000,

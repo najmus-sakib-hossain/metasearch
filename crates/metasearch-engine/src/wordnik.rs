@@ -33,7 +33,7 @@ impl SearchEngine for Wordnik {
             name: "Wordnik".to_string(),
             display_name: "Wordnik".to_string(),
             homepage: "https://www.wordnik.com".to_string(),
-            categories: vec!["dictionaries".to_string(), "general".to_string()],
+            categories: vec![SearchCategory::General, SearchCategory::General],
             enabled: true,
             timeout_ms: 5000,
             weight: 1.0,

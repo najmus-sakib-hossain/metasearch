@@ -42,6 +42,7 @@ impl SearchEngine for Moviepilot {
         EngineMetadata {
             name: "moviepilot".to_string(),
             display_name: "moviepilot".to_string(),
+            homepage: "https://moviepilot.com".to_string(),
             categories: vec![SearchCategory::General],
             enabled: true,
             timeout_ms: 5000,

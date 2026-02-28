@@ -32,7 +32,7 @@ impl SearchEngine for OpenStreetMap {
             name: "OpenStreetMap".to_string(),
             display_name: "OpenStreetMap".to_string(),
             homepage: "https://nominatim.openstreetmap.org".to_string(),
-            categories: vec!["map".to_string()],
+            categories: vec![SearchCategory::Maps],
             enabled: true,
             timeout_ms: 5000,
             weight: 1.0,

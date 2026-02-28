@@ -108,7 +108,7 @@ impl SearchEngine for AlpineLinux {
 
             let mut r = SearchResult::new(&package_name, &result_url, &snippet, "alpinelinux");
             r.engine_rank = i as u32;
-            r.category = "it".to_string();
+            r.category = SearchCategory::IT;
 
             results.push(r);
         }

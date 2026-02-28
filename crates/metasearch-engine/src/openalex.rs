@@ -97,6 +97,7 @@ impl SearchEngine for OpenAlex {
         EngineMetadata {
             name: "OpenAlex".to_string(),
             display_name: "OpenAlex".to_string(),
+            homepage: "https://OpenAlex.com".to_string(),
             categories: vec![SearchCategory::Science],
             enabled: true,
             timeout_ms: 5000,

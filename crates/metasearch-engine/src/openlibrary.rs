@@ -50,6 +50,7 @@ impl SearchEngine for OpenLibrary {
         EngineMetadata {
             name: "openlibrary".to_string(),
             display_name: "openlibrary".to_string(),
+            homepage: "https://openlibrary.com".to_string(),
             categories: vec![SearchCategory::General],
             enabled: true,
             timeout_ms: 5000,
