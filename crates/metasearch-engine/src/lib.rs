@@ -47,6 +47,10 @@
 //!
 //! ## Batch 12 — More SearXNG translations (9):
 //! - iQiyi, Jisho, Lucide, Mwmbl, Nyaa, Odysee, SVG Repo, Wallhaven, Yep
+//!
+//! ## Batch 13 — More SearXNG translations (9):
+//! - PeerTube, pkg.go.dev, Stract, Tagesschau, Void Linux,
+//!   Rumble, Pinterest, Podcast Index, Photon
 
 // Original engines
 pub mod brave;
@@ -166,6 +170,17 @@ pub mod odysee;
 pub mod svgrepo;
 pub mod wallhaven;
 pub mod yep;
+
+// Batch 13
+pub mod peertube;
+pub mod photon;
+pub mod pinterest;
+pub mod pkg_go_dev;
+pub mod podcastindex;
+pub mod rumble;
+pub mod stract;
+pub mod tagesschau;
+pub mod voidlinux;
 
 pub mod registry;
 

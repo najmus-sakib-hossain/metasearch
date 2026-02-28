@@ -86,16 +86,25 @@ use crate::{
     npm::Npm,
     nyaa::Nyaa,
     odysee::Odysee,
+    peertube::PeerTube,
+    photon::Photon,
+    pinterest::Pinterest,
+    pkg_go_dev::PkgGoDev,
+    podcastindex::PodcastIndex,
     pypi::PyPI,
     qwant::Qwant,
     reddit::Reddit,
+    rumble::Rumble,
     semantic_scholar::SemanticScholar,
     soundcloud::SoundCloud,
     spotify::Spotify,
     stackexchange::StackExchange,
+    stract::Stract,
     svgrepo::SvgRepo,
+    tagesschau::Tagesschau,
     unsplash::Unsplash,
     vimeo::Vimeo,
+    voidlinux::VoidLinux,
     wallhaven::Wallhaven,
     wikipedia::Wikipedia,
     yahoo::Yahoo,
@@ -115,7 +124,7 @@ impl EngineRegistry {
         }
     }
 
-    /// Create a registry pre-loaded with all built-in engines (93 total).
+    /// Create a registry pre-loaded with all built-in engines (102 total).
     pub fn with_defaults(client: Client) -> Self {
         let mut registry = Self::new();
 
@@ -237,6 +246,17 @@ impl EngineRegistry {
         registry.register(Arc::new(SvgRepo::new(client.clone())));
         registry.register(Arc::new(Wallhaven::new(client.clone())));
         registry.register(Arc::new(Yep::new(client.clone())));
+
+        // ── Batch 13: More SearXNG translations ───────────
+        registry.register(Arc::new(PeerTube::new(client.clone())));
+        registry.register(Arc::new(PkgGoDev::new(client.clone())));
+        registry.register(Arc::new(Stract::new(client.clone())));
+        registry.register(Arc::new(Tagesschau::new(client.clone())));
+        registry.register(Arc::new(VoidLinux::new(client.clone())));
+        registry.register(Arc::new(Rumble::new(client.clone())));
+        registry.register(Arc::new(Pinterest::new(client.clone())));
+        registry.register(Arc::new(PodcastIndex::new(client.clone())));
+        registry.register(Arc::new(Photon::new(client.clone())));
 
         registry
     }
