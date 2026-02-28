@@ -81,6 +81,10 @@
 //! ## Batch 22 — Instance-URL + multi-module engines (10):
 //! - Google Videos, Google News, Discourse, Invidious, Piped,
 //!   MediaWiki, Elasticsearch, MeiliSearch, DokuWiki, Recoll
+//!
+//! ## Batch 23 — Translation, dictionary, weather, maps, currency (10):
+//! - LibreTranslate, Lingva, DictZone, DeepL, CurrencyConvert,
+//!   Wordnik, TinEye, OpenStreetMap, Apple Maps, DuckDuckGo Weather
 
 // Original engines
 pub mod brave;
@@ -275,6 +279,18 @@ pub mod mediawiki_engine;
 pub mod meilisearch_engine;
 pub mod piped;
 pub mod recoll_engine;
+
+// Batch 23 (translation, dictionary, weather, maps, currency)
+pub mod apple_maps;
+pub mod currency_convert;
+pub mod deepl;
+pub mod dictzone;
+pub mod duckduckgo_weather;
+pub mod libretranslate;
+pub mod lingva;
+pub mod openstreetmap;
+pub mod tineye;
+pub mod wordnik;
 
 pub mod registry;
 
