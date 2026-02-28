@@ -97,11 +97,13 @@ use crate::{
     npm::Npm,
     nyaa::Nyaa,
     odysee::Odysee,
+    openalex::OpenAlex,
     openlibrary::OpenLibrary,
     openverse::Openverse,
     peertube::PeerTube,
     photon::Photon,
     pinterest::Pinterest,
+    piratebay::PirateBay,
     pkg_go_dev::PkgGoDev,
     podcastindex::PodcastIndex,
     pypi::PyPI,
@@ -147,7 +149,7 @@ impl EngineRegistry {
         }
     }
 
-    /// Create a registry pre-loaded with all built-in engines (125 total).
+    /// Create a registry pre-loaded with all built-in engines (127 total).
     pub fn with_defaults(client: Client) -> Self {
         let mut registry = Self::new();
 
@@ -313,6 +315,10 @@ impl EngineRegistry {
         registry.register(Arc::new(Mojeek::new(client.clone())));
         registry.register(Arc::new(GooglePlay::new(client.clone())));
         registry.register(Arc::new(Yandex::new(client.clone())));
+
+        // ── Batch 19: Wired orphans ───────────────────────
+        registry.register(Arc::new(PirateBay::new(client.clone())));
+        registry.register(Arc::new(OpenAlex::new(client.clone())));
 
         registry
     }
