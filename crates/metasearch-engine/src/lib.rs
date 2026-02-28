@@ -54,6 +54,9 @@
 //!
 //! ## Batch 14 — More SearXNG translations (5):
 //! - Moviepilot, Open Library, SolidTorrents, Rotten Tomatoes, SepiaSearch
+//!
+//! ## Batch 15 — More SearXNG translations (4):
+//! - Openverse, Tootfinder, Searchcode, Tokyo Toshokan
 
 // Original engines
 pub mod brave;
@@ -191,6 +194,12 @@ pub mod openlibrary;
 pub mod rottentomatoes;
 pub mod sepiasearch;
 pub mod solidtorrents;
+
+// Batch 15
+pub mod openverse;
+pub mod searchcode;
+pub mod tokyotoshokan;
+pub mod tootfinder;
 
 pub mod registry;
 
