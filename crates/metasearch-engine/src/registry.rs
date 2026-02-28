@@ -95,11 +95,13 @@ use crate::{
     npm::Npm,
     nyaa::Nyaa,
     odysee::Odysee,
+    openalex::OpenAlex,
     openlibrary::OpenLibrary,
     openverse::Openverse,
     peertube::PeerTube,
     photon::Photon,
     pinterest::Pinterest,
+    piratebay::PirateBay,
     pkg_go_dev::PkgGoDev,
     podcastindex::PodcastIndex,
     pypi::PyPI,
@@ -144,7 +146,7 @@ impl EngineRegistry {
         }
     }
 
-    /// Create a registry pre-loaded with all built-in engines (122 total).
+    /// Create a registry pre-loaded with all built-in engines (124 total).
     pub fn with_defaults(client: Client) -> Self {
         let mut registry = Self::new();
 
@@ -305,6 +307,10 @@ impl EngineRegistry {
         registry.register(Arc::new(Ahmia::new(client.clone())));
         registry.register(Arc::new(Naver::new(client.clone())));
         registry.register(Arc::new(RadioBrowser::new(client.clone())));
+
+        // ── Batch 18: More SearXNG translations ───────────
+        registry.register(Arc::new(PirateBay::new(client.clone())));
+        registry.register(Arc::new(OpenAlex::new(client.clone())));
 
         registry
     }

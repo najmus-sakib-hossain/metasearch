@@ -64,6 +64,9 @@
 //!
 //! ## Batch 17 — More SearXNG translations (5):
 //! - Chinaso, Flickr (no API), Ahmia, Naver, Radio Browser
+//!
+//! ## Batch 18 — More SearXNG translations (2):
+//! - The Pirate Bay, OpenAlex
 
 // Original engines
 pub mod brave;
@@ -222,6 +225,10 @@ pub mod chinaso;
 pub mod flickr_noapi;
 pub mod naver;
 pub mod radio_browser;
+
+// Batch 18
+pub mod openalex;
+pub mod piratebay;
 
 pub mod registry;
 
