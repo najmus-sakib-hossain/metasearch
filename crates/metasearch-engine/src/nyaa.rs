@@ -62,8 +62,8 @@ impl SearchEngine for Nyaa {
         let document = Html::parse_document(&body);
         let row_sel = Selector::parse("table.torrent-list tr")
             .map_err(|e| MetasearchError::ParseError(format!("{e:?}")))?;
-        let th_sel = Selector::parse("th")
-            .map_err(|e| MetasearchError::ParseError(format!("{e:?}")))?;
+        let th_sel =
+            Selector::parse("th").map_err(|e| MetasearchError::ParseError(format!("{e:?}")))?;
         let title_sel = Selector::parse("td:nth-child(2) a:last-child")
             .map_err(|e| MetasearchError::ParseError(format!("{e:?}")))?;
         let size_sel = Selector::parse("td:nth-child(4)")

@@ -107,16 +107,10 @@ impl SearchEngine for LibRs {
             let snippet = if version.is_empty() && downloads.is_empty() {
                 content.clone()
             } else {
-                format!(
-                    "{} | v{} | {}",
-                    content,
-                    version.trim(),
-                    downloads.trim()
-                )
+                format!("{} | v{} | {}", content, version.trim(), downloads.trim())
             };
 
-            let mut result =
-                SearchResult::new(title, link, snippet, self.metadata.name.clone());
+            let mut result = SearchResult::new(title, link, snippet, self.metadata.name.clone());
             result.engine_rank = (rank + 1) as u32;
             results.push(result);
         }

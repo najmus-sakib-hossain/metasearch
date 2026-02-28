@@ -10,7 +10,13 @@ use reqwest::Client;
 use serde::Deserialize;
 use std::collections::HashMap;
 
-use crate::{EngineMetadata, MetasearchError, SearchEngine, SearchQuery, SearchResult};
+use metasearch_core::{
+    category::SearchCategory,
+    engine::{EngineMetadata, SearchEngine},
+    error::MetasearchError,
+    query::SearchQuery,
+    result::SearchResult,
+};
 
 pub struct Discourse {
     client: Client,
@@ -110,8 +116,7 @@ impl SearchEngine for Discourse {
         let topics = data.topics.unwrap_or_default();
         let posts = data.posts.unwrap_or_default();
 
-        let topic_map: HashMap<u64, &DiscourseTopic> =
-            topics.iter().map(|t| (t.id, t)).collect();
+        let topic_map: HashMap<u64, &DiscourseTopic> = topics.iter().map(|t| (t.id, t)).collect();
 
         let mut results = Vec::new();
         for (i, post) in posts.iter().enumerate() {

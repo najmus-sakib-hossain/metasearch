@@ -9,7 +9,13 @@ use async_trait::async_trait;
 use reqwest::Client;
 use serde::Deserialize;
 
-use crate::{EngineMetadata, MetasearchError, SearchEngine, SearchQuery, SearchResult};
+use metasearch_core::{
+    category::SearchCategory,
+    engine::{EngineMetadata, SearchEngine},
+    error::MetasearchError,
+    query::SearchQuery,
+    result::SearchResult,
+};
 
 pub struct Invidious {
     client: Client,
@@ -45,7 +51,9 @@ impl SearchEngine for Invidious {
     fn metadata(&self) -> EngineMetadata {
         EngineMetadata {
             name: "Invidious".to_string(),
-            description: "Invidious (alt YouTube frontend) video search — configurable instance URL".to_string(),
+            description:
+                "Invidious (alt YouTube frontend) video search — configurable instance URL"
+                    .to_string(),
             categories: vec![metasearch_core::category::SearchCategory::Videos],
             enabled: !self.base_url.is_empty(),
         }

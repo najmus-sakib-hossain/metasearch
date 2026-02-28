@@ -9,7 +9,13 @@ use async_trait::async_trait;
 use reqwest::Client;
 use serde::Deserialize;
 
-use crate::{EngineMetadata, MetasearchError, SearchEngine, SearchQuery, SearchResult};
+use metasearch_core::{
+    category::SearchCategory,
+    engine::{EngineMetadata, SearchEngine},
+    error::MetasearchError,
+    query::SearchQuery,
+    result::SearchResult,
+};
 
 pub struct RecollEngine {
     client: Client,
@@ -49,7 +55,9 @@ impl SearchEngine for RecollEngine {
     fn metadata(&self) -> EngineMetadata {
         EngineMetadata {
             name: "Recoll".to_string(),
-            description: "Recoll desktop full-text search via recoll-webui — configurable instance URL".to_string(),
+            description:
+                "Recoll desktop full-text search via recoll-webui — configurable instance URL"
+                    .to_string(),
             categories: vec![metasearch_core::category::SearchCategory::General],
             enabled: !self.base_url.is_empty(),
         }
@@ -88,10 +96,7 @@ impl SearchEngine for RecollEngine {
 
             // Map local file:// paths to web-accessible URLs
             let result_url = if !self.mount_prefix.is_empty() && !self.dl_prefix.is_empty() {
-                raw_url.replace(
-                    &format!("file://{}", self.mount_prefix),
-                    &self.dl_prefix,
-                )
+                raw_url.replace(&format!("file://{}", self.mount_prefix), &self.dl_prefix)
             } else {
                 raw_url
             };

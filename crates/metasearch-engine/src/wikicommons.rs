@@ -141,10 +141,7 @@ impl SearchEngine for WikiCommons {
                         .map(|(name, _ext)| name)
                         .unwrap_or(&title);
 
-                    let description_url = imageinfo
-                        .descriptionurl
-                        .as_deref()
-                        .unwrap_or_default();
+                    let description_url = imageinfo.descriptionurl.as_deref().unwrap_or_default();
                     let media_url = imageinfo.url.as_deref().unwrap_or_default();
 
                     if title.is_empty() || description_url.is_empty() {
@@ -178,7 +175,11 @@ impl SearchEngine for WikiCommons {
             }
         }
 
-        info!(engine = "wikicommons", count = results.len(), "Search complete");
+        info!(
+            engine = "wikicommons",
+            count = results.len(),
+            "Search complete"
+        );
         Ok(results)
     }
 }

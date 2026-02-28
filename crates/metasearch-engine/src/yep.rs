@@ -75,8 +75,16 @@ impl SearchEngine for Yep {
             }
 
             rank += 1;
-            let title = item.get("title").and_then(|v| v.as_str()).unwrap_or("").to_string();
-            let page_url = item.get("url").and_then(|v| v.as_str()).unwrap_or("").to_string();
+            let title = item
+                .get("title")
+                .and_then(|v| v.as_str())
+                .unwrap_or("")
+                .to_string();
+            let page_url = item
+                .get("url")
+                .and_then(|v| v.as_str())
+                .unwrap_or("")
+                .to_string();
             let snippet_raw = item.get("snippet").and_then(|v| v.as_str()).unwrap_or("");
             let snippet = html_escape::decode_html_entities(snippet_raw).to_string();
 

@@ -64,13 +64,15 @@ impl SearchEngine for OpenLibrary {
             RESULTS_PER_PAGE
         );
 
-        let resp = self.client.get(&url).send().await.map_err(|e| {
-            MetasearchError::Engine(format!("OpenLibrary request failed: {}", e))
-        })?;
+        let resp =
+            self.client.get(&url).send().await.map_err(|e| {
+                MetasearchError::Engine(format!("OpenLibrary request failed: {}", e))
+            })?;
 
-        let data: OpenLibraryResponse = resp.json().await.map_err(|e| {
-            MetasearchError::Engine(format!("OpenLibrary parse failed: {}", e))
-        })?;
+        let data: OpenLibraryResponse = resp
+            .json()
+            .await
+            .map_err(|e| MetasearchError::Engine(format!("OpenLibrary parse failed: {}", e)))?;
 
         let results = data
             .docs
@@ -98,9 +100,9 @@ impl SearchEngine for OpenLibrary {
                 }
                 let snippet = snippet_parts.join(" ");
 
-                let thumbnail = doc.lending_identifier_s.map(|id| {
-                    format!("https://archive.org/services/img/{}", id)
-                });
+                let thumbnail = doc
+                    .lending_identifier_s
+                    .map(|id| format!("https://archive.org/services/img/{}", id));
 
                 let mut result = SearchResult::new(&title, &page_url, &snippet, "openlibrary");
                 result.engine_rank = (i + 1) as u32;

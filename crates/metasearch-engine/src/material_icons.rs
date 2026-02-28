@@ -73,20 +73,12 @@ impl SearchEngine for MaterialIcons {
                 let tags: Vec<&str> = icon
                     .get("tags")
                     .and_then(|v| v.as_array())
-                    .map(|arr| {
-                        arr.iter()
-                            .filter_map(|v| v.as_str())
-                            .collect()
-                    })
+                    .map(|arr| arr.iter().filter_map(|v| v.as_str()).collect())
                     .unwrap_or_default();
                 let categories: Vec<&str> = icon
                     .get("categories")
                     .and_then(|v| v.as_array())
-                    .map(|arr| {
-                        arr.iter()
-                            .filter_map(|v| v.as_str())
-                            .collect()
-                    })
+                    .map(|arr| arr.iter().filter_map(|v| v.as_str()).collect())
                     .unwrap_or_default();
 
                 let matches = query_parts.iter().any(|part| {

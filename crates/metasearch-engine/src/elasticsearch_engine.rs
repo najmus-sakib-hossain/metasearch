@@ -8,7 +8,13 @@ use async_trait::async_trait;
 use reqwest::Client;
 use serde_json::Value;
 
-use crate::{EngineMetadata, MetasearchError, SearchEngine, SearchQuery, SearchResult};
+use metasearch_core::{
+    category::SearchCategory,
+    engine::{EngineMetadata, SearchEngine},
+    error::MetasearchError,
+    query::SearchQuery,
+    result::SearchResult,
+};
 
 pub struct ElasticsearchEngine {
     client: Client,
@@ -41,7 +47,8 @@ impl SearchEngine for ElasticsearchEngine {
     fn metadata(&self) -> EngineMetadata {
         EngineMetadata {
             name: "Elasticsearch".to_string(),
-            description: "Elasticsearch search — configurable instance URL, index, credentials".to_string(),
+            description: "Elasticsearch search — configurable instance URL, index, credentials"
+                .to_string(),
             categories: vec![metasearch_core::category::SearchCategory::General],
             enabled: !self.base_url.is_empty() && !self.index.is_empty(),
         }
@@ -92,10 +99,7 @@ impl SearchEngine for ElasticsearchEngine {
             )));
         }
 
-        let hits = json["hits"]["hits"]
-            .as_array()
-            .cloned()
-            .unwrap_or_default();
+        let hits = json["hits"]["hits"].as_array().cloned().unwrap_or_default();
 
         let mut results = Vec::new();
         for (i, hit) in hits.iter().enumerate() {

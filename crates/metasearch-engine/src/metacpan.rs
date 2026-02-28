@@ -124,12 +124,7 @@ impl SearchEngine for MetaCpan {
                 let url = format!("https://metacpan.org/pod/{doc}");
                 let snippet = src.abstract_text.unwrap_or_default();
 
-                let mut result = SearchResult::new(
-                    title,
-                    url,
-                    snippet,
-                    self.metadata.name.clone(),
-                );
+                let mut result = SearchResult::new(title, url, snippet, self.metadata.name.clone());
                 result.engine_rank = (i + 1) as u32;
                 Some(result)
             })

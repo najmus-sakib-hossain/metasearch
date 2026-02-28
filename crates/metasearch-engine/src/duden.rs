@@ -72,10 +72,10 @@ impl SearchEngine for Duden {
         let document = Html::parse_document(&body);
         let section_sel = Selector::parse("section:not(.essay)")
             .map_err(|e| MetasearchError::ParseError(format!("{e:?}")))?;
-        let link_sel = Selector::parse("h2 a")
-            .map_err(|e| MetasearchError::ParseError(format!("{e:?}")))?;
-        let content_sel = Selector::parse("p")
-            .map_err(|e| MetasearchError::ParseError(format!("{e:?}")))?;
+        let link_sel =
+            Selector::parse("h2 a").map_err(|e| MetasearchError::ParseError(format!("{e:?}")))?;
+        let content_sel =
+            Selector::parse("p").map_err(|e| MetasearchError::ParseError(format!("{e:?}")))?;
 
         let mut results = Vec::new();
 
@@ -107,12 +107,7 @@ impl SearchEngine for Duden {
                 .map(|el| el.text().collect::<String>().trim().to_string())
                 .unwrap_or_default();
 
-            let mut result = SearchResult::new(
-                title,
-                href,
-                snippet,
-                self.metadata.name.clone(),
-            );
+            let mut result = SearchResult::new(title, href, snippet, self.metadata.name.clone());
             result.engine_rank = (rank + 1) as u32;
             results.push(result);
         }

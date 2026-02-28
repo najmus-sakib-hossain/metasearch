@@ -61,16 +61,17 @@ impl AppleMaps {
             .await
             .map_err(|e| MetasearchError::Engine(format!("Apple Maps bootstrap error: {e}")))?;
 
-        let json: serde_json::Value = bootstrap_resp
-            .json()
-            .await
-            .map_err(|e| MetasearchError::Engine(format!("Apple Maps bootstrap parse error: {e}")))?;
+        let json: serde_json::Value = bootstrap_resp.json().await.map_err(|e| {
+            MetasearchError::Engine(format!("Apple Maps bootstrap parse error: {e}"))
+        })?;
 
         let access_token = json
             .get("authInfo")
             .and_then(|a| a.get("access_token"))
             .and_then(|v| v.as_str())
-            .ok_or_else(|| MetasearchError::Engine("Apple Maps: no access_token in bootstrap".to_string()))?
+            .ok_or_else(|| {
+                MetasearchError::Engine("Apple Maps: no access_token in bootstrap".to_string())
+            })?
             .to_string();
 
         Ok(access_token)

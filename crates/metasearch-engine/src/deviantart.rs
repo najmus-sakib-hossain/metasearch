@@ -65,8 +65,8 @@ impl SearchEngine for DeviantArt {
         let document = Html::parse_document(&body);
         let result_sel = Selector::parse("a[data-hook='deviation_link']")
             .map_err(|e| MetasearchError::ParseError(format!("{e:?}")))?;
-        let img_sel = Selector::parse("img")
-            .map_err(|e| MetasearchError::ParseError(format!("{e:?}")))?;
+        let img_sel =
+            Selector::parse("img").map_err(|e| MetasearchError::ParseError(format!("{e:?}")))?;
 
         let mut results = Vec::new();
 

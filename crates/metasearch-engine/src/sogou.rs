@@ -61,10 +61,7 @@ impl SearchEngine for Sogou {
         let page = query.page.max(1);
         let encoded = urlencoding::encode(&query.query);
 
-        let mut url = format!(
-            "https://www.sogou.com/web?query={}&page={}",
-            encoded, page
-        );
+        let mut url = format!("https://www.sogou.com/web?query={}&page={}", encoded, page);
 
         if let Some(tr) = Self::time_range_param(query.time_range.as_deref()) {
             url.push_str(&format!("&s_from={}&tsn=1", tr));
@@ -114,7 +111,8 @@ impl SearchEngine for Sogou {
         // VR-style results: div.vrwrap with h3.vr-title > a
         let vr_sel = Selector::parse("div.vrwrap").unwrap();
         let vr_title_sel = Selector::parse("h3.vr-title a, h3[class*=\"vr-title\"] a").unwrap();
-        let vr_content_sel = Selector::parse("div[class*=\"attribute-centent\"], div[class*=\"fz-mid\"]").unwrap();
+        let vr_content_sel =
+            Selector::parse("div[class*=\"attribute-centent\"], div[class*=\"fz-mid\"]").unwrap();
 
         let date_re = Regex::new(r"(\d{4}-\d{1,2}-\d{1,2})").unwrap();
         let data_url_re = Regex::new(r#"data-url="([^"]+)"#).unwrap();
@@ -161,10 +159,8 @@ impl SearchEngine for Sogou {
                     if let Some(caps) = date_re.captures(&cite_text) {
                         if let Ok(date) = chrono::NaiveDate::parse_from_str(&caps[1], "%Y-%m-%d") {
                             let dt = date.and_hms_opt(0, 0, 0).unwrap();
-                            r.published_date = chrono::DateTime::from_timestamp(
-                                dt.and_utc().timestamp(),
-                                0,
-                            );
+                            r.published_date =
+                                chrono::DateTime::from_timestamp(dt.and_utc().timestamp(), 0);
                         }
                     }
                 }
@@ -177,10 +173,7 @@ impl SearchEngine for Sogou {
         // Parse VR-style results
         for item in document.select(&vr_sel) {
             // Skip special wraps
-            if item
-                .html()
-                .contains("special-wrap")
-            {
+            if item.html().contains("special-wrap") {
                 continue;
             }
 

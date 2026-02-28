@@ -41,10 +41,8 @@ impl SearchEngine for CurrencyConvert {
 
     async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
         // Parse query like "100 USD to EUR" or "USD to EUR"
-        let re = Regex::new(r"(?i)(\d+\.?\d*)\s*([A-Z]{3})\s+(?:to|in)\s+([A-Z]{3})")
-            .unwrap();
-        let re_simple = Regex::new(r"(?i)([A-Z]{3})\s+(?:to|in)\s+([A-Z]{3})")
-            .unwrap();
+        let re = Regex::new(r"(?i)(\d+\.?\d*)\s*([A-Z]{3})\s+(?:to|in)\s+([A-Z]{3})").unwrap();
+        let re_simple = Regex::new(r"(?i)([A-Z]{3})\s+(?:to|in)\s+([A-Z]{3})").unwrap();
 
         let (amount, from, to) = if let Some(caps) = re.captures(&query.query) {
             (
@@ -58,17 +56,12 @@ impl SearchEngine for CurrencyConvert {
             return Ok(vec![]);
         };
 
-        let url = format!(
-            "https://duckduckgo.com/js/spice/currency/1/{}/{}",
-            from, to
-        );
+        let url = format!("https://duckduckgo.com/js/spice/currency/1/{}/{}", from, to);
 
-        let resp = self
-            .client
-            .get(&url)
-            .send()
-            .await
-            .map_err(|e| MetasearchError::Engine(format!("CurrencyConvert request error: {e}")))?;
+        let resp =
+            self.client.get(&url).send().await.map_err(|e| {
+                MetasearchError::Engine(format!("CurrencyConvert request error: {e}"))
+            })?;
 
         let text = resp
             .text()

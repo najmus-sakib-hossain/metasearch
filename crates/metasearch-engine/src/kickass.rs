@@ -74,8 +74,8 @@ impl SearchEngine for Kickass {
             .map_err(|e| MetasearchError::ParseError(format!("{e:?}")))?;
         let seed_sel = Selector::parse("td.green")
             .map_err(|e| MetasearchError::ParseError(format!("{e:?}")))?;
-        let leech_sel = Selector::parse("td.red")
-            .map_err(|e| MetasearchError::ParseError(format!("{e:?}")))?;
+        let leech_sel =
+            Selector::parse("td.red").map_err(|e| MetasearchError::ParseError(format!("{e:?}")))?;
         let size_sel = Selector::parse("td.nobr")
             .map_err(|e| MetasearchError::ParseError(format!("{e:?}")))?;
 

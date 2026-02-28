@@ -93,16 +93,10 @@ impl SearchEngine for Loc {
                     .and_then(|d| d.into_iter().next())
                     .unwrap_or_default();
 
-                let thumbnail = r
-                    .image_url
-                    .and_then(|imgs| imgs.into_iter().next());
+                let thumbnail = r.image_url.and_then(|imgs| imgs.into_iter().next());
 
-                let mut result = SearchResult::new(
-                    title,
-                    link,
-                    snippet,
-                    self.metadata.name.clone(),
-                );
+                let mut result =
+                    SearchResult::new(title, link, snippet, self.metadata.name.clone());
                 result.engine_rank = (i + 1) as u32;
                 result.thumbnail = thumbnail;
                 Some(result)

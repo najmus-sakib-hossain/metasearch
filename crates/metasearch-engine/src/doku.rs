@@ -8,7 +8,13 @@ use async_trait::async_trait;
 use reqwest::Client;
 use scraper::{Html, Selector};
 
-use crate::{EngineMetadata, MetasearchError, SearchEngine, SearchQuery, SearchResult};
+use metasearch_core::{
+    category::SearchCategory,
+    engine::{EngineMetadata, SearchEngine},
+    error::MetasearchError,
+    query::SearchQuery,
+    result::SearchResult,
+};
 
 pub struct Doku {
     client: Client,
@@ -74,11 +80,7 @@ impl SearchEngine for Doku {
         // Parse quick hits
         for el in doc.select(&quickhit_sel) {
             if let Some(a) = el.select(&link_sel).next() {
-                let title = a
-                    .value()
-                    .attr("title")
-                    .unwrap_or("")
-                    .to_string();
+                let title = a.value().attr("title").unwrap_or("").to_string();
                 let href = a.value().attr("href").unwrap_or("").to_string();
                 let full_url = if href.starts_with("http") {
                     href
@@ -102,11 +104,7 @@ impl SearchEngine for Doku {
 
         for (dt, dd) in dts.iter().zip(dds.iter()) {
             if let Some(a) = dt.select(&link_sel).next() {
-                let title = a
-                    .value()
-                    .attr("title")
-                    .unwrap_or("")
-                    .to_string();
+                let title = a.value().attr("title").unwrap_or("").to_string();
                 let href = a.value().attr("href").unwrap_or("").to_string();
                 let full_url = if href.starts_with("http") {
                     href

@@ -69,8 +69,8 @@ impl SearchEngine for Sourcehut {
             .map_err(|e| MetasearchError::ParseError(format!("{e:?}")))?;
         let h4_sel =
             Selector::parse("h4").map_err(|e| MetasearchError::ParseError(format!("{e:?}")))?;
-        let link_sel = Selector::parse("h4 a")
-            .map_err(|e| MetasearchError::ParseError(format!("{e:?}")))?;
+        let link_sel =
+            Selector::parse("h4 a").map_err(|e| MetasearchError::ParseError(format!("{e:?}")))?;
         let desc_sel =
             Selector::parse("p").map_err(|e| MetasearchError::ParseError(format!("{e:?}")))?;
 

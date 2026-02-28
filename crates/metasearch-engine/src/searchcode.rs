@@ -10,10 +10,10 @@ use reqwest::Client;
 use serde::Deserialize;
 
 use metasearch_core::{
-    engine::{EngineFetcher, EngineMetadata, SearchEngine},
-    schema::{SearchQuery, SearchResult},
-    error::MetasearchError,
     category::SearchCategory,
+    engine::{EngineFetcher, EngineMetadata, SearchEngine},
+    error::MetasearchError,
+    schema::{SearchQuery, SearchResult},
 };
 
 pub struct Searchcode {

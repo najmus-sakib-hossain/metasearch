@@ -61,7 +61,10 @@ impl SearchEngine for Pinterest {
             .client
             .get(&url)
             .header("Accept", "application/json")
-            .header("User-Agent", "Mozilla/5.0 (X11; Linux x86_64; rv:120.0) Gecko/20100101 Firefox/120.0")
+            .header(
+                "User-Agent",
+                "Mozilla/5.0 (X11; Linux x86_64; rv:120.0) Gecko/20100101 Firefox/120.0",
+            )
             .send()
             .await
             .map_err(|e| MetasearchError::Engine(format!("Pinterest request failed: {e}")))?;
@@ -87,10 +90,7 @@ impl SearchEngine for Pinterest {
                     .unwrap_or("Pinterest Pin")
                     .to_string();
                 let result_url = format!("https://www.pinterest.com/pin/{}/", pin_id);
-                let snippet = pin["description"]
-                    .as_str()
-                    .unwrap_or_default()
-                    .to_string();
+                let snippet = pin["description"].as_str().unwrap_or_default().to_string();
                 let thumbnail_url = pin["images"]["236x"]["url"]
                     .as_str()
                     .or_else(|| pin["images"]["orig"]["url"].as_str())

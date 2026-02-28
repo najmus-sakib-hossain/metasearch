@@ -48,9 +48,10 @@ impl SearchEngine for RottenTomatoes {
             MetasearchError::Engine(format!("RottenTomatoes request failed: {}", e))
         })?;
 
-        let html_text = resp.text().await.map_err(|e| {
-            MetasearchError::Engine(format!("RottenTomatoes read failed: {}", e))
-        })?;
+        let html_text = resp
+            .text()
+            .await
+            .map_err(|e| MetasearchError::Engine(format!("RottenTomatoes read failed: {}", e)))?;
 
         let document = Html::parse_document(&html_text);
         let result_sel = Selector::parse("search-page-media-row").unwrap();

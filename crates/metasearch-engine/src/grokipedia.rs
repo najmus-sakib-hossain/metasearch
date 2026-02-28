@@ -87,12 +87,7 @@ impl SearchEngine for Grokipedia {
                 }
                 let url = format!("https://grokipedia.com/wiki/{slug}");
                 let snippet = r.snippet.unwrap_or_default();
-                let mut result = SearchResult::new(
-                    title,
-                    url,
-                    snippet,
-                    self.metadata.name.clone(),
-                );
+                let mut result = SearchResult::new(title, url, snippet, self.metadata.name.clone());
                 result.engine_rank = (i + 1) as u32;
                 Some(result)
             })

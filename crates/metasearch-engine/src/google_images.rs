@@ -152,13 +152,7 @@ impl SearchEngine for GoogleImages {
                     let resolution = item
                         .original_image
                         .as_ref()
-                        .map(|o| {
-                            format!(
-                                "{} x {}",
-                                o.width.unwrap_or(0),
-                                o.height.unwrap_or(0)
-                            )
-                        })
+                        .map(|o| format!("{} x {}", o.width.unwrap_or(0), o.height.unwrap_or(0)))
                         .unwrap_or_default();
 
                     let full_content = if resolution.is_empty() {
@@ -167,12 +161,8 @@ impl SearchEngine for GoogleImages {
                         format!("{} ({})", content, resolution)
                     };
 
-                    let mut r = SearchResult::new(
-                        title,
-                        result_url,
-                        &full_content,
-                        "google_images",
-                    );
+                    let mut r =
+                        SearchResult::new(title, result_url, &full_content, "google_images");
                     r.engine_rank = (i + 1) as u32;
                     r.category = "general".to_string();
                     results.push(r);
@@ -180,7 +170,11 @@ impl SearchEngine for GoogleImages {
             }
         }
 
-        info!(engine = "google_images", count = results.len(), "Search complete");
+        info!(
+            engine = "google_images",
+            count = results.len(),
+            "Search complete"
+        );
         Ok(results)
     }
 }

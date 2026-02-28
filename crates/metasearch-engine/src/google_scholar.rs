@@ -111,11 +111,7 @@ impl SearchEngine for GoogleScholar {
                 .map(|el| el.text().collect())
                 .unwrap_or_default();
 
-            let snippet = if content.is_empty() {
-                &meta
-            } else {
-                &content
-            };
+            let snippet = if content.is_empty() { &meta } else { &content };
 
             let mut r = SearchResult::new(&title, href, snippet, "google_scholar");
             r.engine_rank = (i + 1) as u32;
@@ -141,7 +137,11 @@ impl SearchEngine for GoogleScholar {
             results.push(r);
         }
 
-        info!(engine = "google_scholar", count = results.len(), "Search complete");
+        info!(
+            engine = "google_scholar",
+            count = results.len(),
+            "Search complete"
+        );
         Ok(results)
     }
 }

@@ -9,7 +9,13 @@ use async_trait::async_trait;
 use reqwest::Client;
 use serde::Deserialize;
 
-use crate::{EngineMetadata, MetasearchError, SearchEngine, SearchQuery, SearchResult};
+use metasearch_core::{
+    category::SearchCategory,
+    engine::{EngineMetadata, SearchEngine},
+    error::MetasearchError,
+    query::SearchQuery,
+    result::SearchResult,
+};
 
 pub struct Piped {
     client: Client,
@@ -51,7 +57,8 @@ impl SearchEngine for Piped {
     fn metadata(&self) -> EngineMetadata {
         EngineMetadata {
             name: "Piped".to_string(),
-            description: "Piped (alt YouTube frontend) video search — configurable instance URLs".to_string(),
+            description: "Piped (alt YouTube frontend) video search — configurable instance URLs"
+                .to_string(),
             categories: vec![metasearch_core::category::SearchCategory::Videos],
             enabled: !self.backend_url.is_empty(),
         }

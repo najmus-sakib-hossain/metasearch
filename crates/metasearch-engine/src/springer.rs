@@ -83,7 +83,9 @@ impl SearchEngine for Springer {
         if key.is_empty() {
             return Err(MetasearchError::EngineError {
                 engine: "springer".to_string(),
-                message: "No API key configured. Get one at https://dev.springernature.com/subscription/".to_string(),
+                message:
+                    "No API key configured. Get one at https://dev.springernature.com/subscription/"
+                        .to_string(),
             });
         }
 
@@ -132,10 +134,7 @@ impl SearchEngine for Springer {
                         urls.iter()
                             .filter(|u| u.platform.as_deref() == Some("web"))
                             .find(|u| u.format.as_deref() == Some("html"))
-                            .or_else(|| {
-                                urls.iter()
-                                    .find(|u| u.platform.as_deref() == Some("web"))
-                            })
+                            .or_else(|| urls.iter().find(|u| u.platform.as_deref() == Some("web")))
                             .and_then(|u| u.value.as_ref())
                             .map(|v| v.replace("http://", "https://"))
                     })
@@ -165,14 +164,12 @@ impl SearchEngine for Springer {
                 // Parse publication date (YYYY-MM-DD format)
                 if let Some(date_str) = &record.publication_date {
                     if let Ok(dt) = chrono::NaiveDate::parse_from_str(date_str, "%Y-%m-%d") {
-                        r.published_date = dt
-                            .and_hms_opt(0, 0, 0)
-                            .map(|ndt| {
-                                chrono::DateTime::<chrono::Utc>::from_naive_utc_and_offset(
-                                    ndt,
-                                    chrono::Utc,
-                                )
-                            });
+                        r.published_date = dt.and_hms_opt(0, 0, 0).map(|ndt| {
+                            chrono::DateTime::<chrono::Utc>::from_naive_utc_and_offset(
+                                ndt,
+                                chrono::Utc,
+                            )
+                        });
                     }
                 }
 
@@ -180,7 +177,11 @@ impl SearchEngine for Springer {
             }
         }
 
-        info!(engine = "springer", count = results.len(), "Search complete");
+        info!(
+            engine = "springer",
+            count = results.len(),
+            "Search complete"
+        );
         Ok(results)
     }
 }

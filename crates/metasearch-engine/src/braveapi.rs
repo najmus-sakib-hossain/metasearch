@@ -68,7 +68,9 @@ impl SearchEngine for BraveApi {
         if key.is_empty() {
             return Err(MetasearchError::EngineError {
                 engine: "braveapi".to_string(),
-                message: "No API key configured. Get one at https://api-dashboard.search.brave.com/".to_string(),
+                message:
+                    "No API key configured. Get one at https://api-dashboard.search.brave.com/"
+                        .to_string(),
             });
         }
 
@@ -126,7 +128,11 @@ impl SearchEngine for BraveApi {
             }
         }
 
-        info!(engine = "braveapi", count = results.len(), "Search complete");
+        info!(
+            engine = "braveapi",
+            count = results.len(),
+            "Search complete"
+        );
         Ok(results)
     }
 }

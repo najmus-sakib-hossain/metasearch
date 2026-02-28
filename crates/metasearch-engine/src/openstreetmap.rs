@@ -68,10 +68,7 @@ impl SearchEngine for OpenStreetMap {
                     .get("osm_type")
                     .and_then(|v| v.as_str())
                     .unwrap_or("node");
-                let osm_id = item
-                    .get("osm_id")
-                    .and_then(|v| v.as_u64())
-                    .unwrap_or(0);
+                let osm_id = item.get("osm_id").and_then(|v| v.as_u64()).unwrap_or(0);
                 let lat = item.get("lat").and_then(|v| v.as_str()).unwrap_or("0");
                 let lon = item.get("lon").and_then(|v| v.as_str()).unwrap_or("0");
                 let category = item

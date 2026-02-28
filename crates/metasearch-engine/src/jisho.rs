@@ -111,8 +111,7 @@ impl SearchEngine for Jisho {
                 };
 
                 let page_url = format!("https://jisho.org/word/{}", entry.slug);
-                let mut r =
-                    SearchResult::new(title, page_url, snippet, self.metadata.name.clone());
+                let mut r = SearchResult::new(title, page_url, snippet, self.metadata.name.clone());
                 r.engine_rank = (i + 1) as u32;
                 r
             })

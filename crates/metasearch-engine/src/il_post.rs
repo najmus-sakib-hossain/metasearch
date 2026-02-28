@@ -61,10 +61,7 @@ impl SearchEngine for IlPost {
         let resp = self
             .client
             .get("https://api.ilpost.org/search/api/site_search/")
-            .query(&[
-                ("q", query.query.as_str()),
-                ("page", &page.to_string()),
-            ])
+            .query(&[("q", query.query.as_str()), ("page", &page.to_string())])
             .send()
             .await
             .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
@@ -85,12 +82,8 @@ impl SearchEngine for IlPost {
                     return None;
                 }
                 let snippet = doc.summary.unwrap_or_default();
-                let mut result = SearchResult::new(
-                    title,
-                    link,
-                    snippet,
-                    self.metadata.name.clone(),
-                );
+                let mut result =
+                    SearchResult::new(title, link, snippet, self.metadata.name.clone());
                 result.engine_rank = (i + 1) as u32;
                 result.thumbnail = doc.image;
                 Some(result)

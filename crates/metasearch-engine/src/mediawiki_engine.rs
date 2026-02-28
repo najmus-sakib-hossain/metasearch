@@ -8,7 +8,13 @@ use async_trait::async_trait;
 use reqwest::Client;
 use serde::Deserialize;
 
-use crate::{EngineMetadata, MetasearchError, SearchEngine, SearchQuery, SearchResult};
+use metasearch_core::{
+    category::SearchCategory,
+    engine::{EngineMetadata, SearchEngine},
+    error::MetasearchError,
+    query::SearchQuery,
+    result::SearchResult,
+};
 
 pub struct MediaWikiEngine {
     client: Client,
@@ -83,10 +89,7 @@ impl SearchEngine for MediaWikiEngine {
             .await
             .map_err(|e| MetasearchError::EngineError(format!("MediaWiki JSON: {e}")))?;
 
-        let items = data
-            .query
-            .and_then(|q| q.search)
-            .unwrap_or_default();
+        let items = data.query.and_then(|q| q.search).unwrap_or_default();
 
         let mut results = Vec::new();
         for (i, item) in items.iter().enumerate() {

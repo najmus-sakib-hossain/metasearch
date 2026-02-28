@@ -68,12 +68,12 @@ impl SearchEngine for Ahmia {
         let document = Html::parse_document(&body);
         let result_sel = Selector::parse("li.result")
             .map_err(|e| MetasearchError::ParseError(format!("{e:?}")))?;
-        let link_sel = Selector::parse("h4 a")
-            .map_err(|e| MetasearchError::ParseError(format!("{e:?}")))?;
-        let title_sel = Selector::parse("h4")
-            .map_err(|e| MetasearchError::ParseError(format!("{e:?}")))?;
-        let desc_sel = Selector::parse("p")
-            .map_err(|e| MetasearchError::ParseError(format!("{e:?}")))?;
+        let link_sel =
+            Selector::parse("h4 a").map_err(|e| MetasearchError::ParseError(format!("{e:?}")))?;
+        let title_sel =
+            Selector::parse("h4").map_err(|e| MetasearchError::ParseError(format!("{e:?}")))?;
+        let desc_sel =
+            Selector::parse("p").map_err(|e| MetasearchError::ParseError(format!("{e:?}")))?;
 
         let mut results = Vec::new();
 

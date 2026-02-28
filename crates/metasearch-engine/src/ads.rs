@@ -80,7 +80,8 @@ impl SearchEngine for Ads {
         if key.is_empty() {
             return Err(MetasearchError::EngineError {
                 engine: "astrophysics_data_system".to_string(),
-                message: "No API key configured. Get one at https://ui.adsabs.harvard.edu/help/api".to_string(),
+                message: "No API key configured. Get one at https://ui.adsabs.harvard.edu/help/api"
+                    .to_string(),
             });
         }
 
@@ -111,7 +112,9 @@ impl SearchEngine for Ads {
         if let Some(err) = data.error {
             return Err(MetasearchError::EngineError {
                 engine: "astrophysics_data_system".to_string(),
-                message: err.msg.unwrap_or_else(|| "Unknown ADS API error".to_string()),
+                message: err
+                    .msg
+                    .unwrap_or_else(|| "Unknown ADS API error".to_string()),
             });
         }
 
@@ -130,8 +133,7 @@ impl SearchEngine for Ads {
                     }
 
                     let bibcode = doc.bibcode.as_deref().unwrap_or("");
-                    let result_url =
-                        format!("https://ui.adsabs.harvard.edu/abs/{}/", bibcode);
+                    let result_url = format!("https://ui.adsabs.harvard.edu/abs/{}/", bibcode);
 
                     let content = doc.abstract_text.as_deref().unwrap_or("");
                     let snippet = if content.len() > 300 {
@@ -140,12 +142,8 @@ impl SearchEngine for Ads {
                         content
                     };
 
-                    let mut r = SearchResult::new(
-                        &title,
-                        &result_url,
-                        snippet,
-                        "astrophysics_data_system",
-                    );
+                    let mut r =
+                        SearchResult::new(&title, &result_url, snippet, "astrophysics_data_system");
                     r.engine_rank = (i + 1) as u32;
                     r.category = "general".to_string();
 

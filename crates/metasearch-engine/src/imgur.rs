@@ -70,8 +70,8 @@ impl SearchEngine for Imgur {
             .map_err(|e| MetasearchError::ParseError(format!("{e:?}")))?;
         let link_sel =
             Selector::parse("a").map_err(|e| MetasearchError::ParseError(format!("{e:?}")))?;
-        let img_sel = Selector::parse("a img")
-            .map_err(|e| MetasearchError::ParseError(format!("{e:?}")))?;
+        let img_sel =
+            Selector::parse("a img").map_err(|e| MetasearchError::ParseError(format!("{e:?}")))?;
 
         let mut results = Vec::new();
 

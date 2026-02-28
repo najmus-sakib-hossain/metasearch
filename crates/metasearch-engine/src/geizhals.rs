@@ -67,8 +67,8 @@ impl SearchEngine for Geizhals {
             .map_err(|e| MetasearchError::ParseError(format!("{e:?}")))?;
         let price_sel = Selector::parse("span.price")
             .map_err(|e| MetasearchError::ParseError(format!("{e:?}")))?;
-        let img_sel = Selector::parse("img")
-            .map_err(|e| MetasearchError::ParseError(format!("{e:?}")))?;
+        let img_sel =
+            Selector::parse("img").map_err(|e| MetasearchError::ParseError(format!("{e:?}")))?;
 
         let mut results = Vec::new();
 
@@ -112,12 +112,7 @@ impl SearchEngine for Geizhals {
                 .and_then(|el| el.value().attr("src"))
                 .map(|s| s.to_string());
 
-            let mut result = SearchResult::new(
-                title,
-                href,
-                snippet,
-                self.metadata.name.clone(),
-            );
+            let mut result = SearchResult::new(title, href, snippet, self.metadata.name.clone());
             result.engine_rank = (rank + 1) as u32;
             result.thumbnail = thumbnail;
             results.push(result);

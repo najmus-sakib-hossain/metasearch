@@ -72,8 +72,18 @@ impl SearchEngine for DictZone {
                 continue;
             }
 
-            let from_text: String = tds[0].text().collect::<Vec<_>>().join(" ").trim().to_string();
-            let to_text: String = tds[1].text().collect::<Vec<_>>().join(" ").trim().to_string();
+            let from_text: String = tds[0]
+                .text()
+                .collect::<Vec<_>>()
+                .join(" ")
+                .trim()
+                .to_string();
+            let to_text: String = tds[1]
+                .text()
+                .collect::<Vec<_>>()
+                .join(" ")
+                .trim()
+                .to_string();
 
             if from_text.is_empty() && to_text.is_empty() {
                 continue;

@@ -10,10 +10,10 @@ use reqwest::Client;
 use serde::Deserialize;
 
 use metasearch_core::{
-    engine::{EngineFetcher, EngineMetadata, SearchEngine},
-    schema::{SearchQuery, SearchResult},
-    error::MetasearchError,
     category::SearchCategory,
+    engine::{EngineFetcher, EngineMetadata, SearchEngine},
+    error::MetasearchError,
+    schema::{SearchQuery, SearchResult},
 };
 
 pub struct Tootfinder {
@@ -83,13 +83,10 @@ impl SearchEngine for Tootfinder {
                 .trim()
                 .to_string();
 
-                let title = item
-                    .card
-                    .and_then(|c| c.title)
-                    .unwrap_or_else(|| {
-                        let truncated: String = content.chars().take(75).collect();
-                        truncated
-                    });
+                let title = item.card.and_then(|c| c.title).unwrap_or_else(|| {
+                    let truncated: String = content.chars().take(75).collect();
+                    truncated
+                });
 
                 Some(SearchResult {
                     title,

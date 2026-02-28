@@ -86,10 +86,7 @@ impl SearchEngine for TinEye {
                     .get("image_name")
                     .and_then(|v| v.as_str())
                     .unwrap_or("Image");
-                let domain = m
-                    .get("domain")
-                    .and_then(|v| v.as_str())
-                    .unwrap_or_default();
+                let domain = m.get("domain").and_then(|v| v.as_str()).unwrap_or_default();
                 let width = m.get("width").and_then(|v| v.as_u64()).unwrap_or(0);
                 let height = m.get("height").and_then(|v| v.as_u64()).unwrap_or(0);
 

@@ -45,13 +45,15 @@ impl SearchEngine for SolidTorrents {
             query.page
         );
 
-        let resp = self.client.get(&url).send().await.map_err(|e| {
-            MetasearchError::Engine(format!("SolidTorrents request failed: {}", e))
-        })?;
+        let resp =
+            self.client.get(&url).send().await.map_err(|e| {
+                MetasearchError::Engine(format!("SolidTorrents request failed: {}", e))
+            })?;
 
-        let html_text = resp.text().await.map_err(|e| {
-            MetasearchError::Engine(format!("SolidTorrents read failed: {}", e))
-        })?;
+        let html_text = resp
+            .text()
+            .await
+            .map_err(|e| MetasearchError::Engine(format!("SolidTorrents read failed: {}", e)))?;
 
         let document = Html::parse_document(&html_text);
         let result_sel = Selector::parse("li.search-result").unwrap();

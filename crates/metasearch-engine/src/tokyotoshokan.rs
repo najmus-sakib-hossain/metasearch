@@ -10,10 +10,10 @@ use reqwest::Client;
 use scraper::{Html, Selector};
 
 use metasearch_core::{
-    engine::{EngineFetcher, EngineMetadata, SearchEngine},
-    schema::{SearchQuery, SearchResult},
-    error::MetasearchError,
     category::SearchCategory,
+    engine::{EngineFetcher, EngineMetadata, SearchEngine},
+    error::MetasearchError,
+    schema::{SearchQuery, SearchResult},
 };
 
 pub struct TokyoToshokan {
@@ -86,12 +86,7 @@ impl SearchEngine for TokyoToshokan {
             let content = info_row
                 .select(&info_sel)
                 .next()
-                .map(|el| {
-                    el.text()
-                        .collect::<String>()
-                        .trim()
-                        .to_string()
-                })
+                .map(|el| el.text().collect::<String>().trim().to_string())
                 .unwrap_or_default();
 
             // Truncate overly long content

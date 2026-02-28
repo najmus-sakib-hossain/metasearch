@@ -55,13 +55,15 @@ impl SearchEngine for Moviepilot {
             query.page
         );
 
-        let resp = self.client.get(&url).send().await.map_err(|e| {
-            MetasearchError::Engine(format!("Moviepilot request failed: {}", e))
-        })?;
+        let resp =
+            self.client.get(&url).send().await.map_err(|e| {
+                MetasearchError::Engine(format!("Moviepilot request failed: {}", e))
+            })?;
 
-        let items: Vec<MoviepilotResult> = resp.json().await.map_err(|e| {
-            MetasearchError::Engine(format!("Moviepilot parse failed: {}", e))
-        })?;
+        let items: Vec<MoviepilotResult> = resp
+            .json()
+            .await
+            .map_err(|e| MetasearchError::Engine(format!("Moviepilot parse failed: {}", e)))?;
 
         let results = items
             .into_iter()

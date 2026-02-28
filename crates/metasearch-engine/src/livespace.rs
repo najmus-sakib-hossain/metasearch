@@ -95,12 +95,8 @@ impl SearchEngine for LiveSpace {
                     format!("Live stream by @{username} — {category}")
                 };
 
-                let mut result = SearchResult::new(
-                    title.to_string(),
-                    url,
-                    snippet,
-                    self.metadata.name.clone(),
-                );
+                let mut result =
+                    SearchResult::new(title.to_string(), url, snippet, self.metadata.name.clone());
                 result.engine_rank = (i + 1) as u32;
                 result.thumbnail = thumbnail;
                 result.category = SearchCategory::Videos.to_string();

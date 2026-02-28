@@ -103,7 +103,10 @@ impl SearchEngine for DuckDuckGoWeather {
 
         // Current weather
         if let Some(current) = json.get("currentWeather") {
-            let temp = current.get("temperature").and_then(|v| v.as_f64()).unwrap_or(0.0);
+            let temp = current
+                .get("temperature")
+                .and_then(|v| v.as_f64())
+                .unwrap_or(0.0);
             let feels_like = current
                 .get("temperatureApparent")
                 .and_then(|v| v.as_f64())
@@ -144,7 +147,11 @@ impl SearchEngine for DuckDuckGoWeather {
         }
 
         // Daily forecast (from forecastDaily if available)
-        if let Some(daily) = json.get("forecastDaily").and_then(|fd| fd.get("days")).and_then(|d| d.as_array()) {
+        if let Some(daily) = json
+            .get("forecastDaily")
+            .and_then(|fd| fd.get("days"))
+            .and_then(|d| d.as_array())
+        {
             for (i, day) in daily.iter().take(5).enumerate() {
                 let date = day
                     .get("forecastStart")
@@ -173,10 +180,15 @@ impl SearchEngine for DuckDuckGoWeather {
                         temp_min,
                         condition_label(condition_code)
                     ),
-                    url: format!("https://duckduckgo.com/?q=weather+{}", urlencoding::encode(&query.query)),
+                    url: format!(
+                        "https://duckduckgo.com/?q=weather+{}",
+                        urlencoding::encode(&query.query)
+                    ),
                     content: format!(
                         "High: {:.1}°C | Low: {:.1}°C | {}",
-                        temp_max, temp_min, condition_label(condition_code)
+                        temp_max,
+                        temp_min,
+                        condition_label(condition_code)
                     ),
                     engine: "duckduckgo_weather".to_string(),
                     engine_rank: (i + 2) as u32,

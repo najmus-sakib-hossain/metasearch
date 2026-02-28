@@ -85,12 +85,7 @@ impl SearchEngine for Mwmbl {
                     .next()
                     .map(|e| e.value)
                     .unwrap_or_default();
-                let mut r = SearchResult::new(
-                    title,
-                    item.url,
-                    snippet,
-                    self.metadata.name.clone(),
-                );
+                let mut r = SearchResult::new(title, item.url, snippet, self.metadata.name.clone());
                 r.engine_rank = (i + 1) as u32;
                 r
             })

@@ -98,12 +98,8 @@ impl SearchEngine for ThreeSixtySearchVideos {
             };
             let description = item.description.clone().unwrap_or_default();
 
-            let mut result = SearchResult::new(
-                title,
-                play_url,
-                description,
-                self.metadata.name.clone(),
-            );
+            let mut result =
+                SearchResult::new(title, play_url, description, self.metadata.name.clone());
             result.engine_rank = (rank + 1) as u32;
             result.thumbnail = item.cover_img.clone();
             results.push(result);

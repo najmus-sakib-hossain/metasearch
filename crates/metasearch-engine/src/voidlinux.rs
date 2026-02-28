@@ -85,11 +85,7 @@ impl SearchEngine for VoidLinux {
                     "https://voidlinux.org/packages/?arch=x86_64&q={}",
                     urlencoding::encode(&name)
                 );
-                let snippet = format!(
-                    "[{}] {}",
-                    repo,
-                    pkg.short_desc.unwrap_or_default()
-                );
+                let snippet = format!("[{}] {}", repo, pkg.short_desc.unwrap_or_default());
                 Some(SearchResult {
                     title,
                     url: result_url,

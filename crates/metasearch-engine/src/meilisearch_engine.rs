@@ -8,7 +8,13 @@ use async_trait::async_trait;
 use reqwest::Client;
 use serde_json::Value;
 
-use crate::{EngineMetadata, MetasearchError, SearchEngine, SearchQuery, SearchResult};
+use metasearch_core::{
+    category::SearchCategory,
+    engine::{EngineMetadata, SearchEngine},
+    error::MetasearchError,
+    query::SearchQuery,
+    result::SearchResult,
+};
 
 pub struct MeilisearchEngine {
     client: Client,
@@ -33,7 +39,8 @@ impl SearchEngine for MeilisearchEngine {
     fn metadata(&self) -> EngineMetadata {
         EngineMetadata {
             name: "MeiliSearch".to_string(),
-            description: "MeiliSearch search — configurable instance URL, index, auth key".to_string(),
+            description: "MeiliSearch search — configurable instance URL, index, auth key"
+                .to_string(),
             categories: vec![metasearch_core::category::SearchCategory::General],
             enabled: !self.base_url.is_empty() && !self.index.is_empty(),
         }

@@ -77,7 +77,8 @@ impl SearchEngine for CoreEngine {
         if key.is_empty() {
             return Err(MetasearchError::EngineError {
                 engine: "core".to_string(),
-                message: "No API key configured. Register at https://core.ac.uk/services/api".to_string(),
+                message: "No API key configured. Register at https://core.ac.uk/services/api"
+                    .to_string(),
             });
         }
 

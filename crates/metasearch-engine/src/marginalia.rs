@@ -99,7 +99,11 @@ impl SearchEngine for Marginalia {
             }
         }
 
-        info!(engine = "marginalia", count = results.len(), "Search complete");
+        info!(
+            engine = "marginalia",
+            count = results.len(),
+            "Search complete"
+        );
         Ok(results)
     }
 }

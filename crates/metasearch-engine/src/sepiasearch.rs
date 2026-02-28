@@ -82,13 +82,15 @@ impl SearchEngine for SepiaSearch {
             RESULTS_PER_PAGE
         );
 
-        let resp = self.client.get(&url).send().await.map_err(|e| {
-            MetasearchError::Engine(format!("SepiaSearch request failed: {}", e))
-        })?;
+        let resp =
+            self.client.get(&url).send().await.map_err(|e| {
+                MetasearchError::Engine(format!("SepiaSearch request failed: {}", e))
+            })?;
 
-        let data: SepiaResponse = resp.json().await.map_err(|e| {
-            MetasearchError::Engine(format!("SepiaSearch parse failed: {}", e))
-        })?;
+        let data: SepiaResponse = resp
+            .json()
+            .await
+            .map_err(|e| MetasearchError::Engine(format!("SepiaSearch parse failed: {}", e)))?;
 
         let results = data
             .data

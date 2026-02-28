@@ -131,8 +131,7 @@ impl SearchEngine for DuckDuckGoDefinitions {
                 if let (Some(url), Some(text)) = (&item.first_url, &item.text) {
                     if !url.is_empty() && !text.is_empty() {
                         let title = data.heading.as_deref().unwrap_or(text);
-                        let mut r =
-                            SearchResult::new(title, url, text, "duckduckgo_definitions");
+                        let mut r = SearchResult::new(title, url, text, "duckduckgo_definitions");
                         r.engine_rank = rank;
                         rank += 1;
                         r.category = "general".to_string();
@@ -151,8 +150,7 @@ impl SearchEngine for DuckDuckGoDefinitions {
                         if text.starts_with("http") && text.contains(' ') {
                             continue;
                         }
-                        let mut r =
-                            SearchResult::new(text, url, "", "duckduckgo_definitions");
+                        let mut r = SearchResult::new(text, url, "", "duckduckgo_definitions");
                         r.engine_rank = rank;
                         rank += 1;
                         r.category = "general".to_string();

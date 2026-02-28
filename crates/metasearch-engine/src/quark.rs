@@ -52,8 +52,9 @@ impl Quark {
 
     /// Check if the response contains an Alibaba X5SEC CAPTCHA.
     fn is_captcha(text: &str) -> bool {
-        let re = Regex::new(r#"\{[^{]*?"action"\s*:\s*"captcha"\s*,\s*"url"\s*:\s*"[^"]+"[^{]*?\}"#)
-            .unwrap();
+        let re =
+            Regex::new(r#"\{[^{]*?"action"\s*:\s*"captcha"\s*,\s*"url"\s*:\s*"[^"]+"[^{]*?\}"#)
+                .unwrap();
         re.is_match(text)
     }
 
@@ -64,20 +65,14 @@ impl Quark {
             .pointer("/titleProps/content")
             .and_then(|v| v.as_str())
             .or_else(|| data.get("title").and_then(|v| v.as_str()))
-            .or_else(|| {
-                data.pointer("/title/content")
-                    .and_then(|v| v.as_str())
-            });
+            .or_else(|| data.pointer("/title/content").and_then(|v| v.as_str()));
 
         let url = data
             .pointer("/sourceProps/dest_url")
             .and_then(|v| v.as_str())
             .or_else(|| data.get("normal_url").and_then(|v| v.as_str()))
             .or_else(|| data.get("url").and_then(|v| v.as_str()))
-            .or_else(|| {
-                data.pointer("/source/url")
-                    .and_then(|v| v.as_str())
-            });
+            .or_else(|| data.pointer("/source/url").and_then(|v| v.as_str()));
 
         let content = data
             .pointer("/summaryProps/content")
@@ -88,10 +83,7 @@ impl Quark {
             })
             .or_else(|| data.get("show_body").and_then(|v| v.as_str()))
             .or_else(|| data.get("desc").and_then(|v| v.as_str()))
-            .or_else(|| {
-                data.pointer("/summary/content")
-                    .and_then(|v| v.as_str())
-            });
+            .or_else(|| data.pointer("/summary/content").and_then(|v| v.as_str()));
 
         let title_str = html_escape::decode_html_entities(title?).to_string();
         let url_str = url?.to_string();
@@ -111,7 +103,10 @@ impl Quark {
         let timestamp = data
             .pointer("/sourceProps/time")
             .or_else(|| data.pointer("/source/time"))
-            .and_then(|v| v.as_i64().or_else(|| v.as_str().and_then(|s| s.parse().ok())));
+            .and_then(|v| {
+                v.as_i64()
+                    .or_else(|| v.as_str().and_then(|s| s.parse().ok()))
+            });
 
         if let Some(ts) = timestamp {
             if ts > 0 {
@@ -163,9 +158,10 @@ impl Quark {
                 );
                 r.category = "general".to_string();
 
-                let timestamp = item
-                    .pointer("/source/time")
-                    .and_then(|v| v.as_i64().or_else(|| v.as_str().and_then(|s| s.parse().ok())));
+                let timestamp = item.pointer("/source/time").and_then(|v| {
+                    v.as_i64()
+                        .or_else(|| v.as_str().and_then(|s| s.parse().ok()))
+                });
                 if let Some(ts) = timestamp {
                     if ts > 0 {
                         r.published_date = chrono::DateTime::from_timestamp(ts, 0);

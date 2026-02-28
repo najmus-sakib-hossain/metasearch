@@ -97,10 +97,7 @@ impl SearchEngine for MediathekViewWeb {
                     .and_then(|v| v.as_str())
                     .unwrap_or_default()
                     .replace("http://", "https://");
-                let duration = item
-                    .get("duration")
-                    .and_then(|v| v.as_u64())
-                    .unwrap_or(0);
+                let duration = item.get("duration").and_then(|v| v.as_u64()).unwrap_or(0);
 
                 if url_video.is_empty() {
                     continue;
