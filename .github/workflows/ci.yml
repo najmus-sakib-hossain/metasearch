@@ -11,7 +11,6 @@ env:
   RUSTFLAGS: "-D warnings"
 
 jobs:
-  # ── 1. Format & Lint ────────────────────────────────────────
   fmt:
     name: Rustfmt
     runs-on: ubuntu-latest
@@ -33,7 +32,6 @@ jobs:
       - uses: Swatinem/rust-cache@v2
       - run: cargo clippy --workspace --all-targets --all-features -- -D warnings
 
-  # ── 2. Auto-format ENGINES.md links ─────────────────────────
   format-engines-md:
     name: Format ENGINES.md
     runs-on: ubuntu-latest
@@ -42,34 +40,17 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v4
-        with:
-          token: $ secrets.GITHUB_TOKEN 
-      - name: Sort and deduplicate ENGINES.md links
+      - name: Sort ENGINES.md entries
         run: |
           if [ -f ENGINES.md ]; then
-            # Extract lines that look like markdown links, sort them,
-            # remove duplicates, and write back
-            python3 -c "
-import re, sys
-with open('ENGINES.md', 'r') as f:
-    content = f.read()
-lines = content.split('\n')
-header = []
-body = []
-in_header = True
-for line in lines:
-    if in_header and (line.startswith('#') or line.strip() == '' or line.startswith('>') or line.startswith('<!--')):
-        header.append(line)
-    else:
-        in_header = False
-        body.append(line)
-# Sort non-empty body lines, preserve empty lines as separators
-sorted_body = sorted([l for l in body if l.strip()], key=lambda x: x.lower())
-result = '\n'.join(header + [''] + sorted_body + [''])
-with open('ENGINES.md', 'w') as f:
-    f.write(result)
-"
-            echo 'ENGINES.md formatted'
+            head_end=$(grep -n '^[-*]' ENGINES.md | head -1 | cut -d: -f1)
+            if [ -n "$head_end" ]; then
+              head_end=$((head_end - 1))
+              head -n "$head_end" ENGINES.md > /tmp/engines_header.md
+              tail -n +"$((head_end + 1))" ENGINES.md | sort -f -u > /tmp/engines_body.md
+              cat /tmp/engines_header.md /tmp/engines_body.md > ENGINES.md
+            fi
+            echo "ENGINES.md formatted"
           fi
       - name: Commit if changed
         run: |
@@ -79,7 +60,6 @@ with open('ENGINES.md', 'w') as f:
           git diff --cached --quiet || git commit -m "ci: auto-format ENGINES.md"
           git push || true
 
-  # ── 3. Build ────────────────────────────────────────────────
   build:
     name: Build
     runs-on: ubuntu-latest
@@ -90,7 +70,6 @@ with open('ENGINES.md', 'w') as f:
       - uses: Swatinem/rust-cache@v2
       - run: cargo build --workspace --all-targets
 
-  # ── 4. Tests ────────────────────────────────────────────────
   test:
     name: Tests
     runs-on: ubuntu-latest
@@ -101,7 +80,6 @@ with open('ENGINES.md', 'w') as f:
       - uses: Swatinem/rust-cache@v2
       - run: cargo test --workspace
 
-  # ── 5. Engine smoke tests ───────────────────────────────────
   engine-smoke-test:
     name: Engine Smoke Tests
     runs-on: ubuntu-latest
@@ -113,5 +91,4 @@ with open('ENGINES.md', 'w') as f:
       - name: Run engine registry test
         run: cargo test --package metasearch-engine -- --nocapture
       - name: Verify all engines register
-        run: |
-          cargo test --package metasearch-engine test_all_engines_register -- --nocapture
+        run: cargo test --package metasearch-engine test_all_engines_register -- --nocapture
