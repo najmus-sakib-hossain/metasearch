@@ -4,172 +4,6 @@ A catalog of all **74 search engines** supported by Metasearch, organized by cat
 
 ## Status Legend
 
-| Symbol | Meaning |
-|--------|---------|
-| ✅ | Returns results reliably |
-| ⚠️ | Works with limitations (geo-restricted, rate-limited, query-sensitive) |
-| 🔑 | Requires an API key in `config/default.toml` |
-| 🚧 | Stub — implementation in progress |
-| ❌ | Currently blocked (bot detection, Cloudflare, JS-only SPA) |
-
----
-
-## General Web
-
-| Engine | Homepage | Status | Notes |
-|--------|----------|--------|-------|
-| Ask | <https://www.ask.com> | ❌ | JavaScript-rendered SPA |
-| Baidu | <https://www.baidu.com> | ✅ | Chinese web search |
-| Bing | <https://www.bing.com> | ✅ | |
-| Brave Search | <https://search.brave.com> | 🚧 | Stub — API key integration pending |
-| DuckDuckGo | <https://duckduckgo.com> | ⚠️ | HTML scraping; may be rate-limited |
-| Google | <https://www.google.com> | 🚧 | Stub — scraping blocked |
-| Qwant | <https://www.qwant.com> | ❌ | Cloudflare challenge |
-| Yahoo | <https://search.yahoo.com> | ✅ | |
-
-## Images
-
-| Engine | Homepage | Status | Notes |
-|--------|----------|--------|-------|
-| Adobe Stock | <https://stock.adobe.com> | ✅ | |
-| ArtStation | <https://www.artstation.com> | ✅ | |
-| Artic (Art Institute of Chicago) | <https://www.artic.edu> | ✅ | |
-| Bing Images | <https://www.bing.com/images> | ✅ | |
-| DevIcons | <https://devicon.dev> | ✅ | Tech logo icons |
-| FindThatMeme | <https://findthatmeme.com> | ✅ | |
-| Flickr | <https://www.flickr.com> | ✅ | |
-| Frinkiac | <https://frinkiac.com> | ✅ | Simpsons screencaps |
-| Ipernity | <https://www.ipernity.com> | ✅ | |
-| Unsplash | <https://unsplash.com> | ✅ | |
-
-## Videos
-
-| Engine | Homepage | Status | Notes |
-|--------|----------|--------|-------|
-| ACFun | <https://www.acfun.cn> | ⚠️ | Chinese video; geo-restricted |
-| Bilibili | <https://www.bilibili.com> | ❌ | Requires session cookies (412) |
-| Bing Videos | <https://www.bing.com/videos> | ✅ | |
-| BitChute | <https://www.bitchute.com> | ✅ | |
-| CCC Media | <https://media.ccc.de> | ✅ | Chaos Computer Club talks |
-| Dailymotion | <https://www.dailymotion.com> | ✅ | |
-| INA | <https://www.ina.fr> | ❌ | Migrated to JS-rendered SPA |
-| Vimeo | <https://vimeo.com> | ❌ | 403 Forbidden |
-| YouTube | <https://www.youtube.com> | ✅ | |
-
-## News
-
-| Engine | Homepage | Status | Notes |
-|--------|----------|--------|-------|
-| ANSA | <https://www.ansa.it> | ⚠️ | Italian news agency |
-| Bing News | <https://www.bing.com/news> | ✅ | |
-| Hacker News | <https://news.ycombinator.com> | ✅ | |
-
-## Music & Audio
-
-| Engine | Homepage | Status | Notes |
-|--------|----------|--------|-------|
-| Bandcamp | <https://bandcamp.com> | ✅ | |
-| Deezer | <https://www.deezer.com> | ⚠️ | IP rate-limited |
-| Freesound | <https://freesound.org> | 🔑 | Requires `freesound.api_key` |
-| Fyyd | <https://fyyd.de> | ❌ | 500 Internal Server Error |
-| Genius | <https://genius.com> | ❌ | Cloudflare challenge |
-| Mixcloud | <https://www.mixcloud.com> | ✅ | |
-| SoundCloud | <https://soundcloud.com> | ✅ | |
-| Spotify | <https://www.spotify.com> | 🔑 | Requires `spotify.client_id` + `client_secret` |
-
-## Science & Academia
-
-| Engine | Homepage | Status | Notes |
-|--------|----------|--------|-------|
-| arXiv | <https://arxiv.org> | ✅ | |
-| BASE Search | <https://www.base-search.net> | ⚠️ | Access restricted by IP |
-| CrossRef | <https://www.crossref.org> | ✅ | DOI metadata |
-| Semantic Scholar | <https://www.semanticscholar.org> | ⚠️ | Rate-limited without API key |
-
-## Technology & Code
-
-| Engine | Homepage | Status | Notes |
-|--------|----------|--------|-------|
-| APKMirror | <https://www.apkmirror.com> | ⚠️ | Android app mirror |
-| Apple App Store | <https://apps.apple.com> | ✅ | |
-| CachyOS Packages | <https://packages.cachyos.org> | ⚠️ | Rolling release packages |
-| Crates.io | <https://crates.io> | ✅ | Rust packages |
-| Docker Hub | <https://hub.docker.com> | ✅ | |
-| F-Droid | <https://f-droid.org> | ⚠️ | Android FOSS packages |
-| GitHub | <https://github.com> | ✅ | |
-| GitLab | <https://gitlab.com> | ✅ | |
-| Hex | <https://hex.pm> | ✅ | Elixir/Erlang packages |
-| HuggingFace | <https://huggingface.co> | ✅ | ML models & datasets |
-| npm | <https://www.npmjs.com> | ✅ | JavaScript packages |
-| PyPI | <https://pypi.org> | ❌ | Migrated to JS-rendered SPA |
-
-## Q&A & Communities
-
-| Engine | Homepage | Status | Notes |
-|--------|----------|--------|-------|
-| Lemmy | <https://lemmy.ml> | ✅ | Federated forum |
-| Mastodon | <https://mastodon.social> | ✅ | Federated social |
-| Reddit | <https://www.reddit.com> | ❌ | Bot detection (returns HTML) |
-| Stack Exchange | <https://stackexchange.com> | ✅ | |
-
-## Books & Files
-
-| Engine | Homepage | Status | Notes |
-|--------|----------|--------|-------|
-| Anna's Archive | <https://annas-archive.org> | ❌ | Connection refused from most IPs |
-| DigBT | <https://digbt.org> | ❌ | Site down |
-| Goodreads | <https://www.goodreads.com> | ✅ | |
-
-## Torrents
-
-| Engine | Homepage | Status | Notes |
-|--------|----------|--------|-------|
-| BT4G | <https://bt4g.org> | ❌ | 403 Forbidden |
-| BTDigg | <https://btdig.com> | ❌ | 429 Too Many Requests |
-| KickAss Torrents | <https://kickasstorrents.to> | ⚠️ | |
-| Leet-X (1337x) | <https://1337x.to> | ⚠️ | Selector may be outdated |
-
-## Lifestyle & Shopping
-
-| Engine | Homepage | Status | Notes |
-|--------|----------|--------|-------|
-| Chefkoch | <https://www.chefkoch.de> | ✅ | German recipes |
-| eBay | <https://www.ebay.com> | ❌ | Bot detection |
-| IMDB | <https://www.imdb.com> | ✅ | Films & TV |
-
-## Reference & Culture
-
-| Engine | Homepage | Status | Notes |
-|--------|----------|--------|-------|
-| Alpine Linux Packages | <https://pkgs.alpinelinux.org> | ✅ | Returns empty for generic queries |
-| Arch Linux Wiki | <https://wiki.archlinux.org> | ⚠️ | Bot detection on some IPs |
-| BPB | <https://www.bpb.de> | ✅ | German political education |
-| Destatis | <https://www.destatis.de> | ✅ | German federal statistics |
-| DeviantArt | <https://www.deviantart.com> | ✅ | |
-| Emojipedia | <https://emojipedia.org> | ✅ | |
-| NineGag | <https://9gag.com> | ✅ | |
-| Wikipedia | <https://www.wikipedia.org> | ✅ | |
-
----
-
-## Running the Engine Probe
-
-To test all engines against live external APIs:
-
-```bash
-cargo test -p metasearch-engine --test engine_probe -- --ignored --nocapture
-```
-
-The test queries every engine with `"rust programming"` and asserts that at least
-30 % return results. Engines blocked in CI environments (bot detection, geo-fencing,
-Cloudflare) are expected failures and do not affect the pass threshold.
-
-## Adding a New Engine
-
-1. Create `crates/metasearch-engine/src/<name>.rs` implementing the `SearchEngine` trait.
-2. Expose the module in `crates/metasearch-engine/src/lib.rs`.
-3. Register it in `EngineRegistry::with_defaults()` inside `src/registry.rs`.
-4. Add a row to this file.
 
                         (attribute.language == 'en' and infobox_id_lang is None) or attribute.language != 'en'
                         ),
@@ -10847,6 +10681,7 @@ Cloudflare) are expected failures and do not affect the pass threshold.
 ## 360search_videos
 ## 9gag
 ## acfun
+## Adding a New Engine
 ## adobe_stock
 ## ahmia
 ## alpinelinux
@@ -10871,6 +10706,7 @@ Cloudflare) are expected failures and do not affect the pass threshold.
 ## bing_news
 ## bing_videos
 ## bitchute
+## Books & Files
 ## bpb
 ## brave
 ## braveapi
@@ -10917,6 +10753,7 @@ Cloudflare) are expected failures and do not affect the pass threshold.
 ## frinkiac
 ## fyyd
 ## geizhals
+## General Web
 ## genius
 ## gitea
 ## github
@@ -10934,6 +10771,7 @@ Cloudflare) are expected failures and do not affect the pass threshold.
 ## hex
 ## huggingface
 ## il_post
+## Images
 ## imdb
 ## imgur
 ## ina
@@ -10946,6 +10784,7 @@ Cloudflare) are expected failures and do not affect the pass threshold.
 ## lemmy
 ## libretranslate
 ## lib_rs
+## Lifestyle & Shopping
 ## lingva
 ## livespace
 ## loc
@@ -10965,9 +10804,11 @@ Cloudflare) are expected failures and do not affect the pass threshold.
 ## moviepilot
 ## mozhi
 ## mrs
+## Music & Audio
 ## mwmbl
 ## mysql_server
 ## naver
+## News
 ## niconico
 ## npm
 ## nvd
@@ -10997,16 +10838,20 @@ Cloudflare) are expected failures and do not affect the pass threshold.
 ## public_domain_image_archive
 ## pubmed
 ## pypi
+## Q&A & Communities
 ## quark
 ## qwant
 ## radio_browser
 ## recoll
 ## reddit
+## Reference & Culture
 ## repology
 ## reuters
 ## rottentomatoes
 ## rumble
+## Running the Engine Probe
 ## scanr_structures
+## Science & Academia
 ## searchcode_code
 ## searx_engine
 ## selfhst
@@ -11031,15 +10876,18 @@ Cloudflare) are expected failures and do not affect the pass threshold.
 ## stract
 ## svgrepo
 ## tagesschau
+## Technology & Code
 ## tineye
 ## tokyotoshokan
 ## tootfinder
+## Torrents
 ## torznab
 ## translated
 ## tubearchivist
 ## unsplash
 ## uxwing
 ## valkey_server
+## Videos
 ## vimeo
 ## voidlinux
 ## wallhaven
@@ -11495,6 +11343,7 @@ Cloudflare) are expected failures and do not affect the pass threshold.
 .. __IMDPro: https://pro.imdb.com/login
 .. _`format=json`: https://www.mediawiki.org/w/api.php?action=help&modules=json
 .. _`list=search`: https://www.mediawiki.org/w/api.php?action=help&modules=query%2Bsearch
+1. Create `crates/metasearch-engine/src/<name>.rs` implementing the `SearchEngine` trait.
 1. [1337x](#1337x)
 10. [ansa](#ansa)
 100. [json_engine](#json-engine)
@@ -11606,6 +11455,7 @@ Cloudflare) are expected failures and do not affect the pass threshold.
 197. [uxwing](#uxwing)
 198. [valkey_server](#valkey-server)
 199. [vimeo](#vimeo)
+2. Expose the module in `crates/metasearch-engine/src/lib.rs`.
 2. [360search](#360search)
 2.4 million scholarly articles in the fields of physics, mathematics, computer
 20. [azure](#azure)
@@ -11638,7 +11488,9 @@ Cloudflare) are expected failures and do not affect the pass threshold.
 27. [bing_news](#bing-news)
 28. [bing_videos](#bing-videos)
 29. [bitchute](#bitchute)
+3. Register it in `EngineRegistry::with_defaults()` inside `src/registry.rs`.
 3. [360search_videos](#360search-videos)
+30 % return results. Engines blocked in CI environments (bot detection, geo-fencing,
 30. [bpb](#bpb)
 31. [brave](#brave)
 32. [braveapi](#braveapi)
@@ -11649,6 +11501,7 @@ Cloudflare) are expected failures and do not affect the pass threshold.
 37. [chefkoch](#chefkoch)
 38. [chinaso](#chinaso)
 39. [cloudflareai](#cloudflareai)
+4. Add a row to this file.
 4. [9gag](#9gag)
 40. [command](#command)
 41. [core](#core)
@@ -11991,6 +11844,7 @@ CACHE: EngineCache
 cached_url = ''
 cached_xpath = ''
 CAPTCHA_PATTERN = r'\{[^{]*?"action"\s*:\s*"captcha"\s*,\s*"url"\s*:\s*"([^"]+)"[^{]*?\}'
+cargo test -p metasearch-engine --test engine_probe -- --ignored --nocapture
 cast_xpath = "concat('Starring ', string(./@cast))"
 categories = searx_categories.keys()
 categories = ["currency", "general"]
@@ -12087,6 +11941,7 @@ class WDLabelAttribute(WDAttribute):
 class WDURLAttribute(WDAttribute):
 close to the implementation, its just a simple example which queries `The Art
 close to the implementation, its just a simple example.
+Cloudflare) are expected failures and do not affect the pass threshold.
 code blocks in a single file might be returned from the API).
 code indentation.
 code lines are just relabeled (starting from 1) and appended (a disjoint set of
@@ -13306,6 +13161,7 @@ The service sometimes takes a very long time to respond, the ``timeout`` may
 The sorting of the search results can be influenced by the following additions
 the standard API paths.
 The Tagesschau is a news program of the ARD.  Via the `Tagesschau API`_, current
+The test queries every engine with `"rust programming"` and asserts that at least
 The thumbnail url from the request will be cleaned for the full image link
 The time format returned by Presearch varies depending on the language set.
 the UI of Brave the user gets warned about this, since we can not warn the user
@@ -13408,6 +13264,7 @@ To set header to moderate.'''
 To simulate the behavior of a real browser session, it might be necessary to
 To sort by *most relevant* use an empty string (default)."""
 To support Wikipedia's LanguageConverter_, a SearXNG request to Wikipedia uses
+To test all engines against live external APIs:
 To test in SearXNG, query for ``!wp 出租車`` with each of the available Chinese
 to the search term:
 to use a different lemmy instance, you can specify ``base_url``.
@@ -13610,6 +13467,7 @@ __CACHED_API_URL = None
 ``video`` are not yet implemented (Pull-Requests are welcome).
 ``working_dir``:
 ```
+```bash
 ```python
 ``{language}``:
 ``{lang}``:
@@ -14591,8 +14449,93 @@ __CACHED_API_URL = None
 | **Website** | https://yacy.net/ |
 | **Website** | https://yandex.com/ |
 | **Website** | https://yep.com/ |
+| ACFun | <https://www.acfun.cn> | ⚠️ | Chinese video; geo-restricted |
+| Adobe Stock | <https://stock.adobe.com> | ✅ | |
+| Alpine Linux Packages | <https://pkgs.alpinelinux.org> | ✅ | Returns empty for generic queries |
+| Anna's Archive | <https://annas-archive.org> | ❌ | Connection refused from most IPs |
+| ANSA | <https://www.ansa.it> | ⚠️ | Italian news agency |
+| APKMirror | <https://www.apkmirror.com> | ⚠️ | Android app mirror |
+| Apple App Store | <https://apps.apple.com> | ✅ | |
+| Arch Linux Wiki | <https://wiki.archlinux.org> | ⚠️ | Bot detection on some IPs |
+| Artic (Art Institute of Chicago) | <https://www.artic.edu> | ✅ | |
+| ArtStation | <https://www.artstation.com> | ✅ | |
+| arXiv | <https://arxiv.org> | ✅ | |
+| Ask | <https://www.ask.com> | ❌ | JavaScript-rendered SPA |
+| Baidu | <https://www.baidu.com> | ✅ | Chinese web search |
+| Bandcamp | <https://bandcamp.com> | ✅ | |
+| BASE Search | <https://www.base-search.net> | ⚠️ | Access restricted by IP |
+| Bilibili | <https://www.bilibili.com> | ❌ | Requires session cookies (412) |
+| Bing Images | <https://www.bing.com/images> | ✅ | |
+| Bing News | <https://www.bing.com/news> | ✅ | |
+| Bing Videos | <https://www.bing.com/videos> | ✅ | |
+| Bing | <https://www.bing.com> | ✅ | |
+| BitChute | <https://www.bitchute.com> | ✅ | |
+| BPB | <https://www.bpb.de> | ✅ | German political education |
+| Brave Search | <https://search.brave.com> | 🚧 | Stub — API key integration pending |
+| BT4G | <https://bt4g.org> | ❌ | 403 Forbidden |
+| BTDigg | <https://btdig.com> | ❌ | 429 Too Many Requests |
+| CachyOS Packages | <https://packages.cachyos.org> | ⚠️ | Rolling release packages |
+| CCC Media | <https://media.ccc.de> | ✅ | Chaos Computer Club talks |
+| Chefkoch | <https://www.chefkoch.de> | ✅ | German recipes |
+| Crates.io | <https://crates.io> | ✅ | Rust packages |
+| CrossRef | <https://www.crossref.org> | ✅ | DOI metadata |
+| Dailymotion | <https://www.dailymotion.com> | ✅ | |
+| Deezer | <https://www.deezer.com> | ⚠️ | IP rate-limited |
+| Destatis | <https://www.destatis.de> | ✅ | German federal statistics |
+| DeviantArt | <https://www.deviantart.com> | ✅ | |
+| DevIcons | <https://devicon.dev> | ✅ | Tech logo icons |
+| DigBT | <https://digbt.org> | ❌ | Site down |
+| Docker Hub | <https://hub.docker.com> | ✅ | |
+| DuckDuckGo | <https://duckduckgo.com> | ⚠️ | HTML scraping; may be rate-limited |
+| eBay | <https://www.ebay.com> | ❌ | Bot detection |
+| Emojipedia | <https://emojipedia.org> | ✅ | |
+| Engine | Homepage | Status | Notes |
+| F-Droid | <https://f-droid.org> | ⚠️ | Android FOSS packages |
+| FindThatMeme | <https://findthatmeme.com> | ✅ | |
+| Flickr | <https://www.flickr.com> | ✅ | |
+| Freesound | <https://freesound.org> | 🔑 | Requires `freesound.api_key` |
+| Frinkiac | <https://frinkiac.com> | ✅ | Simpsons screencaps |
+| Fyyd | <https://fyyd.de> | ❌ | 500 Internal Server Error |
+| Genius | <https://genius.com> | ❌ | Cloudflare challenge |
+| GitHub | <https://github.com> | ✅ | |
+| GitLab | <https://gitlab.com> | ✅ | |
+| Goodreads | <https://www.goodreads.com> | ✅ | |
+| Google | <https://www.google.com> | 🚧 | Stub — scraping blocked |
+| Hacker News | <https://news.ycombinator.com> | ✅ | |
+| Hex | <https://hex.pm> | ✅ | Elixir/Erlang packages |
+| HuggingFace | <https://huggingface.co> | ✅ | ML models & datasets |
+| IMDB | <https://www.imdb.com> | ✅ | Films & TV |
+| INA | <https://www.ina.fr> | ❌ | Migrated to JS-rendered SPA |
+| Ipernity | <https://www.ipernity.com> | ✅ | |
+| KickAss Torrents | <https://kickasstorrents.to> | ⚠️ | |
+| Leet-X (1337x) | <https://1337x.to> | ⚠️ | Selector may be outdated |
+| Lemmy | <https://lemmy.ml> | ✅ | Federated forum |
+| Mastodon | <https://mastodon.social> | ✅ | Federated social |
+| Mixcloud | <https://www.mixcloud.com> | ✅ | |
+| NineGag | <https://9gag.com> | ✅ | |
+| npm | <https://www.npmjs.com> | ✅ | JavaScript packages |
 | Property | Value |
+| PyPI | <https://pypi.org> | ❌ | Migrated to JS-rendered SPA |
+| Qwant | <https://www.qwant.com> | ❌ | Cloudflare challenge |
+| Reddit | <https://www.reddit.com> | ❌ | Bot detection (returns HTML) |
+| Semantic Scholar | <https://www.semanticscholar.org> | ⚠️ | Rate-limited without API key |
+| SoundCloud | <https://soundcloud.com> | ✅ | |
+| Spotify | <https://www.spotify.com> | 🔑 | Requires `spotify.client_id` + `client_secret` |
+| Stack Exchange | <https://stackexchange.com> | ✅ | |
+| Symbol | Meaning |
+| Unsplash | <https://unsplash.com> | ✅ | |
+| Vimeo | <https://vimeo.com> | ❌ | 403 Forbidden |
+| Wikipedia | <https://www.wikipedia.org> | ✅ | |
+| Yahoo | <https://search.yahoo.com> | ✅ | |
+| YouTube | <https://www.youtube.com> | ✅ | |
+| ⚠️ | Works with limitations (geo-restricted, rate-limited, query-sensitive) |
+| ✅ | Returns results reliably |
+| ❌ | Currently blocked (bot detection, Cloudflare, JS-only SPA) |
+| 🔑 | Requires an API key in `config/default.toml` |
+| 🚧 | Stub — implementation in progress |
 |----------|-------|
+|--------|----------|--------|-------|
+|--------|---------|
 }
 }"""
 ~~~~~~~~~~~~~~
