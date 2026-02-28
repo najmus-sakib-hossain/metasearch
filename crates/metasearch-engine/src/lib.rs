@@ -35,6 +35,9 @@
 //!
 //! ## Batch 8 — More SearXNG translations (5):
 //! - Frinkiac, Hex.pm, INA, Ipernity, Devicons
+//!
+//! ## Batch 9 — More SearXNG translations (4):
+//! - Adobe Stock, Anna's Archive, BASE, DigBT
 
 // Original engines
 pub mod google;
@@ -123,6 +126,12 @@ pub mod hex;
 pub mod ina;
 pub mod ipernity;
 pub mod devicons;
+
+// Batch 9
+pub mod adobe_stock;
+pub mod annas_archive;
+pub mod base_search;
+pub mod digbt;
 
 pub mod registry;
 

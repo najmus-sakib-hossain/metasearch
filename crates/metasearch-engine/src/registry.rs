@@ -82,6 +82,11 @@ use crate::{
     ina::Ina,
     ipernity::Ipernity,
     devicons::Devicons,
+    // Batch 9
+    adobe_stock::AdobeStock,
+    annas_archive::AnnasArchive,
+    base_search::BaseSearch,
+    digbt::Digbt,
 };
 
 /// Central registry of all search engines.
@@ -96,7 +101,7 @@ impl EngineRegistry {
         }
     }
 
-    /// Create a registry pre-loaded with all built-in engines (70 total).
+    /// Create a registry pre-loaded with all built-in engines (74 total).
     pub fn with_defaults(client: Client) -> Self {
         let mut registry = Self::new();
 
@@ -187,6 +192,12 @@ impl EngineRegistry {
         registry.register(Arc::new(Ina::new(client.clone())));
         registry.register(Arc::new(Ipernity::new(client.clone())));
         registry.register(Arc::new(Devicons::new(client.clone())));
+
+        // ── Batch 9: More SearXNG translations ────────────
+        registry.register(Arc::new(AdobeStock::new(client.clone())));
+        registry.register(Arc::new(AnnasArchive::new(client.clone())));
+        registry.register(Arc::new(BaseSearch::new(client.clone())));
+        registry.register(Arc::new(Digbt::new(client.clone())));
 
         registry
     }
