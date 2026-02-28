@@ -102,7 +102,7 @@ impl SearchEngine for Pinterest {
                     snippet,
                     engine: "pinterest".to_string(),
                     engine_rank: (i + 1) as u32,
-                    thumbnail_url,
+                    thumbnail,
                 })
             })
             .collect();

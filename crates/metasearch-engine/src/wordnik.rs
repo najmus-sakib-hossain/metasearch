@@ -31,9 +31,12 @@ impl SearchEngine for Wordnik {
     fn metadata(&self) -> EngineMetadata {
         EngineMetadata {
             name: "Wordnik".to_string(),
-            base_url: "https://www.wordnik.com".to_string(),
+            display_name: "Wordnik".to_string(),
+            homepage: "https://www.wordnik.com".to_string(),
             categories: vec!["dictionaries".to_string(), "general".to_string()],
             enabled: true,
+            timeout_ms: 5000,
+            weight: 1.0,
         }
     }
 
@@ -95,7 +98,12 @@ impl SearchEngine for Wordnik {
                 content: def,
                 engine: "wordnik".to_string(),
                 engine_rank: (i + 1) as u32,
-            });
+                    score: 0.0,
+                    thumbnail: None,
+                    published_date: None,
+                    category: String::new(),
+                    metadata: serde_json::Value::Null,
+                });
 
             if results.len() >= 10 {
                 break;

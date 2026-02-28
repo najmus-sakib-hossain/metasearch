@@ -35,7 +35,7 @@ impl SearchEngine for Doku {
     fn metadata(&self) -> EngineMetadata {
         EngineMetadata {
             name: "DokuWiki".to_string(),
-            description: "DokuWiki search — configurable instance URL, HTML scraping".to_string(),
+            display_name: "DokuWiki".to_string(),
             categories: vec![metasearch_core::category::SearchCategory::General],
             enabled: !self.base_url.is_empty(),
         }
@@ -57,12 +57,12 @@ impl SearchEngine for Doku {
             .get(&url)
             .send()
             .await
-            .map_err(|e| MetasearchError::EngineError(format!("DokuWiki: {e}")))?;
+            .map_err(|e| MetasearchError::Engine(format!("DokuWiki: {e}")))?;
 
         let text = resp
             .text()
             .await
-            .map_err(|e| MetasearchError::EngineError(format!("DokuWiki body: {e}")))?;
+            .map_err(|e| MetasearchError::Engine(format!("DokuWiki body: {e}")))?;
 
         let doc = Html::parse_document(&text);
 
@@ -93,6 +93,11 @@ impl SearchEngine for Doku {
                     content: String::new(),
                     engine: "DokuWiki".to_string(),
                     engine_rank: rank,
+                    score: 0.0,
+                    thumbnail: None,
+                    published_date: None,
+                    category: String::new(),
+                    metadata: serde_json::Value::Null,
                 });
                 rank += 1;
             }
@@ -119,6 +124,11 @@ impl SearchEngine for Doku {
                     content,
                     engine: "DokuWiki".to_string(),
                     engine_rank: rank,
+                    score: 0.0,
+                    thumbnail: None,
+                    published_date: None,
+                    category: String::new(),
+                    metadata: serde_json::Value::Null,
                 });
                 rank += 1;
             }

@@ -108,7 +108,7 @@ impl SearchEngine for Rumble {
                     snippet,
                     engine: "rumble".to_string(),
                     engine_rank: (i + 1) as u32,
-                    thumbnail_url,
+                    thumbnail,
                 });
             }
         }

@@ -39,6 +39,7 @@ impl SearchEngine for MeilisearchEngine {
     fn metadata(&self) -> EngineMetadata {
         EngineMetadata {
             name: "MeiliSearch".to_string(),
+            display_name: "MeiliSearch".to_string(),
             description: "MeiliSearch search — configurable instance URL, index, auth key"
                 .to_string(),
             categories: vec![metasearch_core::category::SearchCategory::General],
@@ -73,12 +74,12 @@ impl SearchEngine for MeilisearchEngine {
         let resp = req
             .send()
             .await
-            .map_err(|e| MetasearchError::EngineError(format!("MeiliSearch: {e}")))?;
+            .map_err(|e| MetasearchError::Engine(format!("MeiliSearch: {e}")))?;
 
         let json: Value = resp
             .json()
             .await
-            .map_err(|e| MetasearchError::EngineError(format!("MeiliSearch JSON: {e}")))?;
+            .map_err(|e| MetasearchError::Engine(format!("MeiliSearch JSON: {e}")))?;
 
         let hits = json["hits"].as_array().cloned().unwrap_or_default();
 

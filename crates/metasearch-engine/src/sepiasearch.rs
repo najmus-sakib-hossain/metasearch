@@ -38,7 +38,7 @@ struct SepiaVideo {
     url: Option<String>,
     description: Option<String>,
     #[serde(rename = "thumbnailUrl")]
-    thumbnail_url: Option<String>,
+    thumbnail: Option<String>,
     #[serde(rename = "previewPath")]
     preview_path: Option<String>,
     channel: Option<SepiaChannel>,
@@ -66,9 +66,11 @@ impl SearchEngine for SepiaSearch {
     fn metadata(&self) -> EngineMetadata {
         EngineMetadata {
             name: "sepiasearch".to_string(),
-            description: "SepiaSearch federated PeerTube video search".to_string(),
+            display_name: "sepiasearch".to_string(),
             categories: vec![SearchCategory::Videos],
             enabled: true,
+            timeout_ms: 5000,
+            weight: 1.0,
         }
     }
 
@@ -125,7 +127,7 @@ impl SearchEngine for SepiaSearch {
                 }
                 let snippet = snippet_parts.join(" — ");
 
-                let thumbnail = video.thumbnail_url.or(video.preview_path);
+                let thumbnail = video.thumbnail.or(video.preview_path);
 
                 let mut result = SearchResult::new(&title, &video_url, &snippet, "sepiasearch");
                 result.engine_rank = (i + 1) as u32;

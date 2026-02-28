@@ -45,9 +45,11 @@ impl SearchEngine for Tootfinder {
     fn metadata(&self) -> EngineMetadata {
         EngineMetadata {
             name: "Tootfinder".to_string(),
-            description: "Mastodon / fediverse post search".to_string(),
+            display_name: "Tootfinder".to_string(),
             categories: vec![SearchCategory::SocialMedia],
             enabled: true,
+            timeout_ms: 5000,
+            weight: 1.0,
         }
     }
 

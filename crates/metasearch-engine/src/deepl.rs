@@ -31,7 +31,8 @@ impl SearchEngine for DeepL {
     fn metadata(&self) -> EngineMetadata {
         EngineMetadata {
             name: "DeepL".to_string(),
-            base_url: "https://api-free.deepl.com".to_string(),
+            display_name: "DeepL".to_string(),
+            homepage: "https://api-free.deepl.com".to_string(),
             categories: vec!["translate".to_string(), "general".to_string()],
             enabled: self.api_key.is_some(),
         }

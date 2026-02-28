@@ -28,9 +28,11 @@ impl SearchEngine for GoogleVideos {
     fn metadata(&self) -> EngineMetadata {
         EngineMetadata {
             name: "Google Videos".to_string(),
-            description: "Google Videos search — HTML scraping".to_string(),
+            display_name: "Google Videos".to_string(),
             categories: vec![metasearch_core::category::SearchCategory::Videos],
             enabled: true,
+            timeout_ms: 5000,
+            weight: 1.0,
         }
     }
 
@@ -52,12 +54,12 @@ impl SearchEngine for GoogleVideos {
             .header("Accept-Language", "en-US,en;q=0.9")
             .send()
             .await
-            .map_err(|e| MetasearchError::EngineError(format!("Google Videos: {e}")))?;
+            .map_err(|e| MetasearchError::Engine(format!("Google Videos: {e}")))?;
 
         let text = resp
             .text()
             .await
-            .map_err(|e| MetasearchError::EngineError(format!("Google Videos body: {e}")))?;
+            .map_err(|e| MetasearchError::Engine(format!("Google Videos body: {e}")))?;
 
         let doc = Html::parse_document(&text);
         let container_sel = Selector::parse("div.MjjYud").unwrap();
@@ -96,7 +98,12 @@ impl SearchEngine for GoogleVideos {
                 content,
                 engine: "Google Videos".to_string(),
                 engine_rank: (i + 1) as u32,
-            });
+                    score: 0.0,
+                    thumbnail: None,
+                    published_date: None,
+                    category: String::new(),
+                    metadata: serde_json::Value::Null,
+                });
         }
         Ok(results)
     }

@@ -104,7 +104,7 @@ impl SearchEngine for PkgGoDev {
                     snippet,
                     engine: "pkg_go_dev".to_string(),
                     engine_rank: (i + 1) as u32,
-                    thumbnail_url: None,
+                    thumbnail: None,
                 });
             }
         }

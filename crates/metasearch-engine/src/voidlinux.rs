@@ -92,7 +92,7 @@ impl SearchEngine for VoidLinux {
                     snippet,
                     engine: "voidlinux".to_string(),
                     engine_rank: (i + 1) as u32,
-                    thumbnail_url: None,
+                    thumbnail: None,
                 })
             })
             .collect();

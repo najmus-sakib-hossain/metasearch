@@ -108,9 +108,12 @@ impl SearchEngine for AppleMaps {
     fn metadata(&self) -> EngineMetadata {
         EngineMetadata {
             name: "AppleMaps".to_string(),
-            base_url: "https://www.apple.com/maps/".to_string(),
+            display_name: "AppleMaps".to_string(),
+            homepage: "https://www.apple.com/maps/".to_string(),
             categories: vec!["map".to_string()],
             enabled: true,
+            timeout_ms: 5000,
+            weight: 1.0,
         }
     }
 
@@ -209,6 +212,11 @@ impl SearchEngine for AppleMaps {
                     content,
                     engine: "apple_maps".to_string(),
                     engine_rank: (i + 1) as u32,
+                    score: 0.0,
+                    thumbnail: None,
+                    published_date: None,
+                    category: String::new(),
+                    metadata: serde_json::Value::Null,
                 });
 
                 if results.len() >= 10 {

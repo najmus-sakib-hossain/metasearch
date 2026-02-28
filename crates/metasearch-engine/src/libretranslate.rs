@@ -37,7 +37,8 @@ impl SearchEngine for LibreTranslate {
     fn metadata(&self) -> EngineMetadata {
         EngineMetadata {
             name: "LibreTranslate".to_string(),
-            base_url: if self.base_url.is_empty() {
+            display_name: "LibreTranslate".to_string(),
+            homepage: if self.base_url.is_empty() {
                 "https://libretranslate.com".to_string()
             } else {
                 self.base_url.clone()

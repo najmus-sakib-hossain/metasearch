@@ -43,7 +43,7 @@ struct MwQuery {
 #[derive(Deserialize)]
 struct MwSearchResult {
     title: String,
-    snippet: Option<String>,
+    content: Option<String>,
     timestamp: Option<String>,
 }
 
@@ -58,7 +58,7 @@ impl SearchEngine for MediaWikiEngine {
     fn metadata(&self) -> EngineMetadata {
         EngineMetadata {
             name: "MediaWiki".to_string(),
-            description: "MediaWiki Action API search — configurable instance URL".to_string(),
+            display_name: "MediaWiki".to_string(),
             categories: vec![metasearch_core::category::SearchCategory::General],
             enabled: !self.base_url.is_empty(),
         }
@@ -82,12 +82,12 @@ impl SearchEngine for MediaWikiEngine {
             .get(&url)
             .send()
             .await
-            .map_err(|e| MetasearchError::EngineError(format!("MediaWiki: {e}")))?;
+            .map_err(|e| MetasearchError::Engine(format!("MediaWiki: {e}")))?;
 
         let data: MwApiResponse = resp
             .json()
             .await
-            .map_err(|e| MetasearchError::EngineError(format!("MediaWiki JSON: {e}")))?;
+            .map_err(|e| MetasearchError::Engine(format!("MediaWiki JSON: {e}")))?;
 
         let items = data.query.and_then(|q| q.search).unwrap_or_default();
 
@@ -111,7 +111,12 @@ impl SearchEngine for MediaWikiEngine {
                 content,
                 engine: "MediaWiki".to_string(),
                 engine_rank: (i + 1) as u32,
-            });
+                    score: 0.0,
+                    thumbnail: None,
+                    published_date: None,
+                    category: String::new(),
+                    metadata: serde_json::Value::Null,
+                });
         }
         Ok(results)
     }

@@ -30,9 +30,12 @@ impl SearchEngine for OpenStreetMap {
     fn metadata(&self) -> EngineMetadata {
         EngineMetadata {
             name: "OpenStreetMap".to_string(),
-            base_url: "https://nominatim.openstreetmap.org".to_string(),
+            display_name: "OpenStreetMap".to_string(),
+            homepage: "https://nominatim.openstreetmap.org".to_string(),
             categories: vec!["map".to_string()],
             enabled: true,
+            timeout_ms: 5000,
+            weight: 1.0,
         }
     }
 
@@ -101,6 +104,11 @@ impl SearchEngine for OpenStreetMap {
                     content,
                     engine: "openstreetmap".to_string(),
                     engine_rank: (i + 1) as u32,
+                    score: 0.0,
+                    thumbnail: None,
+                    published_date: None,
+                    category: String::new(),
+                    metadata: serde_json::Value::Null,
                 });
             }
         }

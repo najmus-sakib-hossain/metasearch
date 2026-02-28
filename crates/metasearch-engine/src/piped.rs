@@ -57,6 +57,7 @@ impl SearchEngine for Piped {
     fn metadata(&self) -> EngineMetadata {
         EngineMetadata {
             name: "Piped".to_string(),
+            display_name: "Piped".to_string(),
             description: "Piped (alt YouTube frontend) video search — configurable instance URLs"
                 .to_string(),
             categories: vec![metasearch_core::category::SearchCategory::Videos],
@@ -80,12 +81,12 @@ impl SearchEngine for Piped {
             .get(&url)
             .send()
             .await
-            .map_err(|e| MetasearchError::EngineError(format!("Piped: {e}")))?;
+            .map_err(|e| MetasearchError::Engine(format!("Piped: {e}")))?;
 
         let data: PipedResponse = resp
             .json()
             .await
-            .map_err(|e| MetasearchError::EngineError(format!("Piped JSON: {e}")))?;
+            .map_err(|e| MetasearchError::Engine(format!("Piped JSON: {e}")))?;
 
         let frontend = if self.frontend_url.is_empty() {
             "https://piped.video"
@@ -109,7 +110,12 @@ impl SearchEngine for Piped {
                 content,
                 engine: "Piped".to_string(),
                 engine_rank: (i + 1) as u32,
-            });
+                    score: 0.0,
+                    thumbnail: None,
+                    published_date: None,
+                    category: String::new(),
+                    metadata: serde_json::Value::Null,
+                });
         }
         Ok(results)
     }

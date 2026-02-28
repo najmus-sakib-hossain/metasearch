@@ -52,9 +52,12 @@ impl SearchEngine for DuckDuckGoWeather {
     fn metadata(&self) -> EngineMetadata {
         EngineMetadata {
             name: "DuckDuckGoWeather".to_string(),
-            base_url: "https://duckduckgo.com".to_string(),
+            display_name: "DuckDuckGoWeather".to_string(),
+            homepage: "https://duckduckgo.com".to_string(),
             categories: vec!["weather".to_string()],
             enabled: true,
+            timeout_ms: 5000,
+            weight: 1.0,
         }
     }
 

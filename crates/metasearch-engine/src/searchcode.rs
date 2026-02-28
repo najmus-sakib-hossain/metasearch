@@ -46,9 +46,11 @@ impl SearchEngine for Searchcode {
     fn metadata(&self) -> EngineMetadata {
         EngineMetadata {
             name: "Searchcode".to_string(),
-            description: "Source code search engine".to_string(),
+            display_name: "Searchcode".to_string(),
             categories: vec![SearchCategory::IT],
             enabled: true,
+            timeout_ms: 5000,
+            weight: 1.0,
         }
     }
 

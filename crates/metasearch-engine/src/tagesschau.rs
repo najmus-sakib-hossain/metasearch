@@ -97,7 +97,7 @@ impl SearchEngine for Tagesschau {
                     snippet,
                     engine: "tagesschau".to_string(),
                     engine_rank: (i + 1) as u32,
-                    thumbnail_url: None,
+                    thumbnail: None,
                 })
             })
             .collect();

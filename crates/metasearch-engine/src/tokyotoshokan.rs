@@ -32,9 +32,11 @@ impl SearchEngine for TokyoToshokan {
     fn metadata(&self) -> EngineMetadata {
         EngineMetadata {
             name: "Tokyo Toshokan".to_string(),
-            description: "BitTorrent library for Japanese media".to_string(),
+            display_name: "Tokyo Toshokan".to_string(),
             categories: vec![SearchCategory::Files],
             enabled: true,
+            timeout_ms: 5000,
+            weight: 1.0,
         }
     }
 

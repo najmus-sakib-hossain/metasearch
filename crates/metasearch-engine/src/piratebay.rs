@@ -52,9 +52,11 @@ impl SearchEngine for PirateBay {
     fn metadata(&self) -> EngineMetadata {
         EngineMetadata {
             name: "The Pirate Bay".to_string(),
-            description: "Torrent search engine".to_string(),
+            display_name: "The Pirate Bay".to_string(),
             categories: vec![SearchCategory::Files],
             enabled: true,
+            timeout_ms: 5000,
+            weight: 1.0,
         }
     }
 

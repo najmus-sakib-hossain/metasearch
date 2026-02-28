@@ -34,7 +34,8 @@ impl SearchEngine for Lingva {
     fn metadata(&self) -> EngineMetadata {
         EngineMetadata {
             name: "Lingva".to_string(),
-            base_url: if self.url.is_empty() {
+            display_name: "Lingva".to_string(),
+            homepage: if self.url.is_empty() {
                 "https://lingva.thedaviddelta.com".to_string()
             } else {
                 self.url.clone()

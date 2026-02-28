@@ -91,10 +91,10 @@ impl SearchEngine for Stract {
                 Some(SearchResult {
                     title,
                     url,
-                    snippet: page.snippet.unwrap_or_default(),
+                    content: page.snippet.unwrap_or_default(),
                     engine: "stract".to_string(),
                     engine_rank: (i + 1) as u32,
-                    thumbnail_url: None,
+                    thumbnail: None,
                 })
             })
             .collect();

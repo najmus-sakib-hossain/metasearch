@@ -33,9 +33,12 @@ impl SearchEngine for CurrencyConvert {
     fn metadata(&self) -> EngineMetadata {
         EngineMetadata {
             name: "CurrencyConvert".to_string(),
-            base_url: "https://duckduckgo.com".to_string(),
+            display_name: "CurrencyConvert".to_string(),
+            homepage: "https://duckduckgo.com".to_string(),
             categories: vec!["currency".to_string(), "general".to_string()],
             enabled: true,
+            timeout_ms: 5000,
+            weight: 1.0,
         }
     }
 

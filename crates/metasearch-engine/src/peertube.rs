@@ -100,10 +100,10 @@ impl SearchEngine for PeerTube {
                 Some(SearchResult {
                     title,
                     url: result_url,
-                    snippet: item.description.unwrap_or_default(),
+                    content: item.description.unwrap_or_default(),
                     engine: "peertube".to_string(),
                     engine_rank: (i + 1) as u32,
-                    thumbnail_url,
+                    thumbnail,
                 })
             })
             .collect();

@@ -55,6 +55,7 @@ impl SearchEngine for RecollEngine {
     fn metadata(&self) -> EngineMetadata {
         EngineMetadata {
             name: "Recoll".to_string(),
+            display_name: "Recoll".to_string(),
             description:
                 "Recoll desktop full-text search via recoll-webui — configurable instance URL"
                     .to_string(),
@@ -80,12 +81,12 @@ impl SearchEngine for RecollEngine {
             .get(&url)
             .send()
             .await
-            .map_err(|e| MetasearchError::EngineError(format!("Recoll: {e}")))?;
+            .map_err(|e| MetasearchError::Engine(format!("Recoll: {e}")))?;
 
         let data: RecollResponse = resp
             .json()
             .await
-            .map_err(|e| MetasearchError::EngineError(format!("Recoll JSON: {e}")))?;
+            .map_err(|e| MetasearchError::Engine(format!("Recoll JSON: {e}")))?;
 
         let items = data.results.unwrap_or_default();
 
@@ -117,7 +118,12 @@ impl SearchEngine for RecollEngine {
                 content,
                 engine: "Recoll".to_string(),
                 engine_rank: (i + 1) as u32,
-            });
+                    score: 0.0,
+                    thumbnail: None,
+                    published_date: None,
+                    category: String::new(),
+                    metadata: serde_json::Value::Null,
+                });
         }
         Ok(results)
     }

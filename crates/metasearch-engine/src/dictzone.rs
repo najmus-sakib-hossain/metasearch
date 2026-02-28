@@ -31,9 +31,12 @@ impl SearchEngine for DictZone {
     fn metadata(&self) -> EngineMetadata {
         EngineMetadata {
             name: "DictZone".to_string(),
-            base_url: "https://dictzone.com".to_string(),
+            display_name: "DictZone".to_string(),
+            homepage: "https://dictzone.com".to_string(),
             categories: vec!["translate".to_string(), "general".to_string()],
             enabled: true,
+            timeout_ms: 5000,
+            weight: 1.0,
         }
     }
 

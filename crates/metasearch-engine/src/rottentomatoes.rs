@@ -31,9 +31,11 @@ impl SearchEngine for RottenTomatoes {
     fn metadata(&self) -> EngineMetadata {
         EngineMetadata {
             name: "rottentomatoes".to_string(),
-            description: "Rotten Tomatoes movie reviews".to_string(),
+            display_name: "rottentomatoes".to_string(),
             categories: vec![SearchCategory::General],
             enabled: true,
+            timeout_ms: 5000,
+            weight: 1.0,
         }
     }
 

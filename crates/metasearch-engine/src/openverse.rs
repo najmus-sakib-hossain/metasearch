@@ -45,9 +45,11 @@ impl SearchEngine for Openverse {
     fn metadata(&self) -> EngineMetadata {
         EngineMetadata {
             name: "Openverse".to_string(),
-            description: "Creative Commons image search".to_string(),
+            display_name: "Openverse".to_string(),
             categories: vec![SearchCategory::Images],
             enabled: true,
+            timeout_ms: 5000,
+            weight: 1.0,
         }
     }
 

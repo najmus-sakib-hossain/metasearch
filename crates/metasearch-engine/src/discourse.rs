@@ -72,7 +72,7 @@ impl SearchEngine for Discourse {
     fn metadata(&self) -> EngineMetadata {
         EngineMetadata {
             name: "Discourse".to_string(),
-            description: "Discourse forum search — configurable instance URL + API key".to_string(),
+            display_name: "Discourse".to_string(),
             categories: vec![metasearch_core::category::SearchCategory::General],
             enabled: !self.base_url.is_empty(),
         }
@@ -106,12 +106,12 @@ impl SearchEngine for Discourse {
         let resp = req
             .send()
             .await
-            .map_err(|e| MetasearchError::EngineError(format!("Discourse: {e}")))?;
+            .map_err(|e| MetasearchError::Engine(format!("Discourse: {e}")))?;
 
         let data: DiscourseResponse = resp
             .json()
             .await
-            .map_err(|e| MetasearchError::EngineError(format!("Discourse JSON: {e}")))?;
+            .map_err(|e| MetasearchError::Engine(format!("Discourse JSON: {e}")))?;
 
         let topics = data.topics.unwrap_or_default();
         let posts = data.posts.unwrap_or_default();
@@ -131,7 +131,12 @@ impl SearchEngine for Discourse {
                 content,
                 engine: "Discourse".to_string(),
                 engine_rank: (i + 1) as u32,
-            });
+                    score: 0.0,
+                    thumbnail: None,
+                    published_date: None,
+                    category: String::new(),
+                    metadata: serde_json::Value::Null,
+                });
         }
         Ok(results)
     }

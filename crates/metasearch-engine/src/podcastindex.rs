@@ -105,7 +105,7 @@ impl SearchEngine for PodcastIndex {
                     snippet,
                     engine: "podcastindex".to_string(),
                     engine_rank: (i + 1) as u32,
-                    thumbnail_url,
+                    thumbnail,
                 })
             })
             .collect();

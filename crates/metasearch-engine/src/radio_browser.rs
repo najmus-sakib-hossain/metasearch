@@ -43,7 +43,7 @@ impl RadioBrowser {
 #[derive(Deserialize)]
 struct Station {
     name: Option<String>,
-    homepage: Option<String>,
+    base_url: Option<String>,
     url_resolved: Option<String>,
     tags: Option<String>,
     country: Option<String>,

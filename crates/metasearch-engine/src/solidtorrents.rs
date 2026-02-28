@@ -31,9 +31,11 @@ impl SearchEngine for SolidTorrents {
     fn metadata(&self) -> EngineMetadata {
         EngineMetadata {
             name: "solidtorrents".to_string(),
-            description: "SolidTorrents torrent search".to_string(),
+            display_name: "solidtorrents".to_string(),
             categories: vec![SearchCategory::Files],
             enabled: true,
+            timeout_ms: 5000,
+            weight: 1.0,
         }
     }
 

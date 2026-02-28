@@ -30,9 +30,12 @@ impl SearchEngine for TinEye {
     fn metadata(&self) -> EngineMetadata {
         EngineMetadata {
             name: "TinEye".to_string(),
-            base_url: "https://tineye.com".to_string(),
+            display_name: "TinEye".to_string(),
+            homepage: "https://tineye.com".to_string(),
             categories: vec!["images".to_string(), "general".to_string()],
             enabled: true,
+            timeout_ms: 5000,
+            weight: 1.0,
         }
     }
 

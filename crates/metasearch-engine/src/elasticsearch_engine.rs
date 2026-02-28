@@ -47,6 +47,7 @@ impl SearchEngine for ElasticsearchEngine {
     fn metadata(&self) -> EngineMetadata {
         EngineMetadata {
             name: "Elasticsearch".to_string(),
+            display_name: "Elasticsearch".to_string(),
             description: "Elasticsearch search — configurable instance URL, index, credentials"
                 .to_string(),
             categories: vec![metasearch_core::category::SearchCategory::General],
@@ -85,15 +86,15 @@ impl SearchEngine for ElasticsearchEngine {
         let resp = req
             .send()
             .await
-            .map_err(|e| MetasearchError::EngineError(format!("Elasticsearch: {e}")))?;
+            .map_err(|e| MetasearchError::Engine(format!("Elasticsearch: {e}")))?;
 
         let json: Value = resp
             .json()
             .await
-            .map_err(|e| MetasearchError::EngineError(format!("Elasticsearch JSON: {e}")))?;
+            .map_err(|e| MetasearchError::Engine(format!("Elasticsearch JSON: {e}")))?;
 
         if let Some(error) = json.get("error") {
-            return Err(MetasearchError::EngineError(format!(
+            return Err(MetasearchError::Engine(format!(
                 "Elasticsearch error: {}",
                 error
             )));
@@ -148,7 +149,12 @@ impl SearchEngine for ElasticsearchEngine {
                 content,
                 engine: "Elasticsearch".to_string(),
                 engine_rank: (i + 1) as u32,
-            });
+                    score: 0.0,
+                    thumbnail: None,
+                    published_date: None,
+                    category: String::new(),
+                    metadata: serde_json::Value::Null,
+                });
         }
         Ok(results)
     }

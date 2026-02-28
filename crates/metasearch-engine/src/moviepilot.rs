@@ -41,9 +41,11 @@ impl SearchEngine for Moviepilot {
     fn metadata(&self) -> EngineMetadata {
         EngineMetadata {
             name: "moviepilot".to_string(),
-            description: "Moviepilot German movie database".to_string(),
+            display_name: "moviepilot".to_string(),
             categories: vec![SearchCategory::General],
             enabled: true,
+            timeout_ms: 5000,
+            weight: 1.0,
         }
     }
 

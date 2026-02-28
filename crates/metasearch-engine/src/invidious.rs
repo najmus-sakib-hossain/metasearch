@@ -51,6 +51,7 @@ impl SearchEngine for Invidious {
     fn metadata(&self) -> EngineMetadata {
         EngineMetadata {
             name: "Invidious".to_string(),
+            display_name: "Invidious".to_string(),
             description:
                 "Invidious (alt YouTube frontend) video search — configurable instance URL"
                     .to_string(),
@@ -76,12 +77,12 @@ impl SearchEngine for Invidious {
             .get(&url)
             .send()
             .await
-            .map_err(|e| MetasearchError::EngineError(format!("Invidious: {e}")))?;
+            .map_err(|e| MetasearchError::Engine(format!("Invidious: {e}")))?;
 
         let items: Vec<InvidiousResult> = resp
             .json()
             .await
-            .map_err(|e| MetasearchError::EngineError(format!("Invidious JSON: {e}")))?;
+            .map_err(|e| MetasearchError::Engine(format!("Invidious JSON: {e}")))?;
 
         let mut results = Vec::new();
         for (i, item) in items.iter().enumerate() {
@@ -113,7 +114,12 @@ impl SearchEngine for Invidious {
                 content: content_parts.join(" — "),
                 engine: "Invidious".to_string(),
                 engine_rank: (i + 1) as u32,
-            });
+                    score: 0.0,
+                    thumbnail: None,
+                    published_date: None,
+                    category: String::new(),
+                    metadata: serde_json::Value::Null,
+                });
         }
         Ok(results)
     }

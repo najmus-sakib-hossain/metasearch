@@ -96,9 +96,11 @@ impl SearchEngine for OpenAlex {
     fn metadata(&self) -> EngineMetadata {
         EngineMetadata {
             name: "OpenAlex".to_string(),
-            description: "Open catalog of scholarly papers".to_string(),
+            display_name: "OpenAlex".to_string(),
             categories: vec![SearchCategory::Science],
             enabled: true,
+            timeout_ms: 5000,
+            weight: 1.0,
         }
     }
 

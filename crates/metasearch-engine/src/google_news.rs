@@ -57,9 +57,11 @@ impl SearchEngine for GoogleNews {
     fn metadata(&self) -> EngineMetadata {
         EngineMetadata {
             name: "Google News".to_string(),
-            description: "Google News search — HTML scraping with base64 URL decoding".to_string(),
+            display_name: "Google News".to_string(),
             categories: vec![metasearch_core::category::SearchCategory::News],
             enabled: true,
+            timeout_ms: 5000,
+            weight: 1.0,
         }
     }
 
@@ -79,12 +81,12 @@ impl SearchEngine for GoogleNews {
             .header("Accept-Language", "en-US,en;q=0.9")
             .send()
             .await
-            .map_err(|e| MetasearchError::EngineError(format!("Google News: {e}")))?;
+            .map_err(|e| MetasearchError::Engine(format!("Google News: {e}")))?;
 
         let text = resp
             .text()
             .await
-            .map_err(|e| MetasearchError::EngineError(format!("Google News body: {e}")))?;
+            .map_err(|e| MetasearchError::Engine(format!("Google News body: {e}")))?;
 
         let doc = Html::parse_document(&text);
         let article_sel = Selector::parse("div.xrnccd").unwrap();
@@ -141,7 +143,12 @@ impl SearchEngine for GoogleNews {
                 content,
                 engine: "Google News".to_string(),
                 engine_rank: (i + 1) as u32,
-            });
+                    score: 0.0,
+                    thumbnail: None,
+                    published_date: None,
+                    category: String::new(),
+                    metadata: serde_json::Value::Null,
+                });
         }
         Ok(results)
     }

@@ -49,9 +49,11 @@ impl SearchEngine for OpenLibrary {
     fn metadata(&self) -> EngineMetadata {
         EngineMetadata {
             name: "openlibrary".to_string(),
-            description: "Open Library book search".to_string(),
+            display_name: "openlibrary".to_string(),
             categories: vec![SearchCategory::General],
             enabled: true,
+            timeout_ms: 5000,
+            weight: 1.0,
         }
     }
 
