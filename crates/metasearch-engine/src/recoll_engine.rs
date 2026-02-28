@@ -1,0 +1,119 @@
+//! Recoll desktop full-text search via recoll-webui — configurable instance URL.
+//! SearXNG equivalent: `recoll.py`
+//!
+//! Recoll is a desktop full-text search tool based on Xapian. This engine
+//! queries via recoll-webui's JSON API. Configure `base_url`, `mount_prefix`,
+//! and `dl_prefix` to map local file paths to web-accessible URLs.
+
+use async_trait::async_trait;
+use reqwest::Client;
+use serde::Deserialize;
+
+use crate::{EngineMetadata, MetasearchError, SearchEngine, SearchQuery, SearchResult};
+
+pub struct RecollEngine {
+    client: Client,
+    base_url: String,
+    mount_prefix: String,
+    dl_prefix: String,
+}
+
+impl RecollEngine {
+    pub fn new(client: Client, base_url: &str, mount_prefix: &str, dl_prefix: &str) -> Self {
+        Self {
+            client,
+            base_url: base_url.trim_end_matches('/').to_string(),
+            mount_prefix: mount_prefix.to_string(),
+            dl_prefix: dl_prefix.to_string(),
+        }
+    }
+}
+
+#[derive(Deserialize)]
+struct RecollResponse {
+    results: Option<Vec<RecollResult>>,
+}
+
+#[derive(Deserialize)]
+struct RecollResult {
+    label: Option<String>,
+    url: Option<String>,
+    snippet: Option<String>,
+    filename: Option<String>,
+    author: Option<String>,
+    mtype: Option<String>,
+}
+
+#[async_trait]
+impl SearchEngine for RecollEngine {
+    fn metadata(&self) -> EngineMetadata {
+        EngineMetadata {
+            name: "Recoll".to_string(),
+            description: "Recoll desktop full-text search via recoll-webui — configurable instance URL".to_string(),
+            categories: vec![metasearch_core::category::SearchCategory::General],
+            enabled: !self.base_url.is_empty(),
+        }
+    }
+
+    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
+        if self.base_url.is_empty() {
+            return Ok(Vec::new());
+        }
+
+        let url = format!(
+            "{}/json?query={}&page={}&highlight=0",
+            self.base_url,
+            urlencoding::encode(&query.query),
+            query.page,
+        );
+
+        let resp = self
+            .client
+            .get(&url)
+            .send()
+            .await
+            .map_err(|e| MetasearchError::EngineError(format!("Recoll: {e}")))?;
+
+        let data: RecollResponse = resp
+            .json()
+            .await
+            .map_err(|e| MetasearchError::EngineError(format!("Recoll JSON: {e}")))?;
+
+        let items = data.results.unwrap_or_default();
+
+        let mut results = Vec::new();
+        for (i, item) in items.iter().enumerate() {
+            let title = item.label.clone().unwrap_or_default();
+            let raw_url = item.url.clone().unwrap_or_default();
+
+            // Map local file:// paths to web-accessible URLs
+            let result_url = if !self.mount_prefix.is_empty() && !self.dl_prefix.is_empty() {
+                raw_url.replace(
+                    &format!("file://{}", self.mount_prefix),
+                    &self.dl_prefix,
+                )
+            } else {
+                raw_url
+            };
+
+            // Strip HTML from snippet
+            let content = item
+                .snippet
+                .as_deref()
+                .unwrap_or("")
+                .replace("<b>", "")
+                .replace("</b>", "")
+                .replace("<em>", "")
+                .replace("</em>", "");
+
+            results.push(SearchResult {
+                title,
+                url: result_url,
+                content,
+                engine: "Recoll".to_string(),
+                engine_rank: (i + 1) as u32,
+            });
+        }
+        Ok(results)
+    }
+}

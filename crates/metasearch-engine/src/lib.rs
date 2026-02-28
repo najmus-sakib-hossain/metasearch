@@ -77,6 +77,10 @@
 //! ## Batch 21 — API key + multi-module engines (8):
 //! - Brave API, CORE, Springer Nature, NASA ADS, Marginalia,
 //!   DuckDuckGo Definitions, Google Images, Google Scholar
+//!
+//! ## Batch 22 — Instance-URL + multi-module engines (10):
+//! - Google Videos, Google News, Discourse, Invidious, Piped,
+//!   MediaWiki, Elasticsearch, MeiliSearch, DokuWiki, Recoll
 
 // Original engines
 pub mod brave;
@@ -259,6 +263,18 @@ pub mod google_images;
 pub mod google_scholar;
 pub mod marginalia;
 pub mod springer;
+
+// Batch 22 (instance-URL + multi-module engines)
+pub mod discourse;
+pub mod doku;
+pub mod elasticsearch_engine;
+pub mod google_news;
+pub mod google_videos;
+pub mod invidious;
+pub mod mediawiki_engine;
+pub mod meilisearch_engine;
+pub mod piped;
+pub mod recoll_engine;
 
 pub mod registry;
 
