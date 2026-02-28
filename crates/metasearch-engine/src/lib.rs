@@ -61,6 +61,9 @@
 //! ## Batch 16 — Wired orphans + new engines (6):
 //! - Imgur, lib.rs, Kickass Torrents, DeviantArt,
 //!   360 Search Videos, SourceHut
+//!
+//! ## Batch 17 — More SearXNG translations (5):
+//! - Chinaso, Flickr (no API), Ahmia, Naver, Radio Browser
 
 // Original engines
 pub mod brave;
@@ -212,6 +215,13 @@ pub mod kickass;
 pub mod lib_rs;
 pub mod sourcehut;
 pub mod three_sixty_search_videos;
+
+// Batch 17
+pub mod ahmia;
+pub mod chinaso;
+pub mod flickr_noapi;
+pub mod naver;
+pub mod radio_browser;
 
 pub mod registry;
 

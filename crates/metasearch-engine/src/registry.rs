@@ -10,6 +10,7 @@ use reqwest::Client;
 use crate::{
     acfun::AcFun,
     adobe_stock::AdobeStock,
+    ahmia::Ahmia,
     alpinelinux::AlpineLinux,
     annas_archive::AnnasArchive,
     ansa::Ansa,
@@ -36,6 +37,7 @@ use crate::{
     cachy_os::CachyOs,
     ccc_media::CccMedia,
     chefkoch::Chefkoch,
+    chinaso::Chinaso,
     crates_io::CratesIo,
     crossref::Crossref,
     dailymotion::Dailymotion,
@@ -52,6 +54,7 @@ use crate::{
     fdroid::Fdroid,
     findthatmeme::FindThatMeme,
     flickr::Flickr,
+    flickr_noapi::FlickrNoapi,
     freesound::Freesound,
     frinkiac::Frinkiac,
     fyyd::Fyyd,
@@ -87,6 +90,7 @@ use crate::{
     mixcloud::Mixcloud,
     moviepilot::Moviepilot,
     mwmbl::Mwmbl,
+    naver::Naver,
     nine_gag::NineGag,
     npm::Npm,
     nyaa::Nyaa,
@@ -100,6 +104,7 @@ use crate::{
     podcastindex::PodcastIndex,
     pypi::PyPI,
     qwant::Qwant,
+    radio_browser::RadioBrowser,
     reddit::Reddit,
     rottentomatoes::RottenTomatoes,
     rumble::Rumble,
@@ -139,7 +144,7 @@ impl EngineRegistry {
         }
     }
 
-    /// Create a registry pre-loaded with all built-in engines (117 total).
+    /// Create a registry pre-loaded with all built-in engines (122 total).
     pub fn with_defaults(client: Client) -> Self {
         let mut registry = Self::new();
 
@@ -293,6 +298,13 @@ impl EngineRegistry {
         registry.register(Arc::new(DeviantArt::new(client.clone())));
         registry.register(Arc::new(ThreeSixtySearchVideos::new(client.clone())));
         registry.register(Arc::new(Sourcehut::new(client.clone())));
+
+        // ── Batch 17: More SearXNG translations ───────────
+        registry.register(Arc::new(Chinaso::new(client.clone())));
+        registry.register(Arc::new(FlickrNoapi::new(client.clone())));
+        registry.register(Arc::new(Ahmia::new(client.clone())));
+        registry.register(Arc::new(Naver::new(client.clone())));
+        registry.register(Arc::new(RadioBrowser::new(client.clone())));
 
         registry
     }
