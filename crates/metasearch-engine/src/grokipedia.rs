@@ -1,0 +1,103 @@
+//! Grokipedia — AI-powered encyclopedia search.
+//!
+//! Uses the Grokipedia full-text-search JSON API.
+
+use async_trait::async_trait;
+use metasearch_core::{
+    category::SearchCategory,
+    engine::{EngineMetadata, SearchEngine},
+    error::MetasearchError,
+    query::SearchQuery,
+    result::SearchResult,
+};
+use reqwest::Client;
+use serde::Deserialize;
+
+pub struct Grokipedia {
+    metadata: EngineMetadata,
+    client: Client,
+}
+
+impl Grokipedia {
+    pub fn new(client: Client) -> Self {
+        Self {
+            metadata: EngineMetadata {
+                name: "grokipedia".to_string(),
+                display_name: "Grokipedia".to_string(),
+                homepage: "https://grokipedia.com".to_string(),
+                categories: vec![SearchCategory::General],
+                enabled: true,
+                timeout_ms: 5000,
+                weight: 1.0,
+            },
+            client,
+        }
+    }
+}
+
+#[derive(Deserialize)]
+struct ApiResponse {
+    #[serde(default)]
+    results: Vec<ApiResult>,
+}
+
+#[derive(Deserialize)]
+struct ApiResult {
+    slug: Option<String>,
+    title: Option<String>,
+    snippet: Option<String>,
+}
+
+#[async_trait]
+impl SearchEngine for Grokipedia {
+    fn metadata(&self) -> &EngineMetadata {
+        &self.metadata
+    }
+
+    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
+        let page = query.page.unwrap_or(1);
+        let offset = (page.saturating_sub(1)) * 10;
+
+        let resp = self
+            .client
+            .get("https://grokipedia.com/api/full-text-search")
+            .query(&[
+                ("q", query.query.as_str()),
+                ("offset", &offset.to_string()),
+                ("limit", "10"),
+            ])
+            .send()
+            .await
+            .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
+
+        let api: ApiResponse = resp
+            .json()
+            .await
+            .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
+
+        let results = api
+            .results
+            .into_iter()
+            .enumerate()
+            .filter_map(|(i, r)| {
+                let title = r.title.unwrap_or_default();
+                let slug = r.slug?;
+                if title.is_empty() {
+                    return None;
+                }
+                let url = format!("https://grokipedia.com/wiki/{slug}");
+                let snippet = r.snippet.unwrap_or_default();
+                let mut result = SearchResult::new(
+                    title,
+                    url,
+                    snippet,
+                    self.metadata.name.clone(),
+                );
+                result.engine_rank = Some(i + 1);
+                Some(result)
+            })
+            .collect();
+
+        Ok(results)
+    }
+}

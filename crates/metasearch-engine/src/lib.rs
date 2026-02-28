@@ -38,6 +38,9 @@
 //!
 //! ## Batch 9 — More SearXNG translations (4):
 //! - Adobe Stock, Anna's Archive, BASE, DigBT
+//!
+//! ## Batch 10 — More SearXNG translations (5):
+//! - Geizhals, Grokipedia, Il Post, Library of Congress, MetaCPAN
 
 // Original engines
 pub mod brave;
@@ -132,6 +135,13 @@ pub mod adobe_stock;
 pub mod annas_archive;
 pub mod base_search;
 pub mod digbt;
+
+// Batch 10
+pub mod geizhals;
+pub mod grokipedia;
+pub mod il_post;
+pub mod loc;
+pub mod metacpan;
 
 pub mod registry;
 

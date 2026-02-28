@@ -57,21 +57,27 @@ use crate::{
     // Batch 8
     frinkiac::Frinkiac,
     fyyd::Fyyd,
+    // Batch 10
+    geizhals::Geizhals,
     genius::Genius,
     github_engine::GitHub,
     gitlab::GitLab,
     goodreads::Goodreads,
     google::Google,
+    grokipedia::Grokipedia,
     hackernews::HackerNews,
     hex::Hex,
     huggingface::HuggingFace,
+    il_post::IlPost,
     imdb::Imdb,
     ina::Ina,
     ipernity::Ipernity,
     // Batch 5
     leet_x::LeetX,
     lemmy::Lemmy,
+    loc::Loc,
     mastodon::Mastodon,
+    metacpan::MetaCpan,
     mixcloud::Mixcloud,
     nine_gag::NineGag,
     npm::Npm,
@@ -101,7 +107,7 @@ impl EngineRegistry {
         }
     }
 
-    /// Create a registry pre-loaded with all built-in engines (74 total).
+    /// Create a registry pre-loaded with all built-in engines (79 total).
     pub fn with_defaults(client: Client) -> Self {
         let mut registry = Self::new();
 
@@ -198,6 +204,13 @@ impl EngineRegistry {
         registry.register(Arc::new(AnnasArchive::new(client.clone())));
         registry.register(Arc::new(BaseSearch::new(client.clone())));
         registry.register(Arc::new(Digbt::new(client.clone())));
+
+        // ── Batch 10: More SearXNG translations ───────────
+        registry.register(Arc::new(Geizhals::new(client.clone())));
+        registry.register(Arc::new(Grokipedia::new(client.clone())));
+        registry.register(Arc::new(IlPost::new(client.clone())));
+        registry.register(Arc::new(Loc::new(client.clone())));
+        registry.register(Arc::new(MetaCpan::new(client.clone())));
 
         registry
     }
