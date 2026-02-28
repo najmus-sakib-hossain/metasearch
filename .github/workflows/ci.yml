@@ -58,7 +58,7 @@ header = []
 body = []
 in_header = True
 for line in lines:
-    if in_header and (line.startswith('#') or line.strip() == '' or line.startswith('>')  or line.startswith('<!--')):
+    if in_header and (line.startswith('#') or line.strip() == '' or line.startswith('>') or line.startswith('<!--')):
         header.append(line)
     else:
         in_header = False
