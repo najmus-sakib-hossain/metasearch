@@ -67,50 +67,61 @@ impl SearchEngine for BingVideos {
             .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
 
         let document = Html::parse_document(&html_text);
-        let video_sel = Selector::parse("div.dg_u div[id*='mc_vtvc_video']").unwrap();
-        let meta_sel = Selector::parse("div.vrhdata").unwrap();
+        // Each video card is a div with id starting with "mc_vtvc_video_"
+        let video_sel = Selector::parse("div[id^='mc_vtvc_video_']").unwrap();
+        // Title is in a child element whose "title" attribute holds the full title text
+        let title_sel = Selector::parse("div.mc_vtvc_title").unwrap();
+        // Meta spans contain things like view count, channel name, upload date
         let info_sel = Selector::parse("div.mc_vtvc_meta_block span").unwrap();
-        let thumb_sel = Selector::parse("div.mc_vtvc_th img").unwrap();
 
         let mut results = Vec::new();
 
         for (i, video) in document.select(&video_sel).enumerate() {
-            let meta_el = match video.select(&meta_sel).next() {
-                Some(el) => el,
-                None => continue,
-            };
-
-            let meta_json = match meta_el.value().attr("vrhm") {
+            // The "mmeta" attribute on the card div contains JSON with murl (video URL)
+            // and turl (thumbnail URL).
+            let mmeta_raw = match video.value().attr("mmeta") {
                 Some(m) => m,
                 None => continue,
             };
 
-            let meta: serde_json::Value = match serde_json::from_str(meta_json) {
+            // Bing HTML-encodes the JSON (e.g. &quot; instead of "), decode it first.
+            let mmeta_decoded = mmeta_raw
+                .replace("&quot;", "\"")
+                .replace("&amp;", "&")
+                .replace("&#39;", "'")
+                .replace("&lt;", "<")
+                .replace("&gt;", ">");
+
+            let meta: serde_json::Value = match serde_json::from_str(&mmeta_decoded) {
                 Ok(v) => v,
                 Err(_) => continue,
             };
 
-            let video_url = meta["murl"].as_str().unwrap_or_default();
-            let title = meta["vt"].as_str().unwrap_or("Untitled");
-            let duration = meta["du"].as_str().unwrap_or("");
+            let video_url = match meta["murl"].as_str() {
+                Some(u) if !u.is_empty() => u.to_string(),
+                _ => continue,
+            };
+
+            // Title is the "title" attribute of the mc_vtvc_title element
+            let title = video
+                .select(&title_sel)
+                .next()
+                .and_then(|el| el.value().attr("title"))
+                .unwrap_or("Untitled")
+                .to_string();
+
+            let thumbnail = meta["turl"].as_str().map(|s| s.to_string());
 
             let info: Vec<String> = video
                 .select(&info_sel)
-                .map(|el| el.text().collect::<String>())
+                .map(|el| el.text().collect::<String>().trim().to_string())
+                .filter(|s| !s.is_empty())
                 .collect();
-            let info_str = info.join(" - ");
-
-            let thumbnail = video
-                .select(&thumb_sel)
-                .next()
-                .and_then(|el| el.value().attr("src"))
-                .map(|s| s.to_string());
-
-            let snippet = format!("{} — {}", duration, info_str.trim());
+            let snippet = info.join(" · ");
 
             let mut result = SearchResult::new(
-                title.to_string(),
-                video_url.to_string(),
+                title,
+                video_url,
                 snippet,
                 "bing_videos".to_string(),
             );

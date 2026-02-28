@@ -66,7 +66,7 @@ impl SearchEngine for Ina {
 
         let document = Html::parse_document(&body);
 
-        let results_sel = Selector::parse(r#"div#searchHits > div"#)
+        let results_sel = Selector::parse("div.contentResult")
             .map_err(|e| MetasearchError::ParseError(format!("{e:?}")))?;
         let link_sel = Selector::parse("a[href]")
             .map_err(|e| MetasearchError::ParseError(format!("{e:?}")))?;
