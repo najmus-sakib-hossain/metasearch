@@ -37,7 +37,7 @@ pub struct EngineMetadata {
 #[async_trait]
 pub trait SearchEngine: Send + Sync {
     /// Return metadata about this engine.
-    fn metadata(&self) -> &EngineMetadata;
+    fn metadata(&self) -> EngineMetadata;
 
     /// Perform a search and return results.
     async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>>;

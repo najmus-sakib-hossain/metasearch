@@ -7,6 +7,10 @@ pub enum MetasearchError {
     #[error("Engine '{engine}' failed: {message}")]
     EngineError { engine: String, message: String },
 
+    /// General engine error message (used by most engine implementations).
+    #[error("Engine error: {0}")]
+    Engine(String),
+
     #[error("HTTP request failed: {0}")]
     HttpError(String),
 

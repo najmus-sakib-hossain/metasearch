@@ -13,7 +13,7 @@ pub struct SearchResult {
     pub url: String,
 
     /// Text snippet / description.
-    pub snippet: String,
+    pub content: String,
 
     /// Which engine produced this result.
     pub engine: String,
@@ -22,6 +22,7 @@ pub struct SearchResult {
     pub engine_rank: u32,
 
     /// Aggregated score after ranking.
+    #[serde(default)]
     pub score: f64,
 
     /// Optional thumbnail URL (for image/video results).
@@ -31,9 +32,11 @@ pub struct SearchResult {
     pub published_date: Option<DateTime<Utc>>,
 
     /// Result category.
+    #[serde(default)]
     pub category: String,
 
     /// Additional metadata (engine-specific).
+    #[serde(default)]
     pub metadata: serde_json::Value,
 }
 
@@ -41,13 +44,13 @@ impl SearchResult {
     pub fn new(
         title: impl Into<String>,
         url: impl Into<String>,
-        snippet: impl Into<String>,
+        content: impl Into<String>,
         engine: impl Into<String>,
     ) -> Self {
         Self {
             title: title.into(),
             url: url.into(),
-            snippet: snippet.into(),
+            content: content.into(),
             engine: engine.into(),
             engine_rank: 0,
             score: 0.0,
