@@ -6,7 +6,7 @@ use async_trait::async_trait;
 use metasearch_core::{
     category::SearchCategory,
     engine::{EngineMetadata, SearchEngine},
-    error::MetasearchError,
+    error::{MetasearchError, Result},
     query::SearchQuery,
     result::SearchResult,
 };
@@ -14,29 +14,35 @@ use reqwest::Client;
 use scraper::{Html, Selector};
 
 pub struct AnnasArchive {
+    metadata: EngineMetadata,
     client: Client,
 }
 
 impl AnnasArchive {
     pub fn new(client: Client) -> Self {
-        Self { client }
+        Self {
+            metadata: EngineMetadata {
+                name: "annas_archive".to_string(),
+                display_name: "Anna's Archive".to_string(),
+                homepage: "https://annas-archive.org".to_string(),
+                categories: vec![SearchCategory::Files],
+                enabled: true,
+                timeout_ms: 6000,
+                weight: 1.0,
+            },
+            client,
+        }
     }
 }
 
 #[async_trait]
 impl SearchEngine for AnnasArchive {
-    fn metadata(&self) -> EngineMetadata {
-        EngineMetadata {
-            name: "Anna's Archive".to_string(),
-            description: "Free non-profit online shadow library metasearch engine".to_string(),
-            categories: vec![SearchCategory::Files],
-            base_url: "https://annas-archive.org".to_string(),
-            enabled: true,
-        }
+    fn metadata(&self) -> &EngineMetadata {
+        &self.metadata
     }
 
-    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
-        let page = query.page.unwrap_or(1);
+    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>> {
+        let page = query.page;
         let url = format!(
             "https://annas-archive.org/search?q={}&page={}",
             urlencoding::encode(&query.query),
@@ -48,9 +54,9 @@ impl SearchEngine for AnnasArchive {
             .get(&url)
             .send()
             .await
-            .map_err(|e| MetasearchError::RequestError(e.to_string()))?;
+            .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
 
-        let body = resp
+        let body: String = resp
             .text()
             .await
             .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
@@ -98,7 +104,7 @@ impl SearchEngine for AnnasArchive {
 
             let mut result =
                 SearchResult::new(title, full_url, content, "Anna's Archive".to_string());
-            result.category = Some(SearchCategory::Files);
+            result.category = SearchCategory::Files.to_string();
             result.thumbnail = thumbnail;
             results.push(result);
         }

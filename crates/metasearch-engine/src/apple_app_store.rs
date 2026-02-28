@@ -95,7 +95,7 @@ impl SearchEngine for AppleAppStore {
                 format!(
                     "by {} — {}",
                     item.seller_name,
-                    &item.description[..item.description.len().min(250)]
+                    item.description.chars().take(250).collect::<String>()
                 )
             };
 

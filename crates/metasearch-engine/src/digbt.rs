@@ -6,7 +6,7 @@ use async_trait::async_trait;
 use metasearch_core::{
     category::SearchCategory,
     engine::{EngineMetadata, SearchEngine},
-    error::MetasearchError,
+    error::{MetasearchError, Result},
     query::SearchQuery,
     result::SearchResult,
 };
@@ -14,29 +14,35 @@ use reqwest::Client;
 use scraper::{Html, Selector};
 
 pub struct Digbt {
+    metadata: EngineMetadata,
     client: Client,
 }
 
 impl Digbt {
     pub fn new(client: Client) -> Self {
-        Self { client }
+        Self {
+            metadata: EngineMetadata {
+                name: "digbt".to_string(),
+                display_name: "DigBT".to_string(),
+                homepage: "https://digbt.org".to_string(),
+                categories: vec![SearchCategory::Files],
+                enabled: true,
+                timeout_ms: 6000,
+                weight: 1.0,
+            },
+            client,
+        }
     }
 }
 
 #[async_trait]
 impl SearchEngine for Digbt {
-    fn metadata(&self) -> EngineMetadata {
-        EngineMetadata {
-            name: "DigBT".to_string(),
-            description: "DigBT torrent search engine".to_string(),
-            categories: vec![SearchCategory::Files],
-            base_url: "https://digbt.org".to_string(),
-            enabled: true,
-        }
+    fn metadata(&self) -> &EngineMetadata {
+        &self.metadata
     }
 
-    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
-        let page = query.page.unwrap_or(1);
+    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>> {
+        let page = query.page;
         let url = format!(
             "https://digbt.org/search/{}-time-{}",
             urlencoding::encode(&query.query),
@@ -48,9 +54,9 @@ impl SearchEngine for Digbt {
             .get(&url)
             .send()
             .await
-            .map_err(|e| MetasearchError::RequestError(e.to_string()))?;
+            .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
 
-        let body = resp
+        let body: String = resp
             .text()
             .await
             .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
@@ -109,7 +115,7 @@ impl SearchEngine for Digbt {
             };
 
             let mut result = SearchResult::new(title, full_url, snippet, "DigBT".to_string());
-            result.category = Some(SearchCategory::Files);
+            result.category = SearchCategory::Files.to_string();
             results.push(result);
         }
 

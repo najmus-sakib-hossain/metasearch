@@ -6,36 +6,42 @@ use async_trait::async_trait;
 use metasearch_core::{
     category::SearchCategory,
     engine::{EngineMetadata, SearchEngine},
-    error::MetasearchError,
+    error::{MetasearchError, Result},
     query::SearchQuery,
     result::SearchResult,
 };
 use reqwest::Client;
 
 pub struct AdobeStock {
+    metadata: EngineMetadata,
     client: Client,
 }
 
 impl AdobeStock {
     pub fn new(client: Client) -> Self {
-        Self { client }
+        Self {
+            metadata: EngineMetadata {
+                name: "adobe_stock".to_string(),
+                display_name: "Adobe Stock".to_string(),
+                homepage: "https://stock.adobe.com".to_string(),
+                categories: vec![SearchCategory::Images],
+                enabled: true,
+                timeout_ms: 5000,
+                weight: 1.0,
+            },
+            client,
+        }
     }
 }
 
 #[async_trait]
 impl SearchEngine for AdobeStock {
-    fn metadata(&self) -> EngineMetadata {
-        EngineMetadata {
-            name: "Adobe Stock".to_string(),
-            description: "Adobe Stock royalty-free assets search".to_string(),
-            categories: vec![SearchCategory::Images],
-            base_url: "https://stock.adobe.com".to_string(),
-            enabled: true,
-        }
+    fn metadata(&self) -> &EngineMetadata {
+        &self.metadata
     }
 
-    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
-        let page = query.page.unwrap_or(1);
+    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>> {
+        let page = query.page;
         let url = format!(
             "https://stock.adobe.com/de/Ajax/Search?k={}&limit=10&order=relevance&search_page={}&search_type=pagination&filters%5Bcontent_type%3Aphoto%5D=1&filters%5Bcontent_type%3Aillustration%5D=1&filters%5Bcontent_type%3Azip_vector%5D=1&filters%5Bcontent_type%3Aimage%5D=1&filters%5Bcontent_type%3Avideo%5D=0&filters%5Bcontent_type%3Atemplate%5D=0&filters%5Bcontent_type%3A3d%5D=0&filters%5Bcontent_type%3Aaudio%5D=0",
             urlencoding::encode(&query.query),
@@ -48,10 +54,10 @@ impl SearchEngine for AdobeStock {
             .header("Accept-Language", "en-US,en;q=0.5")
             .send()
             .await
-            .map_err(|e| MetasearchError::RequestError(e.to_string()))?;
+            .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
 
         let json: serde_json::Value = resp
-            .json()
+            .json::<serde_json::Value>()
             .await
             .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
 
@@ -96,7 +102,7 @@ impl SearchEngine for AdobeStock {
                     snippet,
                     "Adobe Stock".to_string(),
                 );
-                result.category = Some(SearchCategory::Images);
+                result.category = SearchCategory::Images.to_string();
                 if !thumbnail.is_empty() {
                     result.thumbnail = Some(thumbnail.to_string());
                 }

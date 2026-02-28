@@ -7,7 +7,7 @@ use async_trait::async_trait;
 use metasearch_core::{
     category::SearchCategory,
     engine::{EngineMetadata, SearchEngine},
-    error::MetasearchError,
+    error::{MetasearchError, Result},
     query::SearchQuery,
     result::SearchResult,
 };
@@ -15,29 +15,35 @@ use regex::Regex;
 use reqwest::Client;
 
 pub struct BaseSearch {
+    metadata: EngineMetadata,
     client: Client,
 }
 
 impl BaseSearch {
     pub fn new(client: Client) -> Self {
-        Self { client }
+        Self {
+            metadata: EngineMetadata {
+                name: "base_search".to_string(),
+                display_name: "BASE".to_string(),
+                homepage: "https://base-search.net".to_string(),
+                categories: vec![SearchCategory::General],
+                enabled: true,
+                timeout_ms: 6000,
+                weight: 1.0,
+            },
+            client,
+        }
     }
 }
 
 #[async_trait]
 impl SearchEngine for BaseSearch {
-    fn metadata(&self) -> EngineMetadata {
-        EngineMetadata {
-            name: "BASE".to_string(),
-            description: "Bielefeld Academic Search Engine — scholarly publications".to_string(),
-            categories: vec![SearchCategory::General],
-            base_url: "https://base-search.net".to_string(),
-            enabled: true,
-        }
+    fn metadata(&self) -> &EngineMetadata {
+        &self.metadata
     }
 
-    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
-        let page = query.page.unwrap_or(1);
+    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>> {
+        let page = query.page;
         let hits: u32 = 10;
         let offset = (page as u32 - 1) * hits;
 
@@ -54,9 +60,9 @@ impl SearchEngine for BaseSearch {
             .header("User-Agent", "metasearch/1.0")
             .send()
             .await
-            .map_err(|e| MetasearchError::RequestError(e.to_string()))?;
+            .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
 
-        let body = resp
+        let body: String = resp
             .text()
             .await
             .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
@@ -94,7 +100,7 @@ impl SearchEngine for BaseSearch {
 
             if !link.is_empty() && !title.is_empty() {
                 let mut result = SearchResult::new(title, link, content, "BASE".to_string());
-                result.category = Some(SearchCategory::General);
+                result.category = SearchCategory::General.to_string();
                 results.push(result);
             }
         }

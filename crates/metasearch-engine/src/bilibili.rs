@@ -122,7 +122,7 @@ impl SearchEngine for Bilibili {
                         "by {} | {} | {}",
                         item.author,
                         item.duration,
-                        &item.description[..item.description.len().min(200)]
+                        item.description.chars().take(200).collect::<String>()
                     );
 
                     let thumbnail = if item.pic.starts_with("//") {

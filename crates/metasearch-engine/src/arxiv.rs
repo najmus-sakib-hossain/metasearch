@@ -127,7 +127,7 @@ impl SearchEngine for Arxiv {
             let snippet = if author_str.is_empty() {
                 summary.chars().take(300).collect()
             } else {
-                format!("[{}] {}", author_str, &summary[..summary.len().min(250)])
+                format!("[{}] {}", author_str, summary.chars().take(250).collect::<String>())
             };
 
             if !title.is_empty() && !entry_url.is_empty() {
