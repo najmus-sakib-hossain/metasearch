@@ -2,14 +2,14 @@
 //! Translated from SearXNG `searx/engines/lemmy.py`.
 
 use async_trait::async_trait;
-use reqwest::Client;
 use metasearch_core::{
-    engine::{SearchEngine, EngineMetadata},
-    result::SearchResult,
-    query::SearchQuery,
     category::SearchCategory,
+    engine::{EngineMetadata, SearchEngine},
     error::MetasearchError,
+    query::SearchQuery,
+    result::SearchResult,
 };
+use reqwest::Client;
 
 pub struct Lemmy {
     metadata: EngineMetadata,
@@ -67,13 +67,16 @@ impl SearchEngine for Lemmy {
             page,
         );
 
-        let resp = self.client
+        let resp = self
+            .client
             .get(&url)
             .send()
             .await
             .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
 
-        let data: serde_json::Value = resp.json().await
+        let data: serde_json::Value = resp
+            .json()
+            .await
             .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
 
         let mut results = Vec::new();
@@ -88,7 +91,8 @@ impl SearchEngine for Lemmy {
                 let title = post["name"].as_str().unwrap_or_default();
                 let post_url = post["ap_id"].as_str().unwrap_or_default();
                 let body = post["body"].as_str().unwrap_or("");
-                let user = creator["display_name"].as_str()
+                let user = creator["display_name"]
+                    .as_str()
                     .or_else(|| creator["name"].as_str())
                     .unwrap_or("");
                 let community_title = community["title"].as_str().unwrap_or("");

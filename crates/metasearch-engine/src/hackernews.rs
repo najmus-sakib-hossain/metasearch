@@ -2,14 +2,14 @@
 //! Translated from SearXNG `searx/engines/hackernews.py`.
 
 use async_trait::async_trait;
-use reqwest::Client;
 use metasearch_core::{
-    engine::{SearchEngine, EngineMetadata},
-    result::SearchResult,
-    query::SearchQuery,
     category::SearchCategory,
+    engine::{EngineMetadata, SearchEngine},
     error::MetasearchError,
+    query::SearchQuery,
+    result::SearchResult,
 };
+use reqwest::Client;
 
 pub struct HackerNews {
     metadata: EngineMetadata,
@@ -48,13 +48,16 @@ impl SearchEngine for HackerNews {
             page,
         );
 
-        let resp = self.client
+        let resp = self
+            .client
             .get(&url)
             .send()
             .await
             .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
 
-        let data: serde_json::Value = resp.json().await
+        let data: serde_json::Value = resp
+            .json()
+            .await
             .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
 
         let mut results = Vec::new();
@@ -78,12 +81,8 @@ impl SearchEngine for HackerNews {
                     author,
                 );
 
-                let mut result = SearchResult::new(
-                    title.to_string(),
-                    hn_url,
-                    snippet,
-                    "hackernews".to_string(),
-                );
+                let mut result =
+                    SearchResult::new(title.to_string(), hn_url, snippet, "hackernews".to_string());
                 result.engine_rank = (i + 1) as u32;
                 result.category = SearchCategory::IT.to_string();
                 results.push(result);

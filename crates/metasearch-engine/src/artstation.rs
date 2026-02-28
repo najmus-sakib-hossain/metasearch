@@ -5,15 +5,15 @@
 //! from the token endpoint before each search request.
 
 use async_trait::async_trait;
-use reqwest::Client;
-use regex::Regex;
 use metasearch_core::{
-    engine::{SearchEngine, EngineMetadata},
-    result::SearchResult,
-    query::SearchQuery,
     category::SearchCategory,
+    engine::{EngineMetadata, SearchEngine},
     error::MetasearchError,
+    query::SearchQuery,
+    result::SearchResult,
 };
+use regex::Regex;
+use reqwest::Client;
 
 pub struct ArtStation {
     metadata: EngineMetadata,
@@ -47,7 +47,8 @@ impl SearchEngine for ArtStation {
         let page = query.page;
 
         // Step 1: Fetch CSRF tokens
-        let token_resp = self.client
+        let token_resp = self
+            .client
             .post("https://www.artstation.com/api/v2/csrf_protection/token.json")
             .send()
             .await
@@ -64,7 +65,9 @@ impl SearchEngine for ArtStation {
             .unwrap_or_default()
             .to_string();
 
-        let token_data: serde_json::Value = token_resp.json().await
+        let token_data: serde_json::Value = token_resp
+            .json()
+            .await
             .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
 
         let public_token = token_data["public_csrf_token"]
@@ -81,7 +84,8 @@ impl SearchEngine for ArtStation {
             "pro_first": 1,
         });
 
-        let resp = self.client
+        let resp = self
+            .client
             .post("https://www.artstation.com/api/v2/search/projects.json")
             .header("Content-Type", "application/json")
             .header("PUBLIC-CSRF-TOKEN", &public_token)
@@ -91,7 +95,9 @@ impl SearchEngine for ArtStation {
             .await
             .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
 
-        let data: serde_json::Value = resp.json().await
+        let data: serde_json::Value = resp
+            .json()
+            .await
             .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
 
         let mut results = Vec::new();
@@ -101,14 +107,18 @@ impl SearchEngine for ArtStation {
             for (i, item) in items.iter().enumerate() {
                 let title = item["title"].as_str().unwrap_or("Untitled");
                 let item_url = item["url"].as_str().unwrap_or_default();
-                let thumb = item["smaller_square_cover_url"].as_str().unwrap_or_default();
+                let thumb = item["smaller_square_cover_url"]
+                    .as_str()
+                    .unwrap_or_default();
 
                 if item_url.is_empty() {
                     continue;
                 }
 
                 // Derive full-size image from thumbnail
-                let fullsize = size_re.replace(thumb, "/").replace("smaller_square", "large");
+                let fullsize = size_re
+                    .replace(thumb, "/")
+                    .replace("smaller_square", "large");
 
                 let username = item["user"]["username"].as_str().unwrap_or("");
                 let full_name = item["user"]["full_name"].as_str().unwrap_or("");

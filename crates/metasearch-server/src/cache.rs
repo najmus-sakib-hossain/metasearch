@@ -1,7 +1,7 @@
 //! Result caching layer using Moka.
 
-use moka::future::Cache;
 use metasearch_core::result::SearchResponse;
+use moka::future::Cache;
 use std::time::Duration;
 
 /// Cache for search responses.

@@ -5,15 +5,15 @@
 //! extracts the real destination from the `/RU=…/RK` wrapper.
 
 use async_trait::async_trait;
+use metasearch_core::{
+    category::SearchCategory,
+    engine::{EngineMetadata, SearchEngine},
+    error::MetasearchError,
+    query::SearchQuery,
+    result::SearchResult,
+};
 use reqwest::Client;
 use scraper::{Html, Selector};
-use metasearch_core::{
-    engine::{SearchEngine, EngineMetadata},
-    result::SearchResult,
-    query::SearchQuery,
-    category::SearchCategory,
-    error::MetasearchError,
-};
 
 pub struct Yahoo {
     metadata: EngineMetadata,
@@ -92,14 +92,20 @@ impl SearchEngine for Yahoo {
             url.push_str(&format!("&b={}&pz=7&bct=0&xargs=0", offset));
         }
 
-        let resp = self.client
+        let resp = self
+            .client
             .get(&url)
-            .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
+            .header(
+                "User-Agent",
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+            )
             .send()
             .await
             .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
 
-        let html_text = resp.text().await
+        let html_text = resp
+            .text()
+            .await
             .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
 
         let document = Html::parse_document(&html_text);
@@ -115,7 +121,9 @@ impl SearchEngine for Yahoo {
 
         for (i, result) in document.select(&result_sel).enumerate() {
             // Try primary selector, fall back to alternate
-            let link_el = result.select(&title_link_sel).next()
+            let link_el = result
+                .select(&title_link_sel)
+                .next()
                 .or_else(|| result.select(&title_link_alt_sel).next());
 
             let link_el = match link_el {
@@ -130,26 +138,23 @@ impl SearchEngine for Yahoo {
             }
 
             // Title: prefer aria-label, then inner text
-            let title = link_el.value().attr("aria-label")
+            let title = link_el
+                .value()
+                .attr("aria-label")
                 .map(|s| s.to_string())
-                .unwrap_or_else(|| {
-                    link_el.text().collect::<String>().trim().to_string()
-                });
+                .unwrap_or_else(|| link_el.text().collect::<String>().trim().to_string());
 
             // Clean up title — remove extra whitespace
             let title: String = title.split_whitespace().collect::<Vec<_>>().join(" ");
 
-            let content = result.select(&content_sel).next()
+            let content = result
+                .select(&content_sel)
+                .next()
                 .map(|el| el.text().collect::<String>())
                 .unwrap_or_default();
             let content: String = content.split_whitespace().collect::<Vec<_>>().join(" ");
 
-            let mut sr = SearchResult::new(
-                title,
-                clean_url,
-                content,
-                "yahoo".to_string(),
-            );
+            let mut sr = SearchResult::new(title, clean_url, content, "yahoo".to_string());
             sr.engine_rank = (i + 1) as u32;
             sr.category = SearchCategory::General.to_string();
             results.push(sr);
@@ -165,7 +170,8 @@ mod tests {
 
     #[test]
     fn test_parse_url_with_tracking() {
-        let tracked = "https://r.search.yahoo.com/_ylt=Awr.z/RU=https%3a%2f%2fexample.com%2fpage/RK=2/RS=abc";
+        let tracked =
+            "https://r.search.yahoo.com/_ylt=Awr.z/RU=https%3a%2f%2fexample.com%2fpage/RK=2/RS=abc";
         assert_eq!(parse_url(tracked), "https://example.com/page");
     }
 

@@ -1,7 +1,7 @@
 //! Search query model.
 
-use serde::{Deserialize, Serialize};
 use crate::category::SearchCategory;
+use serde::{Deserialize, Serialize};
 
 /// Represents a user's search request.
 #[derive(Debug, Clone, Serialize, Deserialize)]

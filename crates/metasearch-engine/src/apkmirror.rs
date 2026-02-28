@@ -2,15 +2,15 @@
 //! Translated from SearXNG `searx/engines/apkmirror.py`.
 
 use async_trait::async_trait;
+use metasearch_core::{
+    category::SearchCategory,
+    engine::{EngineMetadata, SearchEngine},
+    error::MetasearchError,
+    query::SearchQuery,
+    result::SearchResult,
+};
 use reqwest::Client;
 use scraper::{Html, Selector};
-use metasearch_core::{
-    engine::{SearchEngine, EngineMetadata},
-    result::SearchResult,
-    query::SearchQuery,
-    category::SearchCategory,
-    error::MetasearchError,
-};
 
 pub struct ApkMirror {
     metadata: EngineMetadata,
@@ -48,13 +48,16 @@ impl SearchEngine for ApkMirror {
             urlencoding::encode(&query.query),
         );
 
-        let resp = self.client
+        let resp = self
+            .client
             .get(&url)
             .send()
             .await
             .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
 
-        let html_text = resp.text().await
+        let html_text = resp
+            .text()
+            .await
             .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
 
         let document = Html::parse_document(&html_text);
@@ -79,7 +82,9 @@ impl SearchEngine for ApkMirror {
 
             let item_url = format!("https://www.apkmirror.com{}#downloads", href);
 
-            let thumbnail = row.select(&img_sel).next()
+            let thumbnail = row
+                .select(&img_sel)
+                .next()
                 .and_then(|e| e.value().attr("src"))
                 .map(|s| format!("https://www.apkmirror.com{}", s));
 

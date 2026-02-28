@@ -2,14 +2,14 @@
 //! Translated from SearXNG `searx/engines/genius.py`.
 
 use async_trait::async_trait;
-use reqwest::Client;
 use metasearch_core::{
-    engine::{SearchEngine, EngineMetadata},
-    result::SearchResult,
-    query::SearchQuery,
     category::SearchCategory,
+    engine::{EngineMetadata, SearchEngine},
     error::MetasearchError,
+    query::SearchQuery,
+    result::SearchResult,
 };
+use reqwest::Client;
 
 const PAGE_SIZE: u32 = 5;
 
@@ -51,13 +51,16 @@ impl SearchEngine for Genius {
             PAGE_SIZE,
         );
 
-        let resp = self.client
+        let resp = self
+            .client
             .get(&url)
             .send()
             .await
             .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
 
-        let data: serde_json::Value = resp.json().await
+        let data: serde_json::Value = resp
+            .json()
+            .await
             .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
 
         let mut results = Vec::new();
@@ -74,7 +77,8 @@ impl SearchEngine for Genius {
                                 let title = res["full_title"].as_str().unwrap_or_default();
                                 let url = res["url"].as_str().unwrap_or_default();
 
-                                let content = hit["highlights"].as_array()
+                                let content = hit["highlights"]
+                                    .as_array()
                                     .and_then(|h| h.first())
                                     .and_then(|h| h["value"].as_str())
                                     .or_else(|| res["title_with_featured"].as_str())
@@ -90,7 +94,8 @@ impl SearchEngine for Genius {
                                 result.engine_rank = (results.len() + 1) as u32;
                                 result.category = SearchCategory::Music.to_string();
                                 result.thumbnail = res["song_art_image_thumbnail_url"]
-                                    .as_str().map(|s| s.to_string());
+                                    .as_str()
+                                    .map(|s| s.to_string());
                                 results.push(result);
                             }
                             "artist" => {
@@ -105,14 +110,14 @@ impl SearchEngine for Genius {
                                 );
                                 result.engine_rank = (results.len() + 1) as u32;
                                 result.category = SearchCategory::Music.to_string();
-                                result.thumbnail = res["image_url"]
-                                    .as_str().map(|s| s.to_string());
+                                result.thumbnail = res["image_url"].as_str().map(|s| s.to_string());
                                 results.push(result);
                             }
                             "album" => {
                                 let full_title = res["full_title"].as_str().unwrap_or_default();
                                 let url = res["url"].as_str().unwrap_or_default();
-                                let name_with_artist = res["name_with_artist"].as_str()
+                                let name_with_artist = res["name_with_artist"]
+                                    .as_str()
                                     .or_else(|| res["name"].as_str())
                                     .unwrap_or("");
                                 let year = res["release_date_components"]["year"].as_u64();
@@ -130,8 +135,8 @@ impl SearchEngine for Genius {
                                 );
                                 result.engine_rank = (results.len() + 1) as u32;
                                 result.category = SearchCategory::Music.to_string();
-                                result.thumbnail = res["cover_art_url"]
-                                    .as_str().map(|s| s.to_string());
+                                result.thumbnail =
+                                    res["cover_art_url"].as_str().map(|s| s.to_string());
                                 results.push(result);
                             }
                             _ => {}

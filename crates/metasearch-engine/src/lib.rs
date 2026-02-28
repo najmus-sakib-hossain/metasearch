@@ -40,67 +40,67 @@
 //! - Adobe Stock, Anna's Archive, BASE, DigBT
 
 // Original engines
-pub mod google;
-pub mod duckduckgo;
 pub mod brave;
+pub mod duckduckgo;
+pub mod google;
 pub mod wikipedia;
 
 // Batch 1
-pub mod bing;
+pub mod alpinelinux;
+pub mod apple_app_store;
+pub mod artic;
 pub mod arxiv;
 pub mod ask;
-pub mod bandcamp;
 pub mod baidu;
-pub mod nine_gag;
-pub mod apple_app_store;
+pub mod bandcamp;
 pub mod bilibili;
-pub mod artic;
-pub mod alpinelinux;
+pub mod bing;
+pub mod nine_gag;
 
 // Batch 2
-pub mod github_engine;
-pub mod hackernews;
-pub mod docker_hub;
-pub mod npm;
 pub mod crates_io;
-pub mod pypi;
-pub mod reddit;
 pub mod dailymotion;
 pub mod deezer;
+pub mod docker_hub;
 pub mod ebay;
-pub mod imdb;
-pub mod soundcloud;
 pub mod flickr;
+pub mod github_engine;
+pub mod hackernews;
+pub mod imdb;
+pub mod npm;
+pub mod pypi;
+pub mod reddit;
+pub mod soundcloud;
 
 // Batch 3
-pub mod youtube;
-pub mod spotify;
-pub mod crossref;
-pub mod lemmy;
-pub mod mastodon;
-pub mod huggingface;
-pub mod goodreads;
-pub mod bing_news;
 pub mod bing_images;
+pub mod bing_news;
 pub mod bing_videos;
+pub mod crossref;
 pub mod genius;
 pub mod gitlab;
+pub mod goodreads;
+pub mod huggingface;
+pub mod lemmy;
+pub mod mastodon;
+pub mod spotify;
+pub mod youtube;
 
 // Batch 4
-pub mod yahoo;
+pub mod freesound;
 pub mod qwant;
-pub mod vimeo;
-pub mod unsplash;
 pub mod semantic_scholar;
 pub mod stackexchange;
-pub mod freesound;
+pub mod unsplash;
+pub mod vimeo;
+pub mod yahoo;
 
 // Batch 5
-pub mod leet_x;
 pub mod apkmirror;
 pub mod archlinux;
 pub mod artstation;
 pub mod fdroid;
+pub mod leet_x;
 
 // Batch 6
 pub mod acfun;
@@ -121,11 +121,11 @@ pub mod ccc_media;
 pub mod destatis;
 
 // Batch 8
+pub mod devicons;
 pub mod frinkiac;
 pub mod hex;
 pub mod ina;
 pub mod ipernity;
-pub mod devicons;
 
 // Batch 9
 pub mod adobe_stock;

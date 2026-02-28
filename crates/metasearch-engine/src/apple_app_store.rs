@@ -92,7 +92,11 @@ impl SearchEngine for AppleAppStore {
             let snippet = if item.seller_name.is_empty() {
                 item.description.chars().take(300).collect()
             } else {
-                format!("by {} — {}", item.seller_name, &item.description[..item.description.len().min(250)])
+                format!(
+                    "by {} — {}",
+                    item.seller_name,
+                    &item.description[..item.description.len().min(250)]
+                )
             };
 
             let mut r = SearchResult::new(
@@ -110,7 +114,11 @@ impl SearchEngine for AppleAppStore {
             results.push(r);
         }
 
-        info!(engine = "apple_app_store", count = results.len(), "Search complete");
+        info!(
+            engine = "apple_app_store",
+            count = results.len(),
+            "Search complete"
+        );
         Ok(results)
     }
 }

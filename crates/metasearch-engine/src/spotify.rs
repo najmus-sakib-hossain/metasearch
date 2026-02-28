@@ -6,14 +6,14 @@
 //! return an auth error.
 
 use async_trait::async_trait;
-use reqwest::Client;
 use metasearch_core::{
-    engine::{SearchEngine, EngineMetadata},
-    result::SearchResult,
-    query::SearchQuery,
     category::SearchCategory,
+    engine::{EngineMetadata, SearchEngine},
     error::MetasearchError,
+    query::SearchQuery,
+    result::SearchResult,
 };
+use reqwest::Client;
 
 pub struct Spotify {
     metadata: EngineMetadata,
@@ -71,7 +71,8 @@ impl Spotify {
         let credentials = format!("{}:{}", cid, csecret);
         let encoded = base64::engine::general_purpose::STANDARD.encode(credentials.as_bytes());
 
-        let resp = self.client
+        let resp = self
+            .client
             .post("https://accounts.spotify.com/api/token")
             .header("Authorization", format!("Basic {}", encoded))
             .form(&[("grant_type", "client_credentials")])
@@ -79,10 +80,13 @@ impl Spotify {
             .await
             .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
 
-        let data: serde_json::Value = resp.json().await
+        let data: serde_json::Value = resp
+            .json()
+            .await
             .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
 
-        data["access_token"].as_str()
+        data["access_token"]
+            .as_str()
             .map(|s| s.to_string())
             .ok_or_else(|| MetasearchError::Other("Failed to get Spotify access token".to_string()))
     }
@@ -105,14 +109,17 @@ impl SearchEngine for Spotify {
             offset,
         );
 
-        let resp = self.client
+        let resp = self
+            .client
             .get(&url)
             .header("Authorization", format!("Bearer {}", token))
             .send()
             .await
             .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
 
-        let data: serde_json::Value = resp.json().await
+        let data: serde_json::Value = resp
+            .json()
+            .await
             .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
 
         let mut results = Vec::new();
@@ -124,17 +131,16 @@ impl SearchEngine for Spotify {
                 }
 
                 let title = item["name"].as_str().unwrap_or_default();
-                let link = item["external_urls"]["spotify"].as_str().unwrap_or_default();
+                let link = item["external_urls"]["spotify"]
+                    .as_str()
+                    .unwrap_or_default();
                 let artist = item["artists"][0]["name"].as_str().unwrap_or("");
                 let album = item["album"]["name"].as_str().unwrap_or("");
                 let duration_ms = item["duration_ms"].as_u64().unwrap_or(0);
                 let minutes = duration_ms / 60000;
                 let seconds = (duration_ms % 60000) / 1000;
 
-                let snippet = format!(
-                    "{} — {} [{}:{:02}]",
-                    artist, album, minutes, seconds,
-                );
+                let snippet = format!("{} — {} [{}:{:02}]", artist, album, minutes, seconds,);
 
                 let mut result = SearchResult::new(
                     title.to_string(),
@@ -144,7 +150,8 @@ impl SearchEngine for Spotify {
                 );
                 result.engine_rank = (i + 1) as u32;
                 result.category = SearchCategory::Music.to_string();
-                result.thumbnail = item["album"]["images"].as_array()
+                result.thumbnail = item["album"]["images"]
+                    .as_array()
                     .and_then(|imgs| imgs.first())
                     .and_then(|img| img["url"].as_str())
                     .map(|s| s.to_string());

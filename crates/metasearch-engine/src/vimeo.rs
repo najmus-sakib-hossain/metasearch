@@ -5,14 +5,14 @@
 //! We extract that JSON and parse `filtered.data` for video results.
 
 use async_trait::async_trait;
-use reqwest::Client;
 use metasearch_core::{
-    engine::{SearchEngine, EngineMetadata},
-    result::SearchResult,
-    query::SearchQuery,
     category::SearchCategory,
+    engine::{EngineMetadata, SearchEngine},
     error::MetasearchError,
+    query::SearchQuery,
+    result::SearchResult,
 };
+use reqwest::Client;
 
 pub struct Vimeo {
     metadata: EngineMetadata,
@@ -59,14 +59,20 @@ impl SearchEngine for Vimeo {
             urlencoding::encode(&query.query),
         );
 
-        let resp = self.client
+        let resp = self
+            .client
             .get(&url)
-            .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
+            .header(
+                "User-Agent",
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+            )
             .send()
             .await
             .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
 
-        let html_text = resp.text().await
+        let html_text = resp
+            .text()
+            .await
             .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
 
         // Extract embedded JSON: `var data = {...};\n`
@@ -102,24 +108,17 @@ impl SearchEngine for Vimeo {
                 let title = inner["name"].as_str().unwrap_or("Untitled").to_string();
 
                 // Get the largest thumbnail
-                let thumbnail = inner["pictures"]["sizes"].as_array()
+                let thumbnail = inner["pictures"]["sizes"]
+                    .as_array()
                     .and_then(|sizes| sizes.last())
                     .and_then(|s| s["link"].as_str())
                     .map(|s| s.to_string());
 
                 let iframe_src = format!("https://player.vimeo.com/video/{}", video_id);
 
-                let snippet = format!(
-                    "Vimeo video — embed: {}",
-                    iframe_src,
-                );
+                let snippet = format!("Vimeo video — embed: {}", iframe_src,);
 
-                let mut sr = SearchResult::new(
-                    title,
-                    video_url,
-                    snippet,
-                    "vimeo".to_string(),
-                );
+                let mut sr = SearchResult::new(title, video_url, snippet, "vimeo".to_string());
                 sr.engine_rank = (i + 1) as u32;
                 sr.category = SearchCategory::Videos.to_string();
                 sr.thumbnail = thumbnail;

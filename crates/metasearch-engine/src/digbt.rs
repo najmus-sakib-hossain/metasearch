@@ -3,15 +3,15 @@
 //! Reference: <https://digbt.org>
 
 use async_trait::async_trait;
+use metasearch_core::{
+    category::SearchCategory,
+    engine::{EngineMetadata, SearchEngine},
+    error::MetasearchError,
+    query::SearchQuery,
+    result::SearchResult,
+};
 use reqwest::Client;
 use scraper::{Html, Selector};
-use metasearch_core::{
-    engine::{EngineMetadata, SearchEngine},
-    result::SearchResult,
-    query::SearchQuery,
-    category::SearchCategory,
-    error::MetasearchError,
-};
 
 pub struct Digbt {
     client: Client,
@@ -43,7 +43,8 @@ impl SearchEngine for Digbt {
             page
         );
 
-        let resp = self.client
+        let resp = self
+            .client
             .get(&url)
             .send()
             .await
@@ -107,12 +108,7 @@ impl SearchEngine for Digbt {
                 format!("{} | Size: {}", content, filesize)
             };
 
-            let mut result = SearchResult::new(
-                title,
-                full_url,
-                snippet,
-                "DigBT".to_string(),
-            );
+            let mut result = SearchResult::new(title, full_url, snippet, "DigBT".to_string());
             result.category = Some(SearchCategory::Files);
             results.push(result);
         }

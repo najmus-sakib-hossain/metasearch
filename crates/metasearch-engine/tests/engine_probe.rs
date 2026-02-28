@@ -50,12 +50,7 @@ async fn probe_all_engines() {
         };
         let meta = engine.metadata();
 
-        print!(
-            "  [{:>3}/{}] {:<30} ",
-            i + 1,
-            total,
-            meta.display_name
-        );
+        print!("  [{:>3}/{}] {:<30} ", i + 1, total, meta.display_name);
 
         match tokio::time::timeout(Duration::from_secs(15), engine.search(&query)).await {
             Ok(Ok(results)) if !results.is_empty() => {

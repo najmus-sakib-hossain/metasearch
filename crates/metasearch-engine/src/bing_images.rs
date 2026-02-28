@@ -2,15 +2,15 @@
 //! Translated from SearXNG `searx/engines/bing_images.py`.
 
 use async_trait::async_trait;
+use metasearch_core::{
+    category::SearchCategory,
+    engine::{EngineMetadata, SearchEngine},
+    error::MetasearchError,
+    query::SearchQuery,
+    result::SearchResult,
+};
 use reqwest::Client;
 use scraper::{Html, Selector};
-use metasearch_core::{
-    engine::{SearchEngine, EngineMetadata},
-    result::SearchResult,
-    query::SearchQuery,
-    category::SearchCategory,
-    error::MetasearchError,
-};
 
 pub struct BingImages {
     metadata: EngineMetadata,
@@ -50,14 +50,20 @@ impl SearchEngine for BingImages {
             first,
         );
 
-        let resp = self.client
+        let resp = self
+            .client
             .get(&url)
-            .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
+            .header(
+                "User-Agent",
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+            )
             .send()
             .await
             .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
 
-        let html_text = resp.text().await
+        let html_text = resp
+            .text()
+            .await
             .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
 
         let document = Html::parse_document(&html_text);
@@ -89,7 +95,9 @@ impl SearchEngine for BingImages {
             let thumbnail_src = meta["turl"].as_str().unwrap_or_default();
             let description = meta["desc"].as_str().unwrap_or("");
 
-            let title = item.select(&title_sel).next()
+            let title = item
+                .select(&title_sel)
+                .next()
                 .map(|el| el.text().collect::<String>())
                 .unwrap_or_default();
 
@@ -103,7 +111,11 @@ impl SearchEngine for BingImages {
             );
             result.engine_rank = (i + 1) as u32;
             result.category = SearchCategory::Images.to_string();
-            result.thumbnail = if thumbnail_src.is_empty() { None } else { Some(thumbnail_src.to_string()) };
+            result.thumbnail = if thumbnail_src.is_empty() {
+                None
+            } else {
+                Some(thumbnail_src.to_string())
+            };
             results.push(result);
         }
 

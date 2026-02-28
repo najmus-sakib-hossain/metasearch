@@ -1,12 +1,12 @@
 //! Route definitions.
 
-pub mod search;
 pub mod api;
 pub mod health;
+pub mod search;
 
-use std::sync::Arc;
-use axum::Router;
 use crate::state::AppState;
+use axum::Router;
+use std::sync::Arc;
 
 pub fn search_routes() -> Router<Arc<AppState>> {
     search::routes()

@@ -5,14 +5,14 @@
 //! The API returns JSON with results in `data.result.items.mainline`.
 
 use async_trait::async_trait;
-use reqwest::Client;
 use metasearch_core::{
-    engine::{SearchEngine, EngineMetadata},
-    result::SearchResult,
-    query::SearchQuery,
     category::SearchCategory,
+    engine::{EngineMetadata, SearchEngine},
     error::MetasearchError,
+    query::SearchQuery,
+    result::SearchResult,
 };
+use reqwest::Client;
 
 pub struct Qwant {
     metadata: EngineMetadata,
@@ -54,22 +54,29 @@ impl SearchEngine for Qwant {
             offset,
         );
 
-        let resp = self.client
+        let resp = self
+            .client
             .get(&url)
-            .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
+            .header(
+                "User-Agent",
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+            )
             .send()
             .await
             .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
 
-        let data: serde_json::Value = resp.json().await
+        let data: serde_json::Value = resp
+            .json()
+            .await
             .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
 
         // Check API status
         if data["status"].as_str() != Some("success") {
             let error_code = data["data"]["error_code"].as_u64().unwrap_or(0);
-            return Err(MetasearchError::Other(
-                format!("Qwant API error (code: {})", error_code),
-            ));
+            return Err(MetasearchError::Other(format!(
+                "Qwant API error (code: {})",
+                error_code
+            )));
         }
 
         let mut results = Vec::new();

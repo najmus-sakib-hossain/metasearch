@@ -2,14 +2,14 @@
 //! Translated from SearXNG `searx/engines/frinkiac.py`.
 
 use async_trait::async_trait;
-use reqwest::Client;
 use metasearch_core::{
-    engine::{SearchEngine, EngineMetadata},
-    result::SearchResult,
-    query::SearchQuery,
     category::SearchCategory,
+    engine::{EngineMetadata, SearchEngine},
     error::MetasearchError,
+    query::SearchQuery,
+    result::SearchResult,
 };
+use reqwest::Client;
 
 const BASE: &str = "https://frinkiac.com/";
 
@@ -42,19 +42,18 @@ impl SearchEngine for Frinkiac {
     }
 
     async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
-        let url = format!(
-            "{}api/search?q={}",
-            BASE,
-            urlencoding::encode(&query.query),
-        );
+        let url = format!("{}api/search?q={}", BASE, urlencoding::encode(&query.query),);
 
-        let resp = self.client
+        let resp = self
+            .client
             .get(&url)
             .send()
             .await
             .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
 
-        let data: Vec<serde_json::Value> = resp.json().await
+        let data: Vec<serde_json::Value> = resp
+            .json()
+            .await
             .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
 
         let mut results = Vec::new();
@@ -63,18 +62,9 @@ impl SearchEngine for Frinkiac {
             let episode = item["Episode"].as_str().unwrap_or_default();
             let timestamp = item["Timestamp"].as_u64().unwrap_or(0);
 
-            let result_url = format!(
-                "{}?p=caption&e={}&t={}",
-                BASE, episode, timestamp,
-            );
-            let thumb = format!(
-                "{}img/{}/{}/medium.jpg",
-                BASE, episode, timestamp,
-            );
-            let img = format!(
-                "{}img/{}/{}.jpg",
-                BASE, episode, timestamp,
-            );
+            let result_url = format!("{}?p=caption&e={}&t={}", BASE, episode, timestamp,);
+            let thumb = format!("{}img/{}/{}/medium.jpg", BASE, episode, timestamp,);
+            let img = format!("{}img/{}/{}.jpg", BASE, episode, timestamp,);
 
             let mut result = SearchResult::new(
                 episode.to_string(),

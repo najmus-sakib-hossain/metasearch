@@ -29,7 +29,11 @@ impl Bing {
                 name: "bing".to_string(),
                 display_name: "Bing".to_string(),
                 homepage: "https://www.bing.com".to_string(),
-                categories: vec![SearchCategory::General, SearchCategory::News, SearchCategory::Images],
+                categories: vec![
+                    SearchCategory::General,
+                    SearchCategory::News,
+                    SearchCategory::Images,
+                ],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 1.4,
@@ -85,7 +89,10 @@ impl SearchEngine for Bing {
         let resp = self
             .client
             .get(&url)
-            .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
+            .header(
+                "User-Agent",
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+            )
             .header("Accept-Language", format!("{},en;q=0.9", lang))
             .header("Cookie", format!("SRCHHPGUSR=ADLT={}", safesearch))
             .send()

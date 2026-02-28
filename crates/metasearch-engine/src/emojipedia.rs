@@ -8,11 +8,11 @@ use reqwest::Client;
 use scraper::{Html, Selector};
 use url::Url;
 
+use metasearch_core::category::SearchCategory;
 use metasearch_core::engine::{EngineMetadata, SearchEngine};
+use metasearch_core::error::MetasearchError;
 use metasearch_core::query::SearchQuery;
 use metasearch_core::result::SearchResult;
-use metasearch_core::error::MetasearchError;
-use metasearch_core::category::SearchCategory;
 
 const BASE_URL: &str = "https://emojipedia.org";
 
@@ -68,7 +68,12 @@ impl SearchEngine for Emojipedia {
 
         for element in document.select(&container_sel) {
             let href = element.value().attr("href").unwrap_or_default();
-            let title: String = element.text().collect::<Vec<_>>().join(" ").trim().to_string();
+            let title: String = element
+                .text()
+                .collect::<Vec<_>>()
+                .join(" ")
+                .trim()
+                .to_string();
 
             if title.is_empty() || href.is_empty() {
                 continue;
@@ -76,12 +81,7 @@ impl SearchEngine for Emojipedia {
 
             let emoji_url = format!("{}{}", BASE_URL, href);
 
-            results.push(SearchResult::new(
-                title,
-                emoji_url,
-                "",
-                "Emojipedia",
-            ));
+            results.push(SearchResult::new(title, emoji_url, "", "Emojipedia"));
         }
 
         Ok(results)

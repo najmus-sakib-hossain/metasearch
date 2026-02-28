@@ -31,7 +31,11 @@ impl ResultAggregator {
 
             for result in results {
                 let normalized_url = Self::normalize_url(&result.url);
-                let weight = self.engine_weights.get(&result.engine).copied().unwrap_or(1.0);
+                let weight = self
+                    .engine_weights
+                    .get(&result.engine)
+                    .copied()
+                    .unwrap_or(1.0);
 
                 let score = weight * (1.0 / (result.engine_rank as f64 + 1.0));
 
@@ -49,7 +53,11 @@ impl ResultAggregator {
         }
 
         let mut results: Vec<SearchResult> = url_map.into_values().collect();
-        results.sort_by(|a, b| b.score.partial_cmp(&a.score).unwrap_or(std::cmp::Ordering::Equal));
+        results.sort_by(|a, b| {
+            b.score
+                .partial_cmp(&a.score)
+                .unwrap_or(std::cmp::Ordering::Equal)
+        });
 
         let number_of_results = results.len();
 

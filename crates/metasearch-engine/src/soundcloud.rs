@@ -6,14 +6,14 @@
 //! configured or discovered at runtime.
 
 use async_trait::async_trait;
-use reqwest::Client;
 use metasearch_core::{
-    engine::{SearchEngine, EngineMetadata},
-    result::SearchResult,
-    query::SearchQuery,
     category::SearchCategory,
+    engine::{EngineMetadata, SearchEngine},
     error::MetasearchError,
+    query::SearchQuery,
+    result::SearchResult,
 };
+use reqwest::Client;
 
 const RESULTS_PER_PAGE: u32 = 10;
 
@@ -67,10 +67,9 @@ impl SearchEngine for SoundCloud {
         // If no client_id, try to discover one from soundcloud.com HTML
         let cid = match &self.client_id {
             Some(id) => id.clone(),
-            None => {
-                discover_client_id(&self.client).await
-                    .unwrap_or_else(|| "iZIs9mchVcX5lhVRyQGGAYlNPVldzAoX".to_string())
-            }
+            None => discover_client_id(&self.client)
+                .await
+                .unwrap_or_else(|| "iZIs9mchVcX5lhVRyQGGAYlNPVldzAoX".to_string()),
         };
 
         let page = query.page;
@@ -84,13 +83,16 @@ impl SearchEngine for SoundCloud {
             cid,
         );
 
-        let resp = self.client
+        let resp = self
+            .client
             .get(&url)
             .send()
             .await
             .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
 
-        let data: serde_json::Value = resp.json().await
+        let data: serde_json::Value = resp
+            .json()
+            .await
             .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
 
         let mut results = Vec::new();
@@ -109,7 +111,8 @@ impl SearchEngine for SoundCloud {
                 }
 
                 let description = item["description"].as_str().unwrap_or("");
-                let artist = item["user"]["full_name"].as_str()
+                let artist = item["user"]["full_name"]
+                    .as_str()
                     .or_else(|| item["user"]["username"].as_str())
                     .unwrap_or("");
                 let duration_ms = item["duration"].as_u64().unwrap_or(0);
@@ -120,8 +123,15 @@ impl SearchEngine for SoundCloud {
 
                 let snippet = format!(
                     "by {} [{}:{:02}] — {} plays — {}",
-                    artist, minutes, seconds, plays,
-                    if description.len() > 200 { &description[..200] } else { description },
+                    artist,
+                    minutes,
+                    seconds,
+                    plays,
+                    if description.len() > 200 {
+                        &description[..200]
+                    } else {
+                        description
+                    },
                 );
 
                 let mut result = SearchResult::new(
@@ -132,7 +142,8 @@ impl SearchEngine for SoundCloud {
                 );
                 result.engine_rank = (i + 1) as u32;
                 result.category = SearchCategory::Music.to_string();
-                result.thumbnail = item["artwork_url"].as_str()
+                result.thumbnail = item["artwork_url"]
+                    .as_str()
                     .or_else(|| item["user"]["avatar_url"].as_str())
                     .map(|s| s.to_string());
                 results.push(result);
@@ -150,7 +161,8 @@ async fn discover_client_id(client: &Client) -> Option<String> {
 
     // Find JavaScript asset URLs
     let re = regex::Regex::new(r#"src="(https://a-v2\.sndcdn\.com/assets/[^"]+\.js)"#).ok()?;
-    let script_urls: Vec<&str> = re.captures_iter(&html)
+    let script_urls: Vec<&str> = re
+        .captures_iter(&html)
         .filter_map(|cap| cap.get(1).map(|m| m.as_str()))
         .collect();
 

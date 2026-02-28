@@ -2,14 +2,14 @@
 //! Translated from SearXNG `searx/engines/huggingface.py`.
 
 use async_trait::async_trait;
-use reqwest::Client;
 use metasearch_core::{
-    engine::{SearchEngine, EngineMetadata},
-    result::SearchResult,
-    query::SearchQuery,
     category::SearchCategory,
+    engine::{EngineMetadata, SearchEngine},
     error::MetasearchError,
+    query::SearchQuery,
+    result::SearchResult,
 };
+use reqwest::Client;
 
 pub struct HuggingFace {
     metadata: EngineMetadata,
@@ -64,13 +64,16 @@ impl SearchEngine for HuggingFace {
             urlencoding::encode(&query.query),
         );
 
-        let resp = self.client
+        let resp = self
+            .client
             .get(&url)
             .send()
             .await
             .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
 
-        let data: serde_json::Value = resp.json().await
+        let data: serde_json::Value = resp
+            .json()
+            .await
             .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
 
         let mut results = Vec::new();
@@ -88,7 +91,8 @@ impl SearchEngine for HuggingFace {
                 let likes = entry["likes"].as_u64().unwrap_or(0);
                 let downloads = entry["downloads"].as_u64().unwrap_or(0);
 
-                let tags: Vec<String> = entry["tags"].as_array()
+                let tags: Vec<String> = entry["tags"]
+                    .as_array()
                     .unwrap_or(&Vec::new())
                     .iter()
                     .take(5)

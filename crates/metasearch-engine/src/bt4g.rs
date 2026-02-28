@@ -3,14 +3,14 @@
 //! Searches bt4gprx.com via its RSS/XML API for torrent metadata.
 
 use async_trait::async_trait;
-use reqwest::Client;
 use metasearch_core::{
-    engine::{SearchEngine, EngineMetadata},
-    result::SearchResult,
-    query::SearchQuery,
     category::SearchCategory,
+    engine::{EngineMetadata, SearchEngine},
     error::MetasearchError,
+    query::SearchQuery,
+    result::SearchResult,
 };
+use reqwest::Client;
 
 pub struct Bt4g {
     metadata: EngineMetadata,
@@ -48,12 +48,16 @@ impl SearchEngine for Bt4g {
             search_term, page
         );
 
-        let resp = self.client.get(&url)
+        let resp = self
+            .client
+            .get(&url)
             .send()
             .await
             .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
 
-        let body = resp.text().await
+        let body = resp
+            .text()
+            .await
             .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
 
         let mut results = Vec::new();

@@ -2,15 +2,15 @@
 //! Translated from SearXNG `searx/engines/goodreads.py`.
 
 use async_trait::async_trait;
+use metasearch_core::{
+    category::SearchCategory,
+    engine::{EngineMetadata, SearchEngine},
+    error::MetasearchError,
+    query::SearchQuery,
+    result::SearchResult,
+};
 use reqwest::Client;
 use scraper::{Html, Selector};
-use metasearch_core::{
-    engine::{SearchEngine, EngineMetadata},
-    result::SearchResult,
-    query::SearchQuery,
-    category::SearchCategory,
-    error::MetasearchError,
-};
 
 pub struct Goodreads {
     metadata: EngineMetadata,
@@ -48,13 +48,16 @@ impl SearchEngine for Goodreads {
             page,
         );
 
-        let resp = self.client
+        let resp = self
+            .client
             .get(&url)
             .send()
             .await
             .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
 
-        let html_text = resp.text().await
+        let html_text = resp
+            .text()
+            .await
             .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
 
         let document = Html::parse_document(&html_text);
@@ -76,26 +79,27 @@ impl SearchEngine for Goodreads {
             let href = title_el.value().attr("href").unwrap_or("");
             let book_url = format!("https://www.goodreads.com{}", href);
 
-            let author = row.select(&author_sel).next()
+            let author = row
+                .select(&author_sel)
+                .next()
                 .map(|el| el.text().collect::<String>())
                 .unwrap_or_default();
 
-            let thumbnail = row.select(&thumb_sel).next()
+            let thumbnail = row
+                .select(&thumb_sel)
+                .next()
                 .and_then(|el| el.value().attr("src"))
                 .map(|s| s.to_string());
 
-            let info = row.select(&info_sel).next()
+            let info = row
+                .select(&info_sel)
+                .next()
                 .map(|el| el.text().collect::<String>())
                 .unwrap_or_default();
 
             let snippet = format!("by {} — {}", author.trim(), info.trim());
 
-            let mut result = SearchResult::new(
-                title,
-                book_url,
-                snippet,
-                "goodreads".to_string(),
-            );
+            let mut result = SearchResult::new(title, book_url, snippet, "goodreads".to_string());
             result.engine_rank = (i + 1) as u32;
             result.category = SearchCategory::General.to_string();
             result.thumbnail = thumbnail;

@@ -2,14 +2,14 @@
 //! Translated from SearXNG `searx/engines/imdb.py`.
 
 use async_trait::async_trait;
-use reqwest::Client;
 use metasearch_core::{
-    engine::{SearchEngine, EngineMetadata},
-    result::SearchResult,
-    query::SearchQuery,
     category::SearchCategory,
+    engine::{EngineMetadata, SearchEngine},
     error::MetasearchError,
+    query::SearchQuery,
+    result::SearchResult,
 };
+use reqwest::Client;
 use std::collections::HashMap;
 
 pub struct Imdb {
@@ -49,26 +49,39 @@ impl SearchEngine for Imdb {
             first_char, q,
         );
 
-        let resp = self.client
+        let resp = self
+            .client
             .get(&url)
             .send()
             .await
             .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
 
-        let data: serde_json::Value = resp.json().await
+        let data: serde_json::Value = resp
+            .json()
+            .await
             .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
 
         let category_map: HashMap<&str, &str> = [
-            ("nm", "name"), ("tt", "title"), ("kw", "keyword"),
-            ("co", "company"), ("ep", "episode"),
-        ].iter().cloned().collect();
+            ("nm", "name"),
+            ("tt", "title"),
+            ("kw", "keyword"),
+            ("co", "company"),
+            ("ep", "episode"),
+        ]
+        .iter()
+        .cloned()
+        .collect();
 
         let mut results = Vec::new();
 
         if let Some(entries) = data["d"].as_array() {
             for (i, entry) in entries.iter().enumerate() {
                 let entry_id = entry["id"].as_str().unwrap_or_default();
-                let category_prefix = if entry_id.len() >= 2 { &entry_id[..2] } else { "" };
+                let category_prefix = if entry_id.len() >= 2 {
+                    &entry_id[..2]
+                } else {
+                    ""
+                };
                 let categ = match category_map.get(category_prefix) {
                     Some(c) => c,
                     None => continue,
@@ -92,12 +105,7 @@ impl SearchEngine for Imdb {
 
                 let imdb_url = format!("https://imdb.com/{}/{}", categ, entry_id);
 
-                let mut result = SearchResult::new(
-                    title,
-                    imdb_url,
-                    content,
-                    "imdb".to_string(),
-                );
+                let mut result = SearchResult::new(title, imdb_url, content, "imdb".to_string());
                 result.engine_rank = (i + 1) as u32;
                 result.category = SearchCategory::General.to_string();
 

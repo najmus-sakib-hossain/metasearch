@@ -2,15 +2,15 @@
 //! Translated from SearXNG `searx/engines/pypi.py`.
 
 use async_trait::async_trait;
+use metasearch_core::{
+    category::SearchCategory,
+    engine::{EngineMetadata, SearchEngine},
+    error::MetasearchError,
+    query::SearchQuery,
+    result::SearchResult,
+};
 use reqwest::Client;
 use scraper::{Html, Selector};
-use metasearch_core::{
-    engine::{SearchEngine, EngineMetadata},
-    result::SearchResult,
-    query::SearchQuery,
-    category::SearchCategory,
-    error::MetasearchError,
-};
 
 pub struct PyPI {
     metadata: EngineMetadata,
@@ -48,13 +48,16 @@ impl SearchEngine for PyPI {
             page,
         );
 
-        let resp = self.client
+        let resp = self
+            .client
             .get(&url)
             .send()
             .await
             .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
 
-        let html_text = resp.text().await
+        let html_text = resp
+            .text()
+            .await
             .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
 
         let document = Html::parse_document(&html_text);
@@ -69,15 +72,21 @@ impl SearchEngine for PyPI {
             let href = el.value().attr("href").unwrap_or("");
             let package_url = format!("https://pypi.org{}", href);
 
-            let name = el.select(&name_sel).next()
+            let name = el
+                .select(&name_sel)
+                .next()
                 .map(|e| e.text().collect::<String>())
                 .unwrap_or_default();
 
-            let version = el.select(&version_sel).next()
+            let version = el
+                .select(&version_sel)
+                .next()
                 .map(|e| e.text().collect::<String>())
                 .unwrap_or_default();
 
-            let description = el.select(&desc_sel).next()
+            let description = el
+                .select(&desc_sel)
+                .next()
                 .map(|e| e.text().collect::<String>())
                 .unwrap_or_default();
 

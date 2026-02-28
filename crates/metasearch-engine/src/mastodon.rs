@@ -2,14 +2,14 @@
 //! Translated from SearXNG `searx/engines/mastodon.py`.
 
 use async_trait::async_trait;
-use reqwest::Client;
 use metasearch_core::{
-    engine::{SearchEngine, EngineMetadata},
-    result::SearchResult,
-    query::SearchQuery,
     category::SearchCategory,
+    engine::{EngineMetadata, SearchEngine},
     error::MetasearchError,
+    query::SearchQuery,
+    result::SearchResult,
 };
+use reqwest::Client;
 
 pub struct Mastodon {
     metadata: EngineMetadata,
@@ -64,13 +64,16 @@ impl SearchEngine for Mastodon {
             urlencoding::encode(&query.query),
         );
 
-        let resp = self.client
+        let resp = self
+            .client
             .get(&url)
             .send()
             .await
             .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
 
-        let data: serde_json::Value = resp.json().await
+        let data: serde_json::Value = resp
+            .json()
+            .await
             .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
 
         let mut results = Vec::new();
@@ -85,8 +88,11 @@ impl SearchEngine for Mastodon {
 
                 // Strip HTML from note
                 let clean_note = html_escape::decode_html_entities(
-                    &regex::Regex::new(r"<[^>]+>").unwrap().replace_all(note, " ")
-                ).to_string();
+                    &regex::Regex::new(r"<[^>]+>")
+                        .unwrap()
+                        .replace_all(note, " "),
+                )
+                .to_string();
 
                 let title = format!("{} ({} followers)", username, followers);
 
@@ -109,7 +115,8 @@ impl SearchEngine for Mastodon {
                 let name = hashtag["name"].as_str().unwrap_or_default();
                 let tag_url = hashtag["url"].as_str().unwrap_or_default();
 
-                let uses: u64 = hashtag["history"].as_array()
+                let uses: u64 = hashtag["history"]
+                    .as_array()
                     .unwrap_or(&Vec::new())
                     .iter()
                     .filter_map(|h| h["uses"].as_str().and_then(|s| s.parse::<u64>().ok()))

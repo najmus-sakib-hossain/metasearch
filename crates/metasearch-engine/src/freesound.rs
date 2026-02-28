@@ -5,14 +5,14 @@
 //! Disabled by default until a key is configured.
 
 use async_trait::async_trait;
-use reqwest::Client;
 use metasearch_core::{
-    engine::{SearchEngine, EngineMetadata},
-    result::SearchResult,
-    query::SearchQuery,
     category::SearchCategory,
+    engine::{EngineMetadata, SearchEngine},
     error::MetasearchError,
+    query::SearchQuery,
+    result::SearchResult,
 };
+use reqwest::Client;
 
 pub struct Freesound {
     metadata: EngineMetadata,
@@ -65,7 +65,8 @@ impl SearchEngine for Freesound {
             Some(k) if !k.is_empty() => k.clone(),
             _ => {
                 return Err(MetasearchError::ConfigError(
-                    "Freesound requires an API key. Get one at https://freesound.org/apiv2/apply/".to_string(),
+                    "Freesound requires an API key. Get one at https://freesound.org/apiv2/apply/"
+                        .to_string(),
                 ));
             }
         };
@@ -79,13 +80,16 @@ impl SearchEngine for Freesound {
             api_key,
         );
 
-        let resp = self.client
+        let resp = self
+            .client
             .get(&url)
             .send()
             .await
             .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
 
-        let data: serde_json::Value = resp.json().await
+        let data: serde_json::Value = resp
+            .json()
+            .await
             .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
 
         let mut results = Vec::new();

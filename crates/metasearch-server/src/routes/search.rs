@@ -3,10 +3,10 @@
 use std::sync::Arc;
 
 use axum::{
+    Router,
     extract::{Query, State},
     response::Html,
     routing::get,
-    Router,
 };
 use serde::Deserialize;
 
@@ -30,7 +30,10 @@ pub fn routes() -> Router<Arc<AppState>> {
 
 async fn index() -> Html<String> {
     // TODO: Render Tera template for homepage
-    Html("<h1>🔍 Metasearch</h1><p>A privacy-respecting metasearch engine, built in Rust.</p>".to_string())
+    Html(
+        "<h1>🔍 Metasearch</h1><p>A privacy-respecting metasearch engine, built in Rust.</p>"
+            .to_string(),
+    )
 }
 
 async fn search(
@@ -39,5 +42,8 @@ async fn search(
 ) -> Html<String> {
     let query = params.q.unwrap_or_default();
     // TODO: Execute search via engine registry, cache, rank results, render template
-    Html(format!("<h1>Results for: {}</h1><p>Coming soon...</p>", query))
+    Html(format!(
+        "<h1>Results for: {}</h1><p>Coming soon...</p>",
+        query
+    ))
 }

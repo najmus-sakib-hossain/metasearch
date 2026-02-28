@@ -2,15 +2,15 @@
 //! Translated from SearXNG `searx/engines/fdroid.py`.
 
 use async_trait::async_trait;
+use metasearch_core::{
+    category::SearchCategory,
+    engine::{EngineMetadata, SearchEngine},
+    error::MetasearchError,
+    query::SearchQuery,
+    result::SearchResult,
+};
 use reqwest::Client;
 use scraper::{Html, Selector};
-use metasearch_core::{
-    engine::{SearchEngine, EngineMetadata},
-    result::SearchResult,
-    query::SearchQuery,
-    category::SearchCategory,
-    error::MetasearchError,
-};
 
 pub struct Fdroid {
     metadata: EngineMetadata,
@@ -48,13 +48,16 @@ impl SearchEngine for Fdroid {
             page,
         );
 
-        let resp = self.client
+        let resp = self
+            .client
             .get(&url)
             .send()
             .await
             .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
 
-        let html_text = resp.text().await
+        let html_text = resp
+            .text()
+            .await
             .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
 
         let document = Html::parse_document(&html_text);
@@ -69,7 +72,9 @@ impl SearchEngine for Fdroid {
         for (i, app) in document.select(&app_sel).enumerate() {
             let app_url = app.value().attr("href").unwrap_or_default().to_string();
 
-            let title = app.select(&name_sel).next()
+            let title = app
+                .select(&name_sel)
+                .next()
                 .map(|e| e.text().collect::<String>())
                 .unwrap_or_default();
 
@@ -77,17 +82,23 @@ impl SearchEngine for Fdroid {
                 continue;
             }
 
-            let summary = app.select(&summary_sel).next()
+            let summary = app
+                .select(&summary_sel)
+                .next()
                 .map(|e| e.text().collect::<String>())
                 .unwrap_or_default();
 
-            let license = app.select(&license_sel).next()
+            let license = app
+                .select(&license_sel)
+                .next()
                 .map(|e| e.text().collect::<String>())
                 .unwrap_or_default();
 
             let snippet = format!("{} - {}", summary.trim(), license.trim());
 
-            let thumbnail = app.select(&icon_sel).next()
+            let thumbnail = app
+                .select(&icon_sel)
+                .next()
                 .and_then(|e| e.value().attr("src"))
                 .map(|s| s.to_string());
 

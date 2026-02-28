@@ -5,15 +5,15 @@
 //! Strips the `ixid` tracking parameter from all returned URLs.
 
 use async_trait::async_trait;
+use metasearch_core::{
+    category::SearchCategory,
+    engine::{EngineMetadata, SearchEngine},
+    error::MetasearchError,
+    query::SearchQuery,
+    result::SearchResult,
+};
 use reqwest::Client;
 use url::Url;
-use metasearch_core::{
-    engine::{SearchEngine, EngineMetadata},
-    result::SearchResult,
-    query::SearchQuery,
-    category::SearchCategory,
-    error::MetasearchError,
-};
 
 pub struct Unsplash {
     metadata: EngineMetadata,
@@ -80,14 +80,20 @@ impl SearchEngine for Unsplash {
             per_page,
         );
 
-        let resp = self.client
+        let resp = self
+            .client
             .get(&url)
-            .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
+            .header(
+                "User-Agent",
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+            )
             .send()
             .await
             .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
 
-        let data: serde_json::Value = resp.json().await
+        let data: serde_json::Value = resp
+            .json()
+            .await
             .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
 
         let mut results = Vec::new();
@@ -98,8 +104,7 @@ impl SearchEngine for Unsplash {
                 let thumb_url = item["urls"]["thumb"].as_str().unwrap_or_default();
                 let img_url = item["urls"]["regular"].as_str().unwrap_or_default();
 
-                let title = item["alt_description"].as_str()
-                    .unwrap_or("Unknown photo");
+                let title = item["alt_description"].as_str().unwrap_or("Unknown photo");
                 let description = item["description"].as_str().unwrap_or("");
 
                 if page_url.is_empty() {

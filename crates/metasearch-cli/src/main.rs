@@ -7,17 +7,9 @@ use tracing_subscriber::EnvFilter;
 
 use metasearch_core::config::Settings;
 use metasearch_engine::{
-    EngineRegistry,
-    google::Google,
-    duckduckgo::DuckDuckGo,
-    brave::Brave,
-    wikipedia::Wikipedia,
+    EngineRegistry, brave::Brave, duckduckgo::DuckDuckGo, google::Google, wikipedia::Wikipedia,
 };
-use metasearch_server::{
-    app,
-    cache::SearchCache,
-    state::AppState,
-};
+use metasearch_server::{app, cache::SearchCache, state::AppState};
 
 #[derive(Parser)]
 #[command(name = "metasearch")]
@@ -73,10 +65,7 @@ async fn main() -> anyhow::Result<()> {
     registry.register(Arc::new(Wikipedia::new(http_client.clone())));
 
     let state = Arc::new(AppState {
-        cache: SearchCache::new(
-            settings.cache.max_entries,
-            settings.cache.ttl_secs,
-        ),
+        cache: SearchCache::new(settings.cache.max_entries, settings.cache.ttl_secs),
         engine_registry: Arc::new(registry),
         settings,
     });

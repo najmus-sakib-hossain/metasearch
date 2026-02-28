@@ -50,15 +50,15 @@ impl SearchEngine for Ask {
         let page = query.page.min(5).max(1);
         let encoded = urlencoding::encode(&query.query);
 
-        let url = format!(
-            "https://www.ask.com/web?q={}&page={}",
-            encoded, page
-        );
+        let url = format!("https://www.ask.com/web?q={}&page={}", encoded, page);
 
         let resp = self
             .client
             .get(&url)
-            .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
+            .header(
+                "User-Agent",
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+            )
             .send()
             .await
             .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
@@ -72,8 +72,13 @@ impl SearchEngine for Ask {
 
         // Ask.com results are in <div class="PartialSearchResults-item">
         let result_selector = Selector::parse(".PartialSearchResults-item, .result").unwrap();
-        let title_selector = Selector::parse(".PartialSearchResults-item-title a, .result-title a, a.result-link").unwrap();
-        let snippet_selector = Selector::parse(".PartialSearchResults-item-abstract, .result-abstract, p.result-url + p").unwrap();
+        let title_selector =
+            Selector::parse(".PartialSearchResults-item-title a, .result-title a, a.result-link")
+                .unwrap();
+        let snippet_selector = Selector::parse(
+            ".PartialSearchResults-item-abstract, .result-abstract, p.result-url + p",
+        )
+        .unwrap();
 
         let mut results = Vec::new();
 

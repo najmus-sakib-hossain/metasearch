@@ -85,7 +85,11 @@ impl SearchEngine for Wikipedia {
             .map(|(i, item)| {
                 let mut r = SearchResult::new(
                     &item.title,
-                    format!("https://{}.wikipedia.org/wiki/{}", lang, item.title.replace(' ', "_")),
+                    format!(
+                        "https://{}.wikipedia.org/wiki/{}",
+                        lang,
+                        item.title.replace(' ', "_")
+                    ),
                     html_escape::decode_html_entities(&item.snippet).to_string(),
                     "wikipedia",
                 );

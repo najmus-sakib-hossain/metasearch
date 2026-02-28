@@ -49,15 +49,15 @@ impl SearchEngine for Bandcamp {
         let encoded = urlencoding::encode(&query.query);
         let page = query.page.max(1);
 
-        let url = format!(
-            "https://bandcamp.com/search?q={}&page={}",
-            encoded, page
-        );
+        let url = format!("https://bandcamp.com/search?q={}&page={}", encoded, page);
 
         let resp = self
             .client
             .get(&url)
-            .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
+            .header(
+                "User-Agent",
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+            )
             .send()
             .await
             .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
@@ -123,7 +123,11 @@ impl SearchEngine for Bandcamp {
             }
         }
 
-        info!(engine = "bandcamp", count = results.len(), "Search complete");
+        info!(
+            engine = "bandcamp",
+            count = results.len(),
+            "Search complete"
+        );
         Ok(results)
     }
 }

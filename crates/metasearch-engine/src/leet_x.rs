@@ -2,15 +2,15 @@
 //! Translated from SearXNG `searx/engines/1337x.py`.
 
 use async_trait::async_trait;
+use metasearch_core::{
+    category::SearchCategory,
+    engine::{EngineMetadata, SearchEngine},
+    error::MetasearchError,
+    query::SearchQuery,
+    result::SearchResult,
+};
 use reqwest::Client;
 use scraper::{Html, Selector};
-use metasearch_core::{
-    engine::{SearchEngine, EngineMetadata},
-    result::SearchResult,
-    query::SearchQuery,
-    category::SearchCategory,
-    error::MetasearchError,
-};
 
 pub struct LeetX {
     metadata: EngineMetadata,
@@ -48,13 +48,16 @@ impl SearchEngine for LeetX {
             page,
         );
 
-        let resp = self.client
+        let resp = self
+            .client
             .get(&url)
             .send()
             .await
             .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
 
-        let html_text = resp.text().await
+        let html_text = resp
+            .text()
+            .await
             .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
 
         let document = Html::parse_document(&html_text);
@@ -67,7 +70,9 @@ impl SearchEngine for LeetX {
         let mut results = Vec::new();
 
         for (i, row) in document.select(&row_sel).enumerate() {
-            let title = row.select(&name_sel).next()
+            let title = row
+                .select(&name_sel)
+                .next()
                 .map(|e| e.text().collect::<String>())
                 .unwrap_or_default();
 
@@ -75,21 +80,29 @@ impl SearchEngine for LeetX {
                 continue;
             }
 
-            let href = row.select(&name_sel).next()
+            let href = row
+                .select(&name_sel)
+                .next()
                 .and_then(|e| e.value().attr("href"))
                 .unwrap_or_default();
 
             let item_url = format!("https://1337x.to{}", href);
 
-            let seeds = row.select(&seeds_sel).next()
+            let seeds = row
+                .select(&seeds_sel)
+                .next()
                 .map(|e| e.text().collect::<String>())
                 .unwrap_or_default();
 
-            let leeches = row.select(&leeches_sel).next()
+            let leeches = row
+                .select(&leeches_sel)
+                .next()
                 .map(|e| e.text().collect::<String>())
                 .unwrap_or_default();
 
-            let filesize = row.select(&size_sel).next()
+            let filesize = row
+                .select(&size_sel)
+                .next()
                 .map(|e| e.text().next().unwrap_or_default().to_string())
                 .unwrap_or_default();
 

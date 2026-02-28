@@ -9,11 +9,11 @@ use reqwest::Client;
 use serde::Deserialize;
 use url::Url;
 
+use metasearch_core::category::SearchCategory;
 use metasearch_core::engine::{EngineMetadata, SearchEngine};
+use metasearch_core::error::MetasearchError;
 use metasearch_core::query::SearchQuery;
 use metasearch_core::result::SearchResult;
-use metasearch_core::error::MetasearchError;
-use metasearch_core::category::SearchCategory;
 
 pub struct AcFun {
     metadata: EngineMetadata,
@@ -55,7 +55,8 @@ impl SearchEngine for AcFun {
     }
 
     async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
-        let mut url = Url::parse("https://www.acfun.cn/search").map_err(|e| MetasearchError::ParseError(e.to_string()))?;
+        let mut url = Url::parse("https://www.acfun.cn/search")
+            .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
         url.query_pairs_mut()
             .append_pair("keyword", &query.query)
             .append_pair("pCursor", &query.page.to_string());
@@ -100,12 +101,7 @@ impl SearchEngine for AcFun {
 
                         let video_url = format!("https://www.acfun.cn/v/ac{}", content_id);
 
-                        results.push(SearchResult::new(
-                            title,
-                            video_url,
-                            "",
-                            "AcFun",
-                        ));
+                        results.push(SearchResult::new(title, video_url, "", "AcFun"));
                     }
                 }
             }

@@ -8,11 +8,11 @@ use reqwest::Client;
 use serde::Deserialize;
 use serde_json::json;
 
+use metasearch_core::category::SearchCategory;
 use metasearch_core::engine::{EngineMetadata, SearchEngine};
+use metasearch_core::error::MetasearchError;
 use metasearch_core::query::SearchQuery;
 use metasearch_core::result::SearchResult;
-use metasearch_core::error::MetasearchError;
-use metasearch_core::category::SearchCategory;
 
 const API_URL: &str = "https://findthatmeme.com/api/v1/search";
 const RESULTS_PER_PAGE: u32 = 50;
@@ -86,17 +86,9 @@ impl SearchEngine for FindThatMeme {
                 continue;
             }
 
-            let img_url = format!(
-                "https://s3.thehackerblog.com/findthatmeme/{}",
-                image_path
-            );
+            let img_url = format!("https://s3.thehackerblog.com/findthatmeme/{}", image_path);
 
-            let mut result = SearchResult::new(
-                title,
-                source_url,
-                "",
-                "FindThatMeme",
-            );
+            let mut result = SearchResult::new(title, source_url, "", "FindThatMeme");
             result.thumbnail = Some(img_url);
             results.push(result);
         }

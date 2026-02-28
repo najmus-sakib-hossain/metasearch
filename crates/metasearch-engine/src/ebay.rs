@@ -2,15 +2,15 @@
 //! Translated from SearXNG `searx/engines/ebay.py`.
 
 use async_trait::async_trait;
+use metasearch_core::{
+    category::SearchCategory,
+    engine::{EngineMetadata, SearchEngine},
+    error::MetasearchError,
+    query::SearchQuery,
+    result::SearchResult,
+};
 use reqwest::Client;
 use scraper::{Html, Selector};
-use metasearch_core::{
-    engine::{SearchEngine, EngineMetadata},
-    result::SearchResult,
-    query::SearchQuery,
-    category::SearchCategory,
-    error::MetasearchError,
-};
 
 pub struct Ebay {
     metadata: EngineMetadata,
@@ -67,13 +67,16 @@ impl SearchEngine for Ebay {
             page,
         );
 
-        let resp = self.client
+        let resp = self
+            .client
             .get(&url)
             .send()
             .await
             .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
 
-        let html_text = resp.text().await
+        let html_text = resp
+            .text()
+            .await
             .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
 
         let document = Html::parse_document(&html_text);
@@ -86,7 +89,9 @@ impl SearchEngine for Ebay {
         let mut results = Vec::new();
 
         for (i, item) in document.select(&item_sel).enumerate() {
-            let title = item.select(&title_sel).next()
+            let title = item
+                .select(&title_sel)
+                .next()
                 .map(|e| e.text().collect::<String>())
                 .unwrap_or_default();
 
@@ -94,16 +99,22 @@ impl SearchEngine for Ebay {
                 continue;
             }
 
-            let item_url = item.select(&link_sel).next()
+            let item_url = item
+                .select(&link_sel)
+                .next()
                 .and_then(|e| e.value().attr("href"))
                 .unwrap_or_default()
                 .to_string();
 
-            let price = item.select(&price_sel).next()
+            let price = item
+                .select(&price_sel)
+                .next()
                 .map(|e| e.text().collect::<String>())
                 .unwrap_or_default();
 
-            let thumbnail = item.select(&thumb_sel).next()
+            let thumbnail = item
+                .select(&thumb_sel)
+                .next()
                 .and_then(|e| e.value().attr("src"))
                 .map(|s| s.to_string());
 

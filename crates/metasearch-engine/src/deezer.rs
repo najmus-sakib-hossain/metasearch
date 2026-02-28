@@ -2,14 +2,14 @@
 //! Translated from SearXNG `searx/engines/deezer.py`.
 
 use async_trait::async_trait;
-use reqwest::Client;
 use metasearch_core::{
-    engine::{SearchEngine, EngineMetadata},
-    result::SearchResult,
-    query::SearchQuery,
     category::SearchCategory,
+    engine::{EngineMetadata, SearchEngine},
     error::MetasearchError,
+    query::SearchQuery,
+    result::SearchResult,
 };
+use reqwest::Client;
 
 pub struct Deezer {
     metadata: EngineMetadata,
@@ -49,13 +49,16 @@ impl SearchEngine for Deezer {
             offset,
         );
 
-        let resp = self.client
+        let resp = self
+            .client
             .get(&url)
             .send()
             .await
             .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
 
-        let data: serde_json::Value = resp.json().await
+        let data: serde_json::Value = resp
+            .json()
+            .await
             .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
 
         let mut results = Vec::new();
@@ -78,20 +81,15 @@ impl SearchEngine for Deezer {
                 let minutes = duration / 60;
                 let seconds = duration % 60;
 
-                let snippet = format!(
-                    "{} — {} [{}:{:02}]",
-                    artist, album, minutes, seconds,
-                );
+                let snippet = format!("{} — {} [{}:{:02}]", artist, album, minutes, seconds,);
 
-                let mut result = SearchResult::new(
-                    title.to_string(),
-                    link,
-                    snippet,
-                    "deezer".to_string(),
-                );
+                let mut result =
+                    SearchResult::new(title.to_string(), link, snippet, "deezer".to_string());
                 result.engine_rank = (i + 1) as u32;
                 result.category = SearchCategory::Music.to_string();
-                result.thumbnail = item["album"]["cover_medium"].as_str().map(|s| s.to_string());
+                result.thumbnail = item["album"]["cover_medium"]
+                    .as_str()
+                    .map(|s| s.to_string());
                 results.push(result);
             }
         }

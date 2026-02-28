@@ -2,15 +2,15 @@
 //! Translated from SearXNG `searx/engines/bing_videos.py`.
 
 use async_trait::async_trait;
+use metasearch_core::{
+    category::SearchCategory,
+    engine::{EngineMetadata, SearchEngine},
+    error::MetasearchError,
+    query::SearchQuery,
+    result::SearchResult,
+};
 use reqwest::Client;
 use scraper::{Html, Selector};
-use metasearch_core::{
-    engine::{SearchEngine, EngineMetadata},
-    result::SearchResult,
-    query::SearchQuery,
-    category::SearchCategory,
-    error::MetasearchError,
-};
 
 pub struct BingVideos {
     metadata: EngineMetadata,
@@ -50,14 +50,20 @@ impl SearchEngine for BingVideos {
             first,
         );
 
-        let resp = self.client
+        let resp = self
+            .client
             .get(&url)
-            .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
+            .header(
+                "User-Agent",
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+            )
             .send()
             .await
             .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
 
-        let html_text = resp.text().await
+        let html_text = resp
+            .text()
+            .await
             .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
 
         let document = Html::parse_document(&html_text);
@@ -88,12 +94,15 @@ impl SearchEngine for BingVideos {
             let title = meta["vt"].as_str().unwrap_or("Untitled");
             let duration = meta["du"].as_str().unwrap_or("");
 
-            let info: Vec<String> = video.select(&info_sel)
+            let info: Vec<String> = video
+                .select(&info_sel)
                 .map(|el| el.text().collect::<String>())
                 .collect();
             let info_str = info.join(" - ");
 
-            let thumbnail = video.select(&thumb_sel).next()
+            let thumbnail = video
+                .select(&thumb_sel)
+                .next()
                 .and_then(|el| el.value().attr("src"))
                 .map(|s| s.to_string());
 

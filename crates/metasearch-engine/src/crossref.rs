@@ -2,14 +2,14 @@
 //! Translated from SearXNG `searx/engines/crossref.py`.
 
 use async_trait::async_trait;
-use reqwest::Client;
 use metasearch_core::{
-    engine::{SearchEngine, EngineMetadata},
-    result::SearchResult,
-    query::SearchQuery,
     category::SearchCategory,
+    engine::{EngineMetadata, SearchEngine},
     error::MetasearchError,
+    query::SearchQuery,
+    result::SearchResult,
 };
+use reqwest::Client;
 
 pub struct Crossref {
     metadata: EngineMetadata,
@@ -56,7 +56,9 @@ impl SearchEngine for Crossref {
             .await
             .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
 
-        let data: serde_json::Value = resp.json().await
+        let data: serde_json::Value = resp
+            .json()
+            .await
             .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
 
         let mut results = Vec::new();
@@ -72,25 +74,30 @@ impl SearchEngine for Crossref {
                 let title = if record_type == "book-chapter" {
                     let container = record["container-title"][0].as_str().unwrap_or("");
                     let chapter = record["title"][0].as_str().unwrap_or("");
-                    if !chapter.is_empty() && chapter.to_lowercase().trim() != container.to_lowercase().trim() {
+                    if !chapter.is_empty()
+                        && chapter.to_lowercase().trim() != container.to_lowercase().trim()
+                    {
                         format!("{} ({})", container, chapter)
                     } else {
                         container.to_string()
                     }
                 } else {
-                    record["title"][0].as_str()
+                    record["title"][0]
+                        .as_str()
                         .or_else(|| record["container-title"][0].as_str())
                         .unwrap_or("Untitled")
                         .to_string()
                 };
 
                 // URL — prefer resource primary URL
-                let url = record["resource"]["primary"]["URL"].as_str()
+                let url = record["resource"]["primary"]["URL"]
+                    .as_str()
                     .or_else(|| record["URL"].as_str())
                     .unwrap_or_default();
 
                 // Authors
-                let authors: Vec<String> = record["author"].as_array()
+                let authors: Vec<String> = record["author"]
+                    .as_array()
                     .unwrap_or(&Vec::new())
                     .iter()
                     .map(|a| {
@@ -121,12 +128,8 @@ impl SearchEngine for Crossref {
 
                 let snippet = content_parts.join(" | ");
 
-                let mut result = SearchResult::new(
-                    title,
-                    url.to_string(),
-                    snippet,
-                    "crossref".to_string(),
-                );
+                let mut result =
+                    SearchResult::new(title, url.to_string(), snippet, "crossref".to_string());
                 result.engine_rank = (i + 1) as u32;
                 result.category = SearchCategory::Science.to_string();
                 results.push(result);

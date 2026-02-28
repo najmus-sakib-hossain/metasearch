@@ -2,14 +2,14 @@
 //! Translated from SearXNG `searx/engines/mixcloud.py`.
 
 use async_trait::async_trait;
-use reqwest::Client;
 use metasearch_core::{
-    engine::{SearchEngine, EngineMetadata},
-    result::SearchResult,
-    query::SearchQuery,
     category::SearchCategory,
+    engine::{EngineMetadata, SearchEngine},
     error::MetasearchError,
+    query::SearchQuery,
+    result::SearchResult,
 };
+use reqwest::Client;
 
 pub struct Mixcloud {
     metadata: EngineMetadata,
@@ -49,13 +49,16 @@ impl SearchEngine for Mixcloud {
             offset,
         );
 
-        let resp = self.client
+        let resp = self
+            .client
             .get(&url)
             .send()
             .await
             .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
 
-        let data: serde_json::Value = resp.json().await
+        let data: serde_json::Value = resp
+            .json()
+            .await
             .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
 
         let mut results = Vec::new();
@@ -74,9 +77,7 @@ impl SearchEngine for Mixcloud {
                 );
                 result.engine_rank = (i + 1) as u32;
                 result.category = SearchCategory::Music.to_string();
-                result.thumbnail = item["pictures"]["medium"]
-                    .as_str()
-                    .map(|s| s.to_string());
+                result.thumbnail = item["pictures"]["medium"].as_str().map(|s| s.to_string());
                 results.push(result);
             }
         }

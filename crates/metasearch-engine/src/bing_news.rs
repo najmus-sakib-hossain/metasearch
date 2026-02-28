@@ -2,15 +2,15 @@
 //! Translated from SearXNG `searx/engines/bing_news.py`.
 
 use async_trait::async_trait;
+use metasearch_core::{
+    category::SearchCategory,
+    engine::{EngineMetadata, SearchEngine},
+    error::MetasearchError,
+    query::SearchQuery,
+    result::SearchResult,
+};
 use reqwest::Client;
 use scraper::{Html, Selector};
-use metasearch_core::{
-    engine::{SearchEngine, EngineMetadata},
-    result::SearchResult,
-    query::SearchQuery,
-    category::SearchCategory,
-    error::MetasearchError,
-};
 
 pub struct BingNews {
     metadata: EngineMetadata,
@@ -51,14 +51,20 @@ impl SearchEngine for BingNews {
             page - 1,
         );
 
-        let resp = self.client
+        let resp = self
+            .client
             .get(&url)
-            .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
+            .header(
+                "User-Agent",
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+            )
             .send()
             .await
             .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
 
-        let html_text = resp.text().await
+        let html_text = resp
+            .text()
+            .await
             .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
 
         let document = Html::parse_document(&html_text);
@@ -77,7 +83,9 @@ impl SearchEngine for BingNews {
             let href = link.value().attr("href").unwrap_or_default();
             let title = link.text().collect::<String>().trim().to_string();
 
-            let content = newsitem.select(&snippet_sel).next()
+            let content = newsitem
+                .select(&snippet_sel)
+                .next()
                 .map(|el| el.text().collect::<String>())
                 .unwrap_or_default();
 

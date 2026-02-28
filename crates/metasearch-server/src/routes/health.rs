@@ -2,10 +2,7 @@
 
 use std::sync::Arc;
 
-use axum::{
-    routing::get,
-    Json, Router,
-};
+use axum::{Json, Router, routing::get};
 
 use crate::state::AppState;
 

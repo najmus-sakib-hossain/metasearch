@@ -23,7 +23,11 @@ impl Google {
                 name: "google".to_string(),
                 display_name: "Google".to_string(),
                 homepage: "https://www.google.com".to_string(),
-                categories: vec![SearchCategory::General, SearchCategory::Images, SearchCategory::News],
+                categories: vec![
+                    SearchCategory::General,
+                    SearchCategory::Images,
+                    SearchCategory::News,
+                ],
                 enabled: true,
                 timeout_ms: 4000,
                 weight: 1.5,

@@ -2,15 +2,15 @@
 //! Translated from SearXNG `searx/engines/ina.py`.
 
 use async_trait::async_trait;
+use metasearch_core::{
+    category::SearchCategory,
+    engine::{EngineMetadata, SearchEngine},
+    error::MetasearchError,
+    query::SearchQuery,
+    result::SearchResult,
+};
 use reqwest::Client;
 use scraper::{Html, Selector};
-use metasearch_core::{
-    engine::{SearchEngine, EngineMetadata},
-    result::SearchResult,
-    query::SearchQuery,
-    category::SearchCategory,
-    error::MetasearchError,
-};
 
 const BASE_URL: &str = "https://www.ina.fr";
 const PAGE_SIZE: u32 = 12;
@@ -52,13 +52,16 @@ impl SearchEngine for Ina {
             offset,
         );
 
-        let resp = self.client
+        let resp = self
+            .client
             .get(&url)
             .send()
             .await
             .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
 
-        let body = resp.text().await
+        let body = resp
+            .text()
+            .await
             .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
 
         let document = Html::parse_document(&body);
@@ -77,7 +80,8 @@ impl SearchEngine for Ina {
         let mut results = Vec::new();
 
         for (i, el) in document.select(&results_sel).enumerate() {
-            let href = el.select(&link_sel)
+            let href = el
+                .select(&link_sel)
                 .next()
                 .and_then(|a| a.value().attr("href"))
                 .unwrap_or_default();
@@ -88,21 +92,24 @@ impl SearchEngine for Ina {
                 href.to_string()
             };
 
-            let title = el.select(&title_sel)
+            let title = el
+                .select(&title_sel)
                 .next()
                 .map(|e| e.text().collect::<String>())
                 .unwrap_or_default()
                 .trim()
                 .to_string();
 
-            let content = el.select(&content_sel)
+            let content = el
+                .select(&content_sel)
                 .next()
                 .map(|e| e.text().collect::<String>())
                 .unwrap_or_default()
                 .trim()
                 .to_string();
 
-            let thumbnail = el.select(&thumb_sel)
+            let thumbnail = el
+                .select(&thumb_sel)
                 .next()
                 .and_then(|img| img.value().attr("data-src"))
                 .map(|s| s.to_string());
@@ -111,12 +118,7 @@ impl SearchEngine for Ina {
                 continue;
             }
 
-            let mut result = SearchResult::new(
-                title,
-                result_url,
-                content,
-                "ina".to_string(),
-            );
+            let mut result = SearchResult::new(title, result_url, content, "ina".to_string());
             result.engine_rank = (i + 1) as u32;
             result.category = SearchCategory::Videos.to_string();
             result.thumbnail = thumbnail;

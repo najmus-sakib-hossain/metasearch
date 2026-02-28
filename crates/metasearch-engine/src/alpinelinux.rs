@@ -91,15 +91,20 @@ impl SearchEngine for AlpineLinux {
             let href = link_el.value().attr("href").unwrap_or("");
             let result_url = format!("https://pkgs.alpinelinux.org{}", href);
 
-            let version: String = cells.get(2)
+            let version: String = cells
+                .get(2)
                 .map(|c| c.text().collect::<String>().trim().to_string())
                 .unwrap_or_default();
 
-            let repo: String = cells.get(4)
+            let repo: String = cells
+                .get(4)
                 .map(|c| c.text().collect::<String>().trim().to_string())
                 .unwrap_or_default();
 
-            let snippet = format!("Alpine Linux package {} v{} [{}]", package_name, version, repo);
+            let snippet = format!(
+                "Alpine Linux package {} v{} [{}]",
+                package_name, version, repo
+            );
 
             let mut r = SearchResult::new(&package_name, &result_url, &snippet, "alpinelinux");
             r.engine_rank = i as u32;
@@ -108,7 +113,11 @@ impl SearchEngine for AlpineLinux {
             results.push(r);
         }
 
-        info!(engine = "alpinelinux", count = results.len(), "Search complete");
+        info!(
+            engine = "alpinelinux",
+            count = results.len(),
+            "Search complete"
+        );
         Ok(results)
     }
 }

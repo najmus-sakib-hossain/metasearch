@@ -3,15 +3,15 @@
 //! Scrapes destatis.de for statistical publications and data.
 
 use async_trait::async_trait;
+use metasearch_core::{
+    category::SearchCategory,
+    engine::{EngineMetadata, SearchEngine},
+    error::MetasearchError,
+    query::SearchQuery,
+    result::SearchResult,
+};
 use reqwest::Client;
 use scraper::{Html, Selector};
-use metasearch_core::{
-    engine::{SearchEngine, EngineMetadata},
-    result::SearchResult,
-    query::SearchQuery,
-    category::SearchCategory,
-    error::MetasearchError,
-};
 
 pub struct Destatis {
     metadata: EngineMetadata,
@@ -49,12 +49,16 @@ impl SearchEngine for Destatis {
             page
         );
 
-        let resp = self.client.get(&url)
+        let resp = self
+            .client
+            .get(&url)
             .send()
             .await
             .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
 
-        let body = resp.text().await
+        let body = resp
+            .text()
+            .await
             .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
 
         let document = Html::parse_document(&body);
@@ -81,28 +85,43 @@ impl SearchEngine for Destatis {
             };
 
             let title = link_el.text().collect::<String>().trim().to_string();
-            let href = link_el.value().attr("href")
+            let href = link_el
+                .value()
+                .attr("href")
                 .map(|h| {
-                    if h.starts_with("http") { h.to_string() }
-                    else { format!("https://www.destatis.de/{}", h.trim_start_matches('/')) }
+                    if h.starts_with("http") {
+                        h.to_string()
+                    } else {
+                        format!("https://www.destatis.de/{}", h.trim_start_matches('/'))
+                    }
                 })
                 .unwrap_or_default();
 
-            let content = element.select(&content_sel).next()
+            let content = element
+                .select(&content_sel)
+                .next()
                 .map(|el| el.text().collect::<String>().trim().to_string())
                 .unwrap_or_default();
 
-            let doctype = element.select(&doctype_sel).next()
+            let doctype = element
+                .select(&doctype_sel)
+                .next()
                 .map(|el| el.text().collect::<String>().trim().to_string())
                 .unwrap_or_default();
 
-            let date = element.select(&date_sel).next()
+            let date = element
+                .select(&date_sel)
+                .next()
                 .map(|el| el.text().collect::<String>().trim().to_string())
                 .unwrap_or_default();
 
             let mut meta_parts = Vec::new();
-            if !doctype.is_empty() { meta_parts.push(doctype); }
-            if !date.is_empty() { meta_parts.push(date); }
+            if !doctype.is_empty() {
+                meta_parts.push(doctype);
+            }
+            if !date.is_empty() {
+                meta_parts.push(date);
+            }
 
             let snippet = if meta_parts.is_empty() {
                 content

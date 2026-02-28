@@ -4,15 +4,15 @@
 //! API docs: <https://api.base-search.net/>
 
 use async_trait::async_trait;
-use reqwest::Client;
-use regex::Regex;
 use metasearch_core::{
-    engine::{EngineMetadata, SearchEngine},
-    result::SearchResult,
-    query::SearchQuery,
     category::SearchCategory,
+    engine::{EngineMetadata, SearchEngine},
     error::MetasearchError,
+    query::SearchQuery,
+    result::SearchResult,
 };
+use regex::Regex;
+use reqwest::Client;
 
 pub struct BaseSearch {
     client: Client,
@@ -48,7 +48,8 @@ impl SearchEngine for BaseSearch {
             offset
         );
 
-        let resp = self.client
+        let resp = self
+            .client
             .get(&url)
             .header("User-Agent", "metasearch/1.0")
             .send()
@@ -92,12 +93,7 @@ impl SearchEngine for BaseSearch {
             }
 
             if !link.is_empty() && !title.is_empty() {
-                let mut result = SearchResult::new(
-                    title,
-                    link,
-                    content,
-                    "BASE".to_string(),
-                );
+                let mut result = SearchResult::new(title, link, content, "BASE".to_string());
                 result.category = Some(SearchCategory::General);
                 results.push(result);
             }

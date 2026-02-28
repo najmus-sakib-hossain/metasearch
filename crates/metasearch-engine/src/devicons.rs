@@ -2,14 +2,14 @@
 //! Translated from SearXNG `searx/engines/devicons.py`.
 
 use async_trait::async_trait;
-use reqwest::Client;
 use metasearch_core::{
-    engine::{SearchEngine, EngineMetadata},
-    result::SearchResult,
-    query::SearchQuery,
     category::SearchCategory,
+    engine::{EngineMetadata, SearchEngine},
     error::MetasearchError,
+    query::SearchQuery,
+    result::SearchResult,
 };
+use reqwest::Client;
 
 const CDN_BASE: &str = "https://cdn.jsdelivr.net/gh/devicons/devicon@latest";
 
@@ -44,16 +44,21 @@ impl SearchEngine for Devicons {
     async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
         let url = format!("{}/devicon.json", CDN_BASE);
 
-        let resp = self.client
+        let resp = self
+            .client
             .get(&url)
             .send()
             .await
             .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
 
-        let data: Vec<serde_json::Value> = resp.json().await
+        let data: Vec<serde_json::Value> = resp
+            .json()
+            .await
             .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
 
-        let query_parts: Vec<String> = query.query.to_lowercase()
+        let query_parts: Vec<String> = query
+            .query
+            .to_lowercase()
             .split_whitespace()
             .map(|s| s.to_string())
             .collect();
@@ -76,8 +81,12 @@ impl SearchEngine for Devicons {
 
             let matches = query_parts.iter().any(|part| {
                 name.contains(part.as_str())
-                    || altnames.iter().any(|a| a.to_lowercase().contains(part.as_str()))
-                    || tags.iter().any(|t| t.to_lowercase().contains(part.as_str()))
+                    || altnames
+                        .iter()
+                        .any(|a| a.to_lowercase().contains(part.as_str()))
+                    || tags
+                        .iter()
+                        .any(|t| t.to_lowercase().contains(part.as_str()))
             });
 
             if !matches {
@@ -93,10 +102,7 @@ impl SearchEngine for Devicons {
             let color = item["color"].as_str().unwrap_or("#000");
 
             for variant in &svg_variants {
-                let img_src = format!(
-                    "{}/icons/{}/{}-{}.svg",
-                    CDN_BASE, name, name, variant,
-                );
+                let img_src = format!("{}/icons/{}/{}-{}.svg", CDN_BASE, name, name, variant,);
 
                 rank += 1;
                 let mut result = SearchResult::new(

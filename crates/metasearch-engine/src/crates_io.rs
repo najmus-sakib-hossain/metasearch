@@ -2,14 +2,14 @@
 //! Translated from SearXNG `searx/engines/crates.py`.
 
 use async_trait::async_trait;
-use reqwest::Client;
 use metasearch_core::{
-    engine::{SearchEngine, EngineMetadata},
-    result::SearchResult,
-    query::SearchQuery,
     category::SearchCategory,
+    engine::{EngineMetadata, SearchEngine},
     error::MetasearchError,
+    query::SearchQuery,
+    result::SearchResult,
 };
+use reqwest::Client;
 
 const PAGE_SIZE: u32 = 10;
 
@@ -51,14 +51,20 @@ impl SearchEngine for CratesIo {
             PAGE_SIZE,
         );
 
-        let resp = self.client
+        let resp = self
+            .client
             .get(&url)
-            .header("User-Agent", "metasearch-engine/1.0 (https://github.com/najmus-sakib-hossain/metasearch)")
+            .header(
+                "User-Agent",
+                "metasearch-engine/1.0 (https://github.com/najmus-sakib-hossain/metasearch)",
+            )
             .send()
             .await
             .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
 
-        let data: serde_json::Value = resp.json().await
+        let data: serde_json::Value = resp
+            .json()
+            .await
             .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
 
         let mut results = Vec::new();
@@ -67,16 +73,14 @@ impl SearchEngine for CratesIo {
             for (i, krate) in crates.iter().enumerate() {
                 let name = krate["name"].as_str().unwrap_or_default();
                 let description = krate["description"].as_str().unwrap_or("");
-                let version = krate["newest_version"].as_str()
+                let version = krate["newest_version"]
+                    .as_str()
                     .or_else(|| krate["max_version"].as_str())
                     .unwrap_or("?");
                 let downloads = krate["downloads"].as_u64().unwrap_or(0);
 
                 let crate_url = format!("https://crates.io/crates/{}", name);
-                let snippet = format!(
-                    "v{} — {} — {} downloads",
-                    version, description, downloads,
-                );
+                let snippet = format!("v{} — {} — {} downloads", version, description, downloads,);
 
                 let mut result = SearchResult::new(
                     name.to_string(),

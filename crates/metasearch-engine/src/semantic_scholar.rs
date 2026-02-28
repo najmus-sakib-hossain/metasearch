@@ -6,14 +6,14 @@
 //! DOIs, and links to PDFs.
 
 use async_trait::async_trait;
-use reqwest::Client;
 use metasearch_core::{
-    engine::{SearchEngine, EngineMetadata},
-    result::SearchResult,
-    query::SearchQuery,
     category::SearchCategory,
+    engine::{EngineMetadata, SearchEngine},
     error::MetasearchError,
+    query::SearchQuery,
+    result::SearchResult,
 };
+use reqwest::Client;
 
 const SEARCH_URL: &str = "https://www.semanticscholar.org/api/1/search";
 const BASE_URL: &str = "https://www.semanticscholar.org";
@@ -62,17 +62,23 @@ impl SearchEngine for SemanticScholar {
             "performTitleMatch": true,
         });
 
-        let resp = self.client
+        let resp = self
+            .client
             .post(SEARCH_URL)
             .header("Content-Type", "application/json")
             .header("X-S2-Client", "webapp-browser")
-            .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
+            .header(
+                "User-Agent",
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+            )
             .json(&body)
             .send()
             .await
             .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
 
-        let data: serde_json::Value = resp.json().await
+        let data: serde_json::Value = resp
+            .json()
+            .await
             .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
 
         let mut results = Vec::new();
@@ -85,14 +91,17 @@ impl SearchEngine for SemanticScholar {
                 }
 
                 // URL priority: primaryPaperLink -> links[0] -> alternatePaperLinks[0] -> fallback
-                let url = item["primaryPaperLink"]["url"].as_str()
+                let url = item["primaryPaperLink"]["url"]
+                    .as_str()
                     .or_else(|| {
-                        item["links"].as_array()
+                        item["links"]
+                            .as_array()
                             .and_then(|links| links.first())
                             .and_then(|l| l.as_str())
                     })
                     .or_else(|| {
-                        item["alternatePaperLinks"].as_array()
+                        item["alternatePaperLinks"]
+                            .as_array()
                             .and_then(|links| links.first())
                             .and_then(|l| l["url"].as_str())
                     })
@@ -111,12 +120,14 @@ impl SearchEngine for SemanticScholar {
                     .to_string();
 
                 // Authors (array of [[{"name": "..."}]])
-                let authors: Vec<String> = item["authors"].as_array()
+                let authors: Vec<String> = item["authors"]
+                    .as_array()
                     .unwrap_or(&Vec::new())
                     .iter()
                     .filter_map(|author_group| {
                         // Each author entry is an array like [{"name": "John Doe"}]
-                        author_group.as_array()
+                        author_group
+                            .as_array()
                             .and_then(|arr| arr.first())
                             .and_then(|a| a["name"].as_str())
                             .map(|s| s.to_string())
@@ -130,12 +141,14 @@ impl SearchEngine for SemanticScholar {
                 let doi = item["doiInfo"]["doi"].as_str().unwrap_or("");
 
                 // Journal / venue
-                let venue = item["venue"]["text"].as_str()
+                let venue = item["venue"]["text"]
+                    .as_str()
                     .or_else(|| item["journal"]["name"].as_str())
                     .unwrap_or("");
 
                 // Fields of study (tags)
-                let fields: Vec<String> = item["fieldsOfStudy"].as_array()
+                let fields: Vec<String> = item["fieldsOfStudy"]
+                    .as_array()
                     .unwrap_or(&Vec::new())
                     .iter()
                     .filter_map(|f| f.as_str().map(|s| s.to_string()))

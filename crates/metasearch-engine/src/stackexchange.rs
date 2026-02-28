@@ -6,14 +6,14 @@
 //! Default: `stackoverflow`.
 
 use async_trait::async_trait;
-use reqwest::Client;
 use metasearch_core::{
-    engine::{SearchEngine, EngineMetadata},
-    result::SearchResult,
-    query::SearchQuery,
     category::SearchCategory,
+    engine::{EngineMetadata, SearchEngine},
     error::MetasearchError,
+    query::SearchQuery,
+    result::SearchResult,
 };
+use reqwest::Client;
 
 pub struct StackExchange {
     metadata: EngineMetadata,
@@ -74,13 +74,16 @@ impl SearchEngine for StackExchange {
             self.api_site,
         );
 
-        let resp = self.client
+        let resp = self
+            .client
             .get(&url)
             .send()
             .await
             .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
 
-        let data: serde_json::Value = resp.json().await
+        let data: serde_json::Value = resp
+            .json()
+            .await
             .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
 
         let mut results = Vec::new();
@@ -96,13 +99,11 @@ impl SearchEngine for StackExchange {
                 let raw_title = item["title"].as_str().unwrap_or("Untitled");
                 let title = html_escape::decode_html_entities(raw_title).to_string();
 
-                let question_url = format!(
-                    "https://{}.com/q/{}",
-                    self.api_site, question_id,
-                );
+                let question_url = format!("https://{}.com/q/{}", self.api_site, question_id,);
 
                 // Tags
-                let tags: Vec<String> = item["tags"].as_array()
+                let tags: Vec<String> = item["tags"]
+                    .as_array()
                     .unwrap_or(&Vec::new())
                     .iter()
                     .filter_map(|t| t.as_str().map(|s| s.to_string()))
@@ -130,12 +131,8 @@ impl SearchEngine for StackExchange {
 
                 let snippet = content_parts.join(" // ");
 
-                let mut sr = SearchResult::new(
-                    title,
-                    question_url,
-                    snippet,
-                    "stackexchange".to_string(),
-                );
+                let mut sr =
+                    SearchResult::new(title, question_url, snippet, "stackexchange".to_string());
                 sr.engine_rank = (i + 1) as u32;
                 sr.category = SearchCategory::IT.to_string();
                 results.push(sr);

@@ -2,14 +2,14 @@
 //! Translated from SearXNG `searx/engines/bpb.py`.
 
 use async_trait::async_trait;
-use reqwest::Client;
 use metasearch_core::{
-    engine::{SearchEngine, EngineMetadata},
-    result::SearchResult,
-    query::SearchQuery,
     category::SearchCategory,
+    engine::{EngineMetadata, SearchEngine},
     error::MetasearchError,
+    query::SearchQuery,
+    result::SearchResult,
 };
+use reqwest::Client;
 
 pub struct Bpb {
     metadata: EngineMetadata,
@@ -49,13 +49,16 @@ impl SearchEngine for Bpb {
             page_index,
         );
 
-        let resp = self.client
+        let resp = self
+            .client
             .get(&url)
             .send()
             .await
             .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
 
-        let data: serde_json::Value = resp.json().await
+        let data: serde_json::Value = resp
+            .json()
+            .await
             .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
 
         let mut results = Vec::new();
@@ -83,12 +86,8 @@ impl SearchEngine for Bpb {
                     .and_then(|s| s["url"].as_str())
                     .map(|url_path| format!("https://www.bpb.de{}", url_path));
 
-                let mut result = SearchResult::new(
-                    title.to_string(),
-                    link,
-                    snippet,
-                    "bpb".to_string(),
-                );
+                let mut result =
+                    SearchResult::new(title.to_string(), link, snippet, "bpb".to_string());
                 result.engine_rank = (i + 1) as u32;
                 result.category = SearchCategory::General.to_string();
                 result.thumbnail = thumbnail;

@@ -3,15 +3,15 @@
 //! Reference: <https://annas-archive.org/>
 
 use async_trait::async_trait;
+use metasearch_core::{
+    category::SearchCategory,
+    engine::{EngineMetadata, SearchEngine},
+    error::MetasearchError,
+    query::SearchQuery,
+    result::SearchResult,
+};
 use reqwest::Client;
 use scraper::{Html, Selector};
-use metasearch_core::{
-    engine::{EngineMetadata, SearchEngine},
-    result::SearchResult,
-    query::SearchQuery,
-    category::SearchCategory,
-    error::MetasearchError,
-};
 
 pub struct AnnasArchive {
     client: Client,
@@ -43,7 +43,8 @@ impl SearchEngine for AnnasArchive {
             page
         );
 
-        let resp = self.client
+        let resp = self
+            .client
             .get(&url)
             .send()
             .await
@@ -95,12 +96,8 @@ impl SearchEngine for AnnasArchive {
 
             let full_url = format!("https://annas-archive.org{}", href);
 
-            let mut result = SearchResult::new(
-                title,
-                full_url,
-                content,
-                "Anna's Archive".to_string(),
-            );
+            let mut result =
+                SearchResult::new(title, full_url, content, "Anna's Archive".to_string());
             result.category = Some(SearchCategory::Files);
             result.thumbnail = thumbnail;
             results.push(result);

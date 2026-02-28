@@ -8,11 +8,11 @@ use reqwest::Client;
 use scraper::{Html, Selector};
 use url::Url;
 
+use metasearch_core::category::SearchCategory;
 use metasearch_core::engine::{EngineMetadata, SearchEngine};
+use metasearch_core::error::MetasearchError;
 use metasearch_core::query::SearchQuery;
 use metasearch_core::result::SearchResult;
-use metasearch_core::error::MetasearchError;
-use metasearch_core::category::SearchCategory;
 
 const BASE_URL: &str = "https://www.ansa.it";
 const SEARCH_URL: &str = "https://www.ansa.it/ricerca/ansait/search.shtml";
@@ -50,7 +50,8 @@ impl SearchEngine for Ansa {
         let page = query.page;
         let start = (page.saturating_sub(1)) * PAGE_SIZE;
 
-        let mut url = Url::parse(SEARCH_URL).map_err(|e| MetasearchError::ParseError(e.to_string()))?;
+        let mut url =
+            Url::parse(SEARCH_URL).map_err(|e| MetasearchError::ParseError(e.to_string()))?;
         url.query_pairs_mut()
             .append_pair("any", &query.query)
             .append_pair("start", &start.to_string())
@@ -79,7 +80,12 @@ impl SearchEngine for Ansa {
                 None => continue,
             };
 
-            let title: String = title_el.text().collect::<Vec<_>>().join(" ").trim().to_string();
+            let title: String = title_el
+                .text()
+                .collect::<Vec<_>>()
+                .join(" ")
+                .trim()
+                .to_string();
             let href = title_el.value().attr("href").unwrap_or_default();
             let article_url = format!("{}{}", BASE_URL, href);
 
@@ -93,12 +99,7 @@ impl SearchEngine for Ansa {
                 continue;
             }
 
-            results.push(SearchResult::new(
-                title,
-                article_url,
-                content,
-                "ANSA",
-            ));
+            results.push(SearchResult::new(title, article_url, content, "ANSA"));
         }
 
         Ok(results)

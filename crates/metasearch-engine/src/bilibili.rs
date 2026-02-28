@@ -98,7 +98,10 @@ impl SearchEngine for Bilibili {
             .client
             .get(&url)
             .header("Referer", "https://www.bilibili.com")
-            .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
+            .header(
+                "User-Agent",
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+            )
             .send()
             .await
             .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
@@ -144,7 +147,11 @@ impl SearchEngine for Bilibili {
             }
         }
 
-        info!(engine = "bilibili", count = results.len(), "Search complete");
+        info!(
+            engine = "bilibili",
+            count = results.len(),
+            "Search complete"
+        );
         Ok(results)
     }
 }

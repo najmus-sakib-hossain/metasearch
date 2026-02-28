@@ -2,14 +2,14 @@
 //! Translated from SearXNG `searx/engines/npm.py`.
 
 use async_trait::async_trait;
-use reqwest::Client;
 use metasearch_core::{
-    engine::{SearchEngine, EngineMetadata},
-    result::SearchResult,
-    query::SearchQuery,
     category::SearchCategory,
+    engine::{EngineMetadata, SearchEngine},
     error::MetasearchError,
+    query::SearchQuery,
+    result::SearchResult,
 };
+use reqwest::Client;
 
 const PAGE_SIZE: u32 = 25;
 
@@ -52,13 +52,16 @@ impl SearchEngine for Npm {
             PAGE_SIZE,
         );
 
-        let resp = self.client
+        let resp = self
+            .client
             .get(&url)
             .send()
             .await
             .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
 
-        let data: serde_json::Value = resp.json().await
+        let data: serde_json::Value = resp
+            .json()
+            .await
             .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
 
         let mut results = Vec::new();
@@ -72,10 +75,7 @@ impl SearchEngine for Npm {
                 let npm_url = package["links"]["npm"].as_str().unwrap_or_default();
                 let author = package["author"]["name"].as_str().unwrap_or("");
 
-                let snippet = format!(
-                    "v{} — {} — by {}",
-                    version, description, author,
-                );
+                let snippet = format!("v{} — {} — by {}", version, description, author,);
 
                 let mut result = SearchResult::new(
                     name.to_string(),

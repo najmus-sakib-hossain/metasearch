@@ -137,11 +137,11 @@ impl SearchEngine for Arxiv {
 
                 // Try to extract published date
                 if let Some(date_str) = Self::extract_tag_text(entry, "published") {
-                    if let Ok(dt) = chrono::NaiveDateTime::parse_from_str(
-                        date_str.trim(),
-                        "%Y-%m-%dT%H:%M:%SZ",
-                    ) {
-                        r.published_date = Some(chrono::DateTime::from_naive_utc_and_offset(dt, chrono::Utc));
+                    if let Ok(dt) =
+                        chrono::NaiveDateTime::parse_from_str(date_str.trim(), "%Y-%m-%dT%H:%M:%SZ")
+                    {
+                        r.published_date =
+                            Some(chrono::DateTime::from_naive_utc_and_offset(dt, chrono::Utc));
                     }
                 }
 

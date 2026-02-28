@@ -2,14 +2,14 @@
 //! Translated from SearXNG `searx/engines/youtube_noapi.py`.
 
 use async_trait::async_trait;
-use reqwest::Client;
 use metasearch_core::{
-    engine::{SearchEngine, EngineMetadata},
-    result::SearchResult,
-    query::SearchQuery,
     category::SearchCategory,
+    engine::{EngineMetadata, SearchEngine},
     error::MetasearchError,
+    query::SearchQuery,
+    result::SearchResult,
 };
+use reqwest::Client;
 
 pub struct YouTube {
     metadata: EngineMetadata,
@@ -47,15 +47,21 @@ impl SearchEngine for YouTube {
             page,
         );
 
-        let resp = self.client
+        let resp = self
+            .client
             .get(&url)
             .header("Cookie", "CONSENT=YES+")
-            .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
+            .header(
+                "User-Agent",
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+            )
             .send()
             .await
             .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
 
-        let html_text = resp.text().await
+        let html_text = resp
+            .text()
+            .await
             .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
 
         // Extract ytInitialData JSON from the HTML page
@@ -72,8 +78,8 @@ impl SearchEngine for YouTube {
 
         // Navigate: contents -> twoColumnSearchResultsRenderer -> primaryContents
         //           -> sectionListRenderer -> contents
-        let sections = &data["contents"]["twoColumnSearchResultsRenderer"]
-            ["primaryContents"]["sectionListRenderer"]["contents"];
+        let sections = &data["contents"]["twoColumnSearchResultsRenderer"]["primaryContents"]["sectionListRenderer"]
+            ["contents"];
 
         if let Some(sections_arr) = sections.as_array() {
             for section in sections_arr {
@@ -96,7 +102,8 @@ impl SearchEngine for YouTube {
                         let length = get_text_simple(&video["lengthText"]);
 
                         let video_url = format!("https://www.youtube.com/watch?v={}", video_id);
-                        let thumbnail = format!("https://i.ytimg.com/vi/{}/hqdefault.jpg", video_id);
+                        let thumbnail =
+                            format!("https://i.ytimg.com/vi/{}/hqdefault.jpg", video_id);
 
                         let snippet = format!(
                             "{} — by {} [{}]",
@@ -105,12 +112,8 @@ impl SearchEngine for YouTube {
                             length,
                         );
 
-                        let mut result = SearchResult::new(
-                            title,
-                            video_url,
-                            snippet,
-                            "youtube".to_string(),
-                        );
+                        let mut result =
+                            SearchResult::new(title, video_url, snippet, "youtube".to_string());
                         result.engine_rank = (results.len() + 1) as u32;
                         result.category = SearchCategory::Videos.to_string();
                         result.thumbnail = Some(thumbnail);

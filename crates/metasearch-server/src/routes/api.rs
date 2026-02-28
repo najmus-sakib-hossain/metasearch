@@ -3,9 +3,9 @@
 use std::sync::Arc;
 
 use axum::{
+    Json, Router,
     extract::{Query, State},
     routing::get,
-    Json, Router,
 };
 use serde::Deserialize;
 
@@ -40,16 +40,12 @@ async fn api_search(
     }))
 }
 
-async fn api_engines(
-    State(state): State<Arc<AppState>>,
-) -> Json<serde_json::Value> {
+async fn api_engines(State(state): State<Arc<AppState>>) -> Json<serde_json::Value> {
     let names = state.engine_registry.engine_names();
     Json(serde_json::json!({ "engines": names }))
 }
 
-async fn api_config(
-    State(state): State<Arc<AppState>>,
-) -> Json<serde_json::Value> {
+async fn api_config(State(state): State<Arc<AppState>>) -> Json<serde_json::Value> {
     Json(serde_json::json!({
         "version": env!("CARGO_PKG_VERSION"),
         "safe_search": state.settings.search.safe_search,

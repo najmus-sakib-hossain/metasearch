@@ -3,14 +3,14 @@
 //! Reference: <https://stock.adobe.com/>
 
 use async_trait::async_trait;
-use reqwest::Client;
 use metasearch_core::{
-    engine::{EngineMetadata, SearchEngine},
-    result::SearchResult,
-    query::SearchQuery,
     category::SearchCategory,
+    engine::{EngineMetadata, SearchEngine},
     error::MetasearchError,
+    query::SearchQuery,
+    result::SearchResult,
 };
+use reqwest::Client;
 
 pub struct AdobeStock {
     client: Client,
@@ -42,7 +42,8 @@ impl SearchEngine for AdobeStock {
             page
         );
 
-        let resp = self.client
+        let resp = self
+            .client
             .get(&url)
             .header("Accept-Language", "en-US,en;q=0.5")
             .send()
@@ -58,11 +59,26 @@ impl SearchEngine for AdobeStock {
 
         if let Some(items) = json.get("items").and_then(|v| v.as_object()) {
             for (_key, item) in items {
-                let title = item.get("title").and_then(|v| v.as_str()).unwrap_or_default();
-                let content_url = item.get("content_url").and_then(|v| v.as_str()).unwrap_or_default();
-                let asset_type = item.get("asset_type").and_then(|v| v.as_str()).unwrap_or_default();
-                let thumbnail = item.get("thumbnail_url").and_then(|v| v.as_str()).unwrap_or_default();
-                let author = item.get("author").and_then(|v| v.as_str()).unwrap_or_default();
+                let title = item
+                    .get("title")
+                    .and_then(|v| v.as_str())
+                    .unwrap_or_default();
+                let content_url = item
+                    .get("content_url")
+                    .and_then(|v| v.as_str())
+                    .unwrap_or_default();
+                let asset_type = item
+                    .get("asset_type")
+                    .and_then(|v| v.as_str())
+                    .unwrap_or_default();
+                let thumbnail = item
+                    .get("thumbnail_url")
+                    .and_then(|v| v.as_str())
+                    .unwrap_or_default();
+                let author = item
+                    .get("author")
+                    .and_then(|v| v.as_str())
+                    .unwrap_or_default();
 
                 if content_url.is_empty() {
                     continue;

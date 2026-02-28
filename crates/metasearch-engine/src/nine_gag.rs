@@ -102,7 +102,10 @@ impl SearchEngine for NineGag {
         let resp = self
             .client
             .get(&url)
-            .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
+            .header(
+                "User-Agent",
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+            )
             .send()
             .await
             .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
@@ -126,12 +129,7 @@ impl SearchEngine for NineGag {
                 post.images.image700.url.clone()
             };
 
-            let mut r = SearchResult::new(
-                &post.title,
-                &post.url,
-                &post.description,
-                "9gag",
-            );
+            let mut r = SearchResult::new(&post.title, &post.url, &post.description, "9gag");
             r.engine_rank = i as u32;
             r.category = "social_media".to_string();
             r.thumbnail = Some(thumbnail_url);

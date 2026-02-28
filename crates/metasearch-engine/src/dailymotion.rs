@@ -2,14 +2,14 @@
 //! Translated from SearXNG `searx/engines/dailymotion.py`.
 
 use async_trait::async_trait;
-use reqwest::Client;
 use metasearch_core::{
-    engine::{SearchEngine, EngineMetadata},
-    result::SearchResult,
-    query::SearchQuery,
     category::SearchCategory,
+    engine::{EngineMetadata, SearchEngine},
     error::MetasearchError,
+    query::SearchQuery,
+    result::SearchResult,
 };
+use reqwest::Client;
 
 const RESULTS_PER_PAGE: u32 = 10;
 
@@ -53,13 +53,16 @@ impl SearchEngine for Dailymotion {
             fields,
         );
 
-        let resp = self.client
+        let resp = self
+            .client
             .get(&url)
             .send()
             .await
             .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
 
-        let data: serde_json::Value = resp.json().await
+        let data: serde_json::Value = resp
+            .json()
+            .await
             .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
 
         let mut results = Vec::new();
@@ -95,7 +98,8 @@ impl SearchEngine for Dailymotion {
                 );
                 result.engine_rank = (i + 1) as u32;
                 result.category = SearchCategory::Videos.to_string();
-                result.thumbnail = item["thumbnail_360_url"].as_str()
+                result.thumbnail = item["thumbnail_360_url"]
+                    .as_str()
                     .map(|t| t.replace("http://", "https://"));
                 results.push(result);
             }

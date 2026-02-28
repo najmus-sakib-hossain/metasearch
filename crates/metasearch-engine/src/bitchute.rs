@@ -8,11 +8,11 @@ use reqwest::Client;
 use serde::Deserialize;
 use serde_json::json;
 
+use metasearch_core::category::SearchCategory;
 use metasearch_core::engine::{EngineMetadata, SearchEngine};
+use metasearch_core::error::MetasearchError;
 use metasearch_core::query::SearchQuery;
 use metasearch_core::result::SearchResult;
-use metasearch_core::error::MetasearchError;
-use metasearch_core::category::SearchCategory;
 
 const API_URL: &str = "https://api.bitchute.com/api/beta/search/videos";
 const RESULTS_PER_PAGE: u32 = 20;
@@ -99,10 +99,9 @@ impl SearchEngine for BitChute {
 
             let video_url = format!("https://www.bitchute.com/video/{}", video_id);
 
-            let mut snippet = html_escape::decode_html_entities(
-                &item.description.unwrap_or_default(),
-            )
-            .to_string();
+            let mut snippet =
+                html_escape::decode_html_entities(&item.description.unwrap_or_default())
+                    .to_string();
 
             // Strip HTML tags from description
             let tag_re = regex::Regex::new(r"<[^>]+>").unwrap();
@@ -116,12 +115,7 @@ impl SearchEngine for BitChute {
                 }
             }
 
-            results.push(SearchResult::new(
-                title,
-                video_url,
-                snippet,
-                "BitChute",
-            ));
+            results.push(SearchResult::new(title, video_url, snippet, "BitChute"));
         }
 
         Ok(results)

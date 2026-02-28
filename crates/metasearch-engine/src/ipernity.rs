@@ -2,15 +2,15 @@
 //! Translated from SearXNG `searx/engines/ipernity.py`.
 
 use async_trait::async_trait;
+use metasearch_core::{
+    category::SearchCategory,
+    engine::{EngineMetadata, SearchEngine},
+    error::MetasearchError,
+    query::SearchQuery,
+    result::SearchResult,
+};
 use reqwest::Client;
 use scraper::{Html, Selector};
-use metasearch_core::{
-    engine::{SearchEngine, EngineMetadata},
-    result::SearchResult,
-    query::SearchQuery,
-    category::SearchCategory,
-    error::MetasearchError,
-};
 
 const BASE_URL: &str = "https://www.ipernity.com";
 const PAGE_SIZE: u32 = 10;
@@ -53,13 +53,16 @@ impl SearchEngine for Ipernity {
             urlencoding::encode(&query.query),
         );
 
-        let resp = self.client
+        let resp = self
+            .client
             .get(&url)
             .send()
             .await
             .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
 
-        let body = resp.text().await
+        let body = resp
+            .text()
+            .await
             .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
 
         let document = Html::parse_document(&body);
@@ -87,12 +90,8 @@ impl SearchEngine for Ipernity {
                 .unwrap_or("Ipernity Photo")
                 .to_string();
 
-            let mut result = SearchResult::new(
-                title,
-                result_url,
-                String::new(),
-                "ipernity".to_string(),
-            );
+            let mut result =
+                SearchResult::new(title, result_url, String::new(), "ipernity".to_string());
             result.engine_rank = (i + 1) as u32;
             result.category = SearchCategory::Images.to_string();
             result.thumbnail = thumbnail;

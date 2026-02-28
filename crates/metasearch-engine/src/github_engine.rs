@@ -2,14 +2,14 @@
 //! Translated from SearXNG `searx/engines/github.py`.
 
 use async_trait::async_trait;
-use reqwest::Client;
 use metasearch_core::{
-    engine::{SearchEngine, EngineMetadata},
-    result::SearchResult,
-    query::SearchQuery,
     category::SearchCategory,
+    engine::{EngineMetadata, SearchEngine},
     error::MetasearchError,
+    query::SearchQuery,
+    result::SearchResult,
 };
+use reqwest::Client;
 
 pub struct GitHub {
     metadata: EngineMetadata,
@@ -45,7 +45,8 @@ impl SearchEngine for GitHub {
             urlencoding::encode(&query.query)
         );
 
-        let resp = self.client
+        let resp = self
+            .client
             .get(&url)
             .header("Accept", "application/vnd.github.preview.text-match+json")
             .header("User-Agent", "metasearch-engine/1.0")
@@ -53,7 +54,9 @@ impl SearchEngine for GitHub {
             .await
             .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
 
-        let data: serde_json::Value = resp.json().await
+        let data: serde_json::Value = resp
+            .json()
+            .await
             .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
 
         let mut results = Vec::new();

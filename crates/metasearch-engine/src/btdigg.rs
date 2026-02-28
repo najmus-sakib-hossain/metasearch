@@ -3,15 +3,15 @@
 //! Scrapes btdig.com for torrent metadata via HTML parsing.
 
 use async_trait::async_trait;
+use metasearch_core::{
+    category::SearchCategory,
+    engine::{EngineMetadata, SearchEngine},
+    error::MetasearchError,
+    query::SearchQuery,
+    result::SearchResult,
+};
 use reqwest::Client;
 use scraper::{Html, Selector};
-use metasearch_core::{
-    engine::{SearchEngine, EngineMetadata},
-    result::SearchResult,
-    query::SearchQuery,
-    category::SearchCategory,
-    error::MetasearchError,
-};
 
 pub struct Btdigg {
     metadata: EngineMetadata,
@@ -46,12 +46,16 @@ impl SearchEngine for Btdigg {
         let page = query.page.saturating_sub(1); // 0-indexed
         let url = format!("https://btdig.com/search?q={}&p={}", search_term, page);
 
-        let resp = self.client.get(&url)
+        let resp = self
+            .client
+            .get(&url)
             .send()
             .await
             .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
 
-        let body = resp.text().await
+        let body = resp
+            .text()
+            .await
             .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
 
         let document = Html::parse_document(&body);
@@ -64,27 +68,40 @@ impl SearchEngine for Btdigg {
         let mut results = Vec::new();
 
         for element in document.select(&result_sel) {
-            let title = element.select(&name_sel).next()
+            let title = element
+                .select(&name_sel)
+                .next()
                 .map(|el| el.text().collect::<String>().trim().to_string())
                 .unwrap_or_default();
 
-            let href = element.select(&name_sel).next()
+            let href = element
+                .select(&name_sel)
+                .next()
                 .and_then(|el| el.value().attr("href"))
                 .map(|h| {
-                    if h.starts_with("http") { h.to_string() }
-                    else { format!("https://btdig.com{}", h) }
+                    if h.starts_with("http") {
+                        h.to_string()
+                    } else {
+                        format!("https://btdig.com{}", h)
+                    }
                 })
                 .unwrap_or_default();
 
-            let content = element.select(&excerpt_sel).next()
+            let content = element
+                .select(&excerpt_sel)
+                .next()
                 .map(|el| el.text().collect::<String>().trim().replace('\n', " | "))
                 .unwrap_or_default();
 
-            let filesize = element.select(&size_sel).next()
+            let filesize = element
+                .select(&size_sel)
+                .next()
                 .map(|el| el.text().collect::<String>().trim().to_string())
                 .unwrap_or_default();
 
-            let _magnet = element.select(&magnet_sel).next()
+            let _magnet = element
+                .select(&magnet_sel)
+                .next()
                 .and_then(|el| el.value().attr("href"))
                 .unwrap_or_default();
 
