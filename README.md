@@ -2,6 +2,8 @@
 
 **A blazing-fast, privacy-respecting metasearch engine written in Rust** — inspired by [SearXNG](https://github.com/searxng/searxng).
 
+Currently, we are showing it in our website, XM Dustbase website. That's good. And I want to also show this in GPUI Desktop App. Now please do a web search about GPUI and create a markdown file about how to create a GPUI and show the results of our meta-search. 
+
 Today is the first of March 2026. Please use best Rust traits to make our meta search engine the fastest search engine possible. Please use the best Rust trait that we can use or please write a prompt for asking another more advanced AI to give you the list of best Rust traits and ways and suggestions to make our current Rust-based meta search engine the fastest meta search engine on the planet. 
 
 Please search the web about what are the biggest search engines out there, rank them, and make sure we at least support most of the biggest search engines. 
