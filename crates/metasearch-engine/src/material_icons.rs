@@ -41,73 +41,56 @@ impl SearchEngine for MaterialIcons {
     }
 
     async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>> {
+        // Use Iconify's search API — much faster than downloading the full
+        // Google Fonts metadata file (~3 MB).
+        let url = format!(
+            "https://api.iconify.design/search?query={}&prefix=material-symbols&limit=20",
+            urlencoding::encode(&query.query)
+        );
+
         let resp = self
             .client
-            .get("https://fonts.google.com/metadata/icons?key=material_symbols&incomplete=true")
+            .get(&url)
+            .header("Accept", "application/json")
             .send()
             .await
             .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
 
-        let body = resp
-            .text()
-            .await
-            .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
+        if !resp.status().is_success() {
+            return Ok(Vec::new());
+        }
 
-        // Response starts with ")]}'\n" prefix; skip first 5 chars
-        let json_str = if body.len() > 5 { &body[5..] } else { &body };
-
-        let json: serde_json::Value = serde_json::from_str(json_str)
-            .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
-
-        let query_lower = query.query.to_lowercase();
-        let query_parts: Vec<&str> = query_lower.split_whitespace().collect();
+        let json: serde_json::Value = match resp.json().await {
+            Ok(v) => v,
+            Err(_) => return Ok(Vec::new()),
+        };
 
         let mut results = Vec::new();
 
         if let Some(icons) = json.get("icons").and_then(|v| v.as_array()) {
-            for icon in icons {
-                let name = icon
-                    .get("name")
-                    .and_then(|v| v.as_str())
-                    .unwrap_or_default();
-                let tags: Vec<&str> = icon
-                    .get("tags")
-                    .and_then(|v| v.as_array())
-                    .map(|arr| arr.iter().filter_map(|v| v.as_str()).collect())
-                    .unwrap_or_default();
-                let categories: Vec<&str> = icon
-                    .get("categories")
-                    .and_then(|v| v.as_array())
-                    .map(|arr| arr.iter().filter_map(|v| v.as_str()).collect())
-                    .unwrap_or_default();
+            for icon_ref in icons {
+                let full_name = match icon_ref.as_str() {
+                    Some(s) => s,
+                    None => continue,
+                };
 
-                let matches = query_parts.iter().any(|part| {
-                    name.contains(part)
-                        || tags.iter().any(|t| t.contains(part))
-                        || categories.iter().any(|c| c.contains(part))
-                });
+                // full_name looks like "material-symbols:add" or "material-symbols:add-outlined"
+                let name = full_name.split(':').nth(1).unwrap_or(full_name);
+                let display = name.replace('-', " ");
 
-                if !matches {
-                    continue;
-                }
-
-                let url = format!(
-                    "https://fonts.google.com/icons?icon.query={}&selected=Material+Symbols+Outlined:{name}:FILL@0;wght@400;GRAD@0;opsz@24",
+                let page_url = format!(
+                    "https://fonts.google.com/icons?icon.query={}",
                     urlencoding::encode(name)
                 );
                 let img_src = format!(
-                    "https://fonts.gstatic.com/s/i/short-term/release/materialsymbolsoutlined/{name}/default/24px.svg"
+                    "https://api.iconify.design/material-symbols/{name}.svg"
                 );
 
-                let snippet = format!(
-                    "Tags: {} / Categories: {}",
-                    tags.join(", "),
-                    categories.join(", ")
-                );
+                let snippet = format!("Material Symbol icon: {}", display);
 
                 let mut result = SearchResult::new(
-                    name.replace('_', " "),
-                    url,
+                    display,
+                    page_url,
                     snippet,
                     self.metadata.name.clone(),
                 );
@@ -115,10 +98,6 @@ impl SearchEngine for MaterialIcons {
                 result.thumbnail = Some(img_src);
                 result.category = SearchCategory::Images.to_string();
                 results.push(result);
-
-                if results.len() >= 20 {
-                    break;
-                }
             }
         }
 

@@ -75,10 +75,25 @@ impl SearchEngine for Stract {
             .await
             .map_err(|e| MetasearchError::Engine(format!("Stract request failed: {e}")))?;
 
-        let api: ApiResponse = resp
-            .json()
+        // Handle non-success HTTP status (e.g., 503 Service Unavailable)
+        if !resp.status().is_success() {
+            return Ok(Vec::new());
+        }
+
+        let text = resp
+            .text()
             .await
-            .map_err(|e| MetasearchError::Engine(format!("Stract parse failed: {e}")))?;
+            .map_err(|e| MetasearchError::Engine(format!("Stract read failed: {e}")))?;
+
+        // Guard against HTML error pages (bot detection, server errors)
+        if text.trim_start().starts_with('<') {
+            return Ok(Vec::new());
+        }
+
+        let api: ApiResponse = match serde_json::from_str(&text) {
+            Ok(v) => v,
+            Err(_) => return Ok(Vec::new()),
+        };
 
         let results = api
             .webpages

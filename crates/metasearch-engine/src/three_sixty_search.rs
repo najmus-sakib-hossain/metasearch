@@ -64,7 +64,7 @@ impl SearchEngine for ThreeSixtySearch {
             }
         }
 
-        let resp = self
+        let resp = match self
             .client
             .get(&url)
             .header(
@@ -76,7 +76,11 @@ impl SearchEngine for ThreeSixtySearch {
             .header("Referer", "https://www.so.com/")
             .send()
             .await
-            .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
+        {
+            Ok(r) => r,
+            // Geo-blocking or redirect loop → return empty gracefully
+            Err(_) => return Ok(Vec::new()),
+        };
 
         // Handle redirect detection (e.g., CAPTCHA or geo-block)
         if !resp.status().is_success() {

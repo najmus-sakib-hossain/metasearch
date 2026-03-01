@@ -120,10 +120,24 @@ impl SearchEngine for DuckDuckGoExtra {
             .await
             .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
 
-        let json: serde_json::Value = resp
-            .json()
+        // DDG may block / rate-limit and return HTML instead of JSON
+        if !resp.status().is_success() {
+            return Ok(Vec::new());
+        }
+
+        let text = resp
+            .text()
             .await
-            .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
+            .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
+
+        if text.trim_start().starts_with('<') {
+            return Ok(Vec::new());
+        }
+
+        let json: serde_json::Value = match serde_json::from_str(&text) {
+            Ok(v) => v,
+            Err(_) => return Ok(Vec::new()),
+        };
 
         let items = match json.get("results").and_then(|r| r.as_array()) {
             Some(arr) => arr,
@@ -140,6 +154,7 @@ impl SearchEngine for DuckDuckGoExtra {
 
             let title = item["title"].as_str().unwrap_or("Untitled").to_string();
             let image = item["image"].as_str().unwrap_or_default();
+            let thumbnail_url = item["thumbnail"].as_str().unwrap_or(image);
             let width = item["width"].as_u64().unwrap_or(0);
             let height = item["height"].as_u64().unwrap_or(0);
             let source = item["source"].as_str().unwrap_or_default();
@@ -153,8 +168,8 @@ impl SearchEngine for DuckDuckGoExtra {
             let mut result = SearchResult::new(&title, url, &content, "duckduckgo_extra");
             result.engine_rank = (i + 1) as u32;
             result.category = SearchCategory::Images.to_string();
-            if !image.is_empty() {
-                result.thumbnail = Some(image.to_string());
+            if !thumbnail_url.is_empty() {
+                result.thumbnail = Some(thumbnail_url.to_string());
             }
             results.push(result);
         }

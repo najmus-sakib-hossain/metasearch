@@ -58,8 +58,13 @@ impl SearchEngine for DictZone {
             .header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
             .header("Accept-Language", "en-US,en;q=0.9")
             .send()
-            .await
-            .map_err(|e| MetasearchError::Engine(format!("DictZone request error: {e}")))?;
+            .await;
+
+        // dictzone.com may be unreachable — return empty gracefully
+        let resp = match resp {
+            Ok(r) => r,
+            Err(_) => return Ok(Vec::new()),
+        };
 
         if !resp.status().is_success() {
             return Ok(vec![]);

@@ -64,12 +64,20 @@ impl SearchEngine for AcFun {
         let resp = self
             .client
             .get(url.as_str())
+            .timeout(std::time::Duration::from_secs(6))
             .send()
-            .await
-            .map_err(|e| MetasearchError::HttpError(e.to_string()))?
-            .text()
-            .await
-            .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
+            .await;
+
+        // AcFun may be unreachable outside China — return empty gracefully
+        let resp = match resp {
+            Ok(r) => r,
+            Err(_) => return Ok(Vec::new()),
+        };
+
+        let resp = match resp.text().await {
+            Ok(t) => t,
+            Err(_) => return Ok(Vec::new()),
+        };
 
         let mut results = Vec::new();
         let re = Regex::new(r"bigPipe\.onPageletArrive\((\{.*?\})\);")

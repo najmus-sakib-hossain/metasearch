@@ -49,28 +49,29 @@ impl SearchEngine for WolframAlphaNoapi {
         let token_resp = self
             .client
             .get(token_url)
+            .timeout(std::time::Duration::from_secs(5))
             .header(
                 "User-Agent",
                 "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
             )
             .send()
-            .await
-            .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
+            .await;
 
-        let token_data: serde_json::Value = token_resp
-            .json()
-            .await
-            .map_err(|e| {
-                MetasearchError::ParseError(format!("Token JSON error: {}", e))
-            })?;
+        // Wolfram|Alpha may be slow or unavailable
+        let token_resp = match token_resp {
+            Ok(r) => r,
+            Err(_) => return Ok(Vec::new()),
+        };
 
-        let token = token_data["code"]
-            .as_str()
-            .ok_or_else(|| {
-                MetasearchError::ParseError(
-                    "Missing 'code' in token response".to_string(),
-                )
-            })?;
+        let token_data: serde_json::Value = match token_resp.json().await {
+            Ok(v) => v,
+            Err(_) => return Ok(Vec::new()),
+        };
+
+        let token = match token_data["code"].as_str() {
+            Some(t) => t.to_string(),
+            None => return Ok(Vec::new()),
+        };
 
         let encoded_query = urlencoding::encode(&query.query);
         let referer = format!(
@@ -84,12 +85,13 @@ impl SearchEngine for WolframAlphaNoapi {
              ?async=false&banners=raw&format=image,plaintext\
              &input={}&output=JSON&proxycode={}",
             encoded_query,
-            urlencoding::encode(token),
+            urlencoding::encode(&token),
         );
 
-        let resp = self
+        let resp = match self
             .client
             .get(&query_url)
+            .timeout(std::time::Duration::from_secs(5))
             .header("Referer", &referer)
             .header(
                 "User-Agent",
@@ -97,12 +99,15 @@ impl SearchEngine for WolframAlphaNoapi {
             )
             .send()
             .await
-            .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
+        {
+            Ok(r) => r,
+            Err(_) => return Ok(Vec::new()),
+        };
 
-        let data: serde_json::Value = resp
-            .json()
-            .await
-            .map_err(|e| MetasearchError::ParseError(format!("JSON error: {}", e)))?;
+        let data: serde_json::Value = match resp.json().await {
+            Ok(v) => v,
+            Err(_) => return Ok(Vec::new()),
+        };
 
         let result_url = format!(
             "https://www.wolframalpha.com/input/?i={}",

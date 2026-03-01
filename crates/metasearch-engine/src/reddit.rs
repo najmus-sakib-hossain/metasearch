@@ -58,10 +58,25 @@ impl SearchEngine for Reddit {
             .await
             .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
 
-        let data: serde_json::Value = resp
-            .json()
+        // Reddit may return 429 (rate-limit) or a redirect/HTML page instead of JSON
+        if !resp.status().is_success() {
+            return Ok(Vec::new());
+        }
+
+        let text = resp
+            .text()
             .await
             .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
+
+        // Guard against HTML responses (bot detection, CAPTCHA, login wall)
+        if text.trim_start().starts_with('<') {
+            return Ok(Vec::new());
+        }
+
+        let data: serde_json::Value = match serde_json::from_str(&text) {
+            Ok(v) => v,
+            Err(_) => return Ok(Vec::new()),
+        };
 
         let mut results = Vec::new();
 
