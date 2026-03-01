@@ -85,6 +85,10 @@
 //! ## Batch 23 — Translation, dictionary, weather, maps, currency (10):
 //! - LibreTranslate, Lingva, DictZone, DeepL, CurrencyConvert,
 //!   Wordnik, TinEye, OpenStreetMap, Apple Maps, DuckDuckGo Weather
+//!
+//! ## Batch 33 — Database engines (6, optional features):
+//! - SQLite, PostgreSQL, MySQL, MariaDB, MongoDB, Valkey/Redis
+//! - Enable with cargo features: `sqlite`, `postgres`, `mysql`, `mongodb_feature`, `redis`
 
 // Original engines
 pub mod brave;
@@ -360,6 +364,14 @@ pub mod wikidata;
 pub mod azure;
 pub mod cloudflareai;
 pub mod ollama;
+
+// Batch 33 (Database engines — offline, require database drivers)
+pub mod mariadb_engine;
+pub mod mongodb_engine;
+pub mod mysql_engine;
+pub mod postgres_engine;
+pub mod sqlite_engine;
+pub mod valkey_engine;
 
 pub mod registry;
 
