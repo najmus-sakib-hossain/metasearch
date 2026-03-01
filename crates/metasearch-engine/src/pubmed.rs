@@ -3,8 +3,9 @@
 //! Two-step XML API:
 //! 1. esearch to get PMIDs
 //! 2. efetch to get article details
-//! Website: https://www.ncbi.nlm.nih.gov/pubmed
-//! Features: Paging
+//!
+//!    Website: https://www.ncbi.nlm.nih.gov/pubmed
+//!    Features: Paging
 
 use async_trait::async_trait;
 use metasearch_core::{

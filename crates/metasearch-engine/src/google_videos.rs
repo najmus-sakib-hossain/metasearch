@@ -6,7 +6,6 @@ use reqwest::Client;
 use scraper::{Html, Selector};
 
 use metasearch_core::{
-    category::SearchCategory,
     engine::{EngineMetadata, SearchEngine},
     error::MetasearchError,
     query::SearchQuery,

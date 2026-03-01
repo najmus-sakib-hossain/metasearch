@@ -56,12 +56,14 @@ struct CoreResult {
     source_urls: Option<String>,
     #[serde(rename = "fullText")]
     full_text: Option<String>,
+    #[allow(dead_code)]
     authors: Option<Vec<CoreAuthor>>,
     #[serde(rename = "publishedDate")]
     published_date: Option<String>,
 }
 
 #[derive(Deserialize)]
+#[allow(dead_code)]
 struct CoreAuthor {
     name: Option<String>,
 }

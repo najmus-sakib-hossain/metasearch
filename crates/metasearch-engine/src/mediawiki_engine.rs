@@ -44,6 +44,7 @@ struct MwQuery {
 struct MwSearchResult {
     title: String,
     content: Option<String>,
+    #[allow(dead_code)]
     timestamp: Option<String>,
 }
 

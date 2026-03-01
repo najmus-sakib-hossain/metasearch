@@ -59,10 +59,12 @@ struct GImagesMeta {
 struct GImagesResult {
     referrer_url: Option<String>,
     page_title: Option<String>,
+    #[allow(dead_code)]
     site_title: Option<String>,
 }
 
 #[derive(Deserialize)]
+#[allow(dead_code)]
 struct GImagesOriginal {
     url: Option<String>,
     width: Option<u32>,

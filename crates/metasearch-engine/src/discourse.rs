@@ -52,8 +52,10 @@ struct DiscourseTopic {
     id: u64,
     title: String,
     #[serde(default)]
+    #[allow(dead_code)]
     posts_count: u32,
     #[serde(default)]
+    #[allow(dead_code)]
     created_at: String,
 }
 
@@ -62,6 +64,7 @@ struct DiscoursePost {
     id: u64,
     topic_id: u64,
     #[serde(default)]
+    #[allow(dead_code)]
     username: String,
     #[serde(default)]
     blurb: String,

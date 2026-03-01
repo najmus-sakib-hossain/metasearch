@@ -44,7 +44,9 @@ struct SepiaVideo {
     channel: Option<SepiaChannel>,
     duration: Option<i64>,
     #[serde(rename = "publishedAt")]
+    #[allow(dead_code)]
     published_at: Option<String>,
+    #[allow(dead_code)]
     account: Option<SepiaAccount>,
 }
 
@@ -56,6 +58,7 @@ struct SepiaChannel {
 }
 
 #[derive(Debug, Deserialize)]
+#[allow(dead_code)]
 struct SepiaAccount {
     #[serde(rename = "displayName")]
     display_name: Option<String>,

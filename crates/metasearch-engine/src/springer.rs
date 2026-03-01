@@ -46,6 +46,7 @@ struct SpringerResponse {
 }
 
 #[derive(Deserialize)]
+#[allow(dead_code)]
 struct SpringerRecord {
     title: Option<String>,
     #[serde(rename = "abstract")]
@@ -68,6 +69,7 @@ struct SpringerUrl {
 }
 
 #[derive(Deserialize)]
+#[allow(dead_code)]
 struct SpringerCreator {
     creator: Option<String>,
 }

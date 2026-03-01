@@ -36,10 +36,12 @@ impl Piped {
 #[derive(Deserialize)]
 struct PipedResponse {
     items: Vec<PipedItem>,
+    #[allow(dead_code)]
     nextpage: Option<String>,
 }
 
 #[derive(Deserialize)]
+#[allow(dead_code)]
 struct PipedItem {
     url: Option<String>,
     title: Option<String>,

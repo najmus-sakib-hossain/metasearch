@@ -169,7 +169,7 @@ impl SearchEngine for MongoDbEngine {
                 }
             };
 
-            let skip = ((query.page.saturating_sub(1)) * self.results_per_page) as u64;
+            let skip = ((query.page.saturating_sub(1)) * (self.results_per_page as u32)) as u64;
             let limit = self.results_per_page as i64;
 
             let mut cursor = collection

@@ -38,6 +38,7 @@ impl DuckDuckGoDefinitions {
 }
 
 #[derive(Deserialize)]
+#[allow(dead_code)]
 struct DdgResponse {
     #[serde(rename = "Heading")]
     heading: Option<String>,
@@ -58,6 +59,7 @@ struct DdgResponse {
 }
 
 #[derive(Deserialize)]
+#[allow(dead_code)]
 struct DdgDirectResult {
     #[serde(rename = "FirstURL")]
     first_url: Option<String>,

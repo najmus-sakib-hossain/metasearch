@@ -41,8 +41,10 @@ struct InvidiousResult {
     description: Option<String>,
     author: Option<String>,
     #[serde(rename = "viewCount", default)]
+    #[allow(dead_code)]
     view_count: u64,
     #[serde(rename = "lengthSeconds", default)]
+    #[allow(dead_code)]
     length_seconds: u64,
 }
 

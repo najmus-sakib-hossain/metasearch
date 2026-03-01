@@ -41,6 +41,7 @@ struct OpenLibraryDoc {
     first_publish_year: Option<u32>,
     first_sentence: Option<Vec<String>>,
     lending_identifier_s: Option<String>,
+    #[allow(dead_code)]
     subject: Option<Vec<String>>,
 }
 

@@ -142,7 +142,7 @@ async fn search(
         let template_results: Vec<TemplateResult> = cached
             .results
             .iter()
-            .map(|r| result_to_template(r))
+            .map(result_to_template)
             .collect();
 
         let number_of_results = template_results.len();
@@ -244,7 +244,7 @@ async fn search(
     // ── Convert to template format ──
     let template_results: Vec<TemplateResult> = deduped_results
         .iter()
-        .map(|r| result_to_template(r))
+        .map(result_to_template)
         .collect();
 
     let number_of_results = template_results.len();
@@ -308,6 +308,7 @@ fn strip_html_tags(s: &str) -> String {
 }
 
 /// Build the Tera context for the results template.
+#[allow(clippy::too_many_arguments)]
 fn build_context(
     query: &str,
     category: &str,

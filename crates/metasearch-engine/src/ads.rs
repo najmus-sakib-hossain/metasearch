@@ -57,6 +57,7 @@ struct AdsError {
 }
 
 #[derive(Deserialize)]
+#[allow(dead_code)]
 struct AdsDoc {
     title: Option<Vec<String>>,
     author: Option<Vec<String>>,

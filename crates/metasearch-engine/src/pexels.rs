@@ -20,7 +20,7 @@ pub struct Pexels {
 
 impl Pexels {
     pub fn new(client: Client, api_key: Option<String>) -> Self {
-        let enabled = api_key.as_ref().map_or(false, |k| !k.is_empty());
+        let enabled = api_key.as_ref().is_some_and(|k| !k.is_empty());
         Self {
             metadata: EngineMetadata {
                 name: "pexels".to_string(),

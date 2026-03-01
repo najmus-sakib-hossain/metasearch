@@ -106,7 +106,7 @@ impl SearchEngine for SqliteEngine {
             let db_path = self.database_path.clone();
             let query_str = self.query_str.clone();
             let limit = self.limit;
-            let offset = (query.page.saturating_sub(1)) * limit;
+            let offset = (query.page.saturating_sub(1)) * (limit as u32);
             let search_query = query.query.clone();
             let wildcard = format!("%{}%", search_query.replace(' ', "%"));
             let result_type = self.result_type;
@@ -153,26 +153,24 @@ impl SearchEngine for SqliteEngine {
                     })
                     .map_err(|e| MetasearchError::Engine(format!("SQLite query: {e}")))?;
 
-                for row_result in rows {
-                    if let Ok(kvmap) = row_result {
-                        let result = match result_type {
-                            SqliteResultType::Main => {
-                                let title = kvmap.get("title").cloned().unwrap_or_default();
-                                let url = kvmap.get("url").cloned().unwrap_or_default();
-                                let content = kvmap.get("content").cloned().unwrap_or_default();
-                                SearchResult::new(title, url, content, "sqlite")
-                            }
-                            SqliteResultType::KeyValue => {
-                                let title = kvmap
-                                    .iter()
-                                    .map(|(k, v)| format!("{k}: {v}"))
-                                    .collect::<Vec<_>>()
-                                    .join(", ");
-                                SearchResult::new(title, "", "", "sqlite")
-                            }
-                        };
-                        results.push(result);
-                    }
+                for kvmap in rows.flatten() {
+                    let result = match result_type {
+                        SqliteResultType::Main => {
+                            let title = kvmap.get("title").cloned().unwrap_or_default();
+                            let url = kvmap.get("url").cloned().unwrap_or_default();
+                            let content = kvmap.get("content").cloned().unwrap_or_default();
+                            SearchResult::new(title, url, content, "sqlite")
+                        }
+                        SqliteResultType::KeyValue => {
+                            let title = kvmap
+                                .iter()
+                                .map(|(k, v)| format!("{k}: {v}"))
+                                .collect::<Vec<_>>()
+                                .join(", ");
+                            SearchResult::new(title, "", "", "sqlite")
+                        }
+                    };
+                    results.push(result);
                 }
 
                 Ok::<_, MetasearchError>(results)

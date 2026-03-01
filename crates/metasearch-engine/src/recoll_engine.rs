@@ -41,6 +41,7 @@ struct RecollResponse {
 }
 
 #[derive(Deserialize)]
+#[allow(dead_code)]
 struct RecollResult {
     label: Option<String>,
     url: Option<String>,

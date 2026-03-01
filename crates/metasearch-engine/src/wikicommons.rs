@@ -78,7 +78,7 @@ impl SearchEngine for WikiCommons {
         let results_per_page: u32 = 10;
         let page = query.page.max(1);
         let offset = results_per_page * (page - 1);
-        let encoded = urlencoding::encode(&query.query);
+        let _encoded = urlencoding::encode(&query.query);
 
         // Search for image files using MediaWiki generator search API
         let filetype = "bitmap|drawing";
@@ -142,7 +142,7 @@ impl SearchEngine for WikiCommons {
                         .unwrap_or(&title);
 
                     let description_url = imageinfo.descriptionurl.as_deref().unwrap_or_default();
-                    let media_url = imageinfo.url.as_deref().unwrap_or_default();
+                    let _media_url = imageinfo.url.as_deref().unwrap_or_default();
 
                     if title.is_empty() || description_url.is_empty() {
                         continue;

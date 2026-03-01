@@ -3,8 +3,9 @@
 //! Two-step JSON API:
 //! 1. Geocoding: <https://geocoding-api.open-meteo.com/v1/search>
 //! 2. Forecast: <https://api.open-meteo.com/v1/forecast>
-//! Website: https://open-meteo.com
-//! Features: Current weather with geocoding, no pagination
+//!
+//!    Website: https://open-meteo.com
+//!    Features: Current weather with geocoding, no pagination
 
 use async_trait::async_trait;
 use metasearch_core::{

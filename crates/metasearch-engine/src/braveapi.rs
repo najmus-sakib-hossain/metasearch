@@ -54,6 +54,7 @@ struct WebResult {
     url: String,
     title: String,
     description: Option<String>,
+    #[allow(dead_code)]
     age: Option<String>,
 }
 

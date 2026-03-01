@@ -31,6 +31,7 @@ impl Tootfinder {
 struct TootResult {
     url: Option<String>,
     content: Option<String>,
+    #[allow(dead_code)]
     created_at: Option<String>,
     card: Option<TootCard>,
 }

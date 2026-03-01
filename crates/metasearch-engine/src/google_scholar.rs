@@ -84,6 +84,9 @@ impl SearchEngine for GoogleScholar {
         let content_sel = Selector::parse("div.gs_rs").unwrap();
         let meta_sel = Selector::parse("div.gs_a").unwrap();
 
+        // Compile regex once outside the loop
+        let year_regex = regex::Regex::new(r"\b(19|20)\d{2}\b").ok();
+
         let mut results = Vec::new();
         for (i, result_el) in document.select(&result_sel).enumerate() {
             // Get title and URL from h3 > a
@@ -118,10 +121,7 @@ impl SearchEngine for GoogleScholar {
             r.category = SearchCategory::General.to_string();
 
             // Try to extract year from metadata (e.g., "Author - Journal, 2024 - Publisher")
-            if let Some(caps) = regex::Regex::new(r"\b(19|20)\d{2}\b")
-                .ok()
-                .and_then(|re| re.find(&meta))
-            {
+            if let Some(caps) = year_regex.as_ref().and_then(|re| re.find(&meta)) {
                 if let Ok(year) = caps.as_str().parse::<i32>() {
                     if let Some(date) = chrono::NaiveDate::from_ymd_opt(year, 1, 1) {
                         r.published_date = date.and_hms_opt(0, 0, 0).map(|ndt| {

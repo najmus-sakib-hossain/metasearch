@@ -108,7 +108,7 @@ impl SearchEngine for MysqlEngine {
         {
             use mysql_async::{prelude::*, Pool, Opts, OptsBuilder};
 
-            let offset = (query.page.saturating_sub(1)) * self.limit;
+            let offset = (query.page.saturating_sub(1)) * (self.limit as u32);
             let wildcard = format!("%{}%", query.query.replace(' ', "%"));
 
             let opts: Opts = OptsBuilder::default()
