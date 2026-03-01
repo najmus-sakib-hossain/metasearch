@@ -9,6 +9,7 @@ Today is the first of March 2026. Please use best Rust traits to make our meta s
 Please search the web about what are the biggest search engines out there, rank them, and make sure we at least support most of the biggest search engines. 
 
 Now I checked it on many of the general websites and this engine may not work in our Rust. Please test them locally and make sure they work. If they don't work then please learn from the local copy of integration SearXNG and implement our Rust code in that Python way so that our code actually works. Also you can use web search to actually make the Rust code work. I need these search engines listed at the bottom to work perfectly fine so please test them separately and make sure they give results:
+
 #### General Web Search (10)
 - ✅ google
 - ✅ duckduckgo

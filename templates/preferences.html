@@ -4,6 +4,20 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Preferences — Metasearch</title>
+  <script>
+    (function () {
+      try {
+        var prefs = JSON.parse(localStorage.getItem('metasearch-prefs') || '{}');
+        var theme = prefs.theme || 'dark';
+        document.documentElement.classList.remove('light');
+        if (theme === 'light') {
+          document.documentElement.classList.add('light');
+        } else if (theme === 'auto' && window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+          document.documentElement.classList.add('light');
+        }
+      } catch (_) {}
+    }());
+  </script>
   <link rel="stylesheet" href="/static/css/style.css">
   <link rel="stylesheet" href="/static/css/shadcn-vercel.css">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230070f3' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><circle cx='11' cy='11' r='8'/><path d='m21 21-4.35-4.35'/></svg>">
@@ -166,8 +180,8 @@
           <div class="pref-desc">Choose your preferred color scheme</div>
         </div>
         <select id="theme">
-          <option value="light" selected>Light</option>
-          <option value="dark">Dark</option>
+          <option value="dark" selected>Dark</option>
+          <option value="light">Light</option>
           <option value="auto">Auto</option>
         </select>
       </div>
@@ -195,7 +209,7 @@
       if (prefs.safeSearch) document.getElementById('safe-search').value = prefs.safeSearch;
       if (prefs.resultsPerPage) document.getElementById('results-per-page').value = prefs.resultsPerPage;
       if (prefs.language) document.getElementById('language').value = prefs.language;
-      if (prefs.theme) document.getElementById('theme').value = prefs.theme;
+      document.getElementById('theme').value = prefs.theme || 'dark';
     }
 
     // Save preferences to localStorage
@@ -209,10 +223,11 @@
       localStorage.setItem('metasearch-prefs', JSON.stringify(prefs));
       
       // Apply theme
-      if (prefs.theme === 'dark') {
-        document.documentElement.classList.add('dark');
-      } else if (prefs.theme === 'light') {
-        document.documentElement.classList.remove('dark');
+      document.documentElement.classList.remove('light');
+      if (prefs.theme === 'light') {
+        document.documentElement.classList.add('light');
+      } else if (prefs.theme === 'auto' && window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+        document.documentElement.classList.add('light');
       }
       
       alert('Preferences saved successfully!');
@@ -224,8 +239,8 @@
       document.getElementById('safe-search').value = '1';
       document.getElementById('results-per-page').value = '10';
       document.getElementById('language').value = 'en';
-      document.getElementById('theme').value = 'light';
-      document.documentElement.classList.remove('dark');
+      document.getElementById('theme').value = 'dark';
+      document.documentElement.classList.remove('light');
       alert('Preferences reset to defaults!');
     }
 

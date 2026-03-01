@@ -4,6 +4,20 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Metasearch — Privacy-respecting Search</title>
+  <script>
+    (function () {
+      try {
+        var prefs = JSON.parse(localStorage.getItem('metasearch-prefs') || '{}');
+        var theme = prefs.theme || 'dark';
+        document.documentElement.classList.remove('light');
+        if (theme === 'light') {
+          document.documentElement.classList.add('light');
+        } else if (theme === 'auto' && window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+          document.documentElement.classList.add('light');
+        }
+      } catch (_) {}
+    }());
+  </script>
   <link rel="stylesheet" href="/static/css/style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,6 +30,9 @@
   <script>document.addEventListener('DOMContentLoaded', () => lucide.createIcons())</script>
 </head>
 <body class="home-page">
+
+  <!-- Page loading bar -->
+  <div class="search-loading-bar" id="page-loading-bar"></div>
 
   <!-- Nav Bar -->
   <nav class="home-nav">
@@ -215,6 +232,7 @@
     var currentFetch;
 
     // Loading state for search button
+    var bar = document.getElementById('page-loading-bar');
     form.addEventListener('submit', function() {
       var btnText = document.getElementById('btn-text');
       var btnIcon = document.getElementById('btn-icon');
@@ -224,7 +242,11 @@
       if (btnText) btnText.style.display = 'none';
       if (btnIcon) btnIcon.style.display = 'none';
       if (btnSpinner) btnSpinner.style.display = 'inline-block';
-      if (searchBtn) searchBtn.disabled = true;
+      if (searchBtn) searchBtn.style.cursor = 'wait';
+      if (bar) bar.classList.add('active');
+    });
+    window.addEventListener('beforeunload', function () {
+      if (bar) bar.classList.add('complete');
     });
 
     function clearDropdown() {

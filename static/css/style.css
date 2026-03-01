@@ -5,28 +5,28 @@
 /* ── Tokens ──────────────────────────────────────────────────── */
 :root {
   /* Colors */
-  --bg:           #000000;
-  --bg-1:         #0a0a0a;
-  --bg-2:         #111111;
-  --bg-3:         #181818;
-  --border:       rgba(255,255,255,0.08);
-  --border-hover: rgba(255,255,255,0.15);
-  --txt-1:        #ededed;
-  --txt-2:        #888888;
-  --txt-3:        #555555;
+  --bg:           hsl(var(--background));
+  --bg-1:         hsl(var(--card));
+  --bg-2:         hsl(var(--secondary));
+  --bg-3:         hsl(var(--accent));
+  --border:       hsl(var(--border) / 0.72);
+  --border-hover: hsl(var(--border));
+  --txt-1:        hsl(var(--foreground));
+  --txt-2:        hsl(var(--muted-foreground));
+  --txt-3:        hsl(var(--muted-foreground) / 0.72);
   --blue:         #0070f3;
-  --blue-hover:   #338ef7;
+  --blue-hover:   #3291ff;
   --blue-dim:     rgba(0,112,243,0.12);
-  --green:        #50e3c2;
-  --green-dim:    rgba(80,227,194,0.12);
-  --purple:       #7928ca;
-  --purple-dim:   rgba(121,40,202,0.12);
-  --orange:       #f5a623;
-  --orange-dim:   rgba(245,166,35,0.12);
-  --red:          #ff4040;
-  --red-dim:      rgba(255,64,64,0.12);
-  --cyan:         #79ffe1;
-  --cyan-dim:     rgba(121,255,225,0.12);
+  --green:        hsl(var(--foreground));
+  --green-dim:    hsl(var(--accent));
+  --purple:       hsl(var(--foreground));
+  --purple-dim:   hsl(var(--accent));
+  --orange:       hsl(var(--foreground));
+  --orange-dim:   hsl(var(--accent));
+  --red:          hsl(var(--foreground));
+  --red-dim:      hsl(var(--accent));
+  --cyan:         hsl(var(--foreground));
+  --cyan-dim:     hsl(var(--accent));
 
   /* Typography */
   --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -199,10 +199,7 @@ svg.lucide {
   color: var(--txt-1);
 }
 .hero-title-accent {
-  background: linear-gradient(135deg, var(--blue) 0%, #8b5cf6 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--blue);
 }
 
 .hero-sub {
@@ -262,7 +259,10 @@ svg.lucide {
 
 .hero-btn {
   display: flex; align-items: center; justify-content: center;
-  width: 44px; height: 44px;
+  width: auto;
+  min-width: 44px;
+  height: 44px;
+  padding: 0 14px;
   margin: 4px;
   background: var(--blue);
   border: none;
@@ -271,10 +271,19 @@ svg.lucide {
   cursor: pointer;
   flex-shrink: 0;
   transition: background 0.15s, transform 0.1s;
+  gap: 6px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  font-family: var(--font);
 }
 .hero-btn:hover { background: var(--blue-hover); }
 .hero-btn:active { transform: scale(0.95); }
 .hero-btn svg { width: 18px; height: 18px; }
+/* Loading spinner inside hero button should use contrasting color */
+.hero-btn .loading-spinner {
+  border-color: rgba(255,255,255,0.25);
+  border-top-color: #fff;
+}
 
 /* ── Category Pills ────────────────────────────────────────── */
 .category-pills {
@@ -352,7 +361,7 @@ svg.lucide {
 }
 .feature-icon svg { width: 20px; height: 20px; }
 .feature-icon--blue   { background: var(--blue-dim);   color: var(--blue); }
-.feature-icon--purple { background: var(--purple-dim); color: #a855f7; }
+.feature-icon--purple { background: var(--purple-dim); color: var(--purple); }
 .feature-icon--green  { background: var(--green-dim);  color: var(--green); }
 .feature-icon--orange { background: var(--orange-dim); color: var(--orange); }
 .feature-icon--red    { background: var(--red-dim);    color: var(--red); }
@@ -497,7 +506,7 @@ svg.lucide {
   border: 1px solid var(--border);
   border-radius: var(--r-lg);
   transition: border-color 0.2s, box-shadow 0.2s;
-  overflow: hidden;
+  overflow: visible; /* must be visible for autocomplete dropdown */
 }
 .rp-input-wrap:focus-within {
   border-color: var(--blue);
@@ -658,9 +667,9 @@ svg.lucide {
 }
 .meta-chip svg { width: 11px; height: 11px; }
 .meta-chip--accent {
-  background: rgba(121,40,202,0.12);
-  color: #a78bfa;
-  border-color: rgba(121,40,202,0.2);
+  background: var(--bg-3);
+  color: var(--txt-1);
+  border-color: var(--border);
 }
 
 /* ── Favicon ─────────────────────────────────────────────────── */

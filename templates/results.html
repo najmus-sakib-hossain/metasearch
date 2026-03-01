@@ -4,6 +4,20 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{{ query }} — Metasearch</title>
+  <script>
+    (function () {
+      try {
+        var prefs = JSON.parse(localStorage.getItem('metasearch-prefs') || '{}');
+        var theme = prefs.theme || 'dark';
+        document.documentElement.classList.remove('light');
+        if (theme === 'light') {
+          document.documentElement.classList.add('light');
+        } else if (theme === 'auto' && window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+          document.documentElement.classList.add('light');
+        }
+      } catch (_) {}
+    }());
+  </script>
   <link rel="stylesheet" href="/static/css/style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,51 +28,11 @@
   <link rel="search" type="application/opensearchdescription+xml" title="Metasearch" href="/opensearch.xml">
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
   <script>document.addEventListener('DOMContentLoaded', () => lucide.createIcons())</script>
-  <style>
-    /* ── Autocomplete dropdown ────────────────────────── */
-    .autocomplete-dropdown {
-      position: absolute;
-      top: calc(100% + 4px);
-      left: 0;
-      right: 0;
-      background: rgba(15, 15, 30, 0.98);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 12px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
-      list-style: none;
-      margin: 0;
-      padding: 4px 0;
-      z-index: 1000;
-      backdrop-filter: blur(12px);
-      overflow: hidden;
-    }
-    .autocomplete-dropdown li {
-      padding: 10px 16px;
-      cursor: pointer;
-      font-size: 0.9rem;
-      color: rgba(255,255,255,0.85);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      transition: background 0.12s;
-    }
-    .autocomplete-dropdown li:hover,
-    .autocomplete-dropdown li[aria-selected="true"] {
-      background: rgba(0, 112, 243, 0.18);
-      color: #fff;
-    }
-    .autocomplete-dropdown li .ac-icon {
-      opacity: 0.45;
-      flex-shrink: 0;
-      width: 15px;
-      height: 15px;
-    }
-    .rp-input-wrap {
-      position: relative;
-    }
-  </style>
 </head>
 <body class="results-page-body">
+
+  <!-- Page loading bar -->
+  <div class="search-loading-bar" id="page-loading-bar"></div>
 
   <!-- ── Sticky Header ─────────────────────────────────────── -->
   <header class="rp-header">
@@ -92,9 +66,10 @@
       </form>
 
       <div class="rp-header-actions">
-        <a href="/preferences" class="icon-btn" title="Preferences">
-          <i data-lucide="settings-2"></i>
-        </a>
+        <button class="customize-btn" id="customize-open-btn" title="Customize search">
+          <i data-lucide="sliders-horizontal"></i>
+          <span>Customize</span>
+        </button>
         <a href="https://github.com/najmus-sakib-hossain/metasearch" target="_blank" rel="noopener" class="icon-btn" title="GitHub">
           <i data-lucide="github"></i>
         </a>
@@ -424,6 +399,94 @@
     </div>
   </footer>
 
+  <!-- ── Customize Drawer ──────────────────────────────────── -->
+  <div class="customize-backdrop" id="customize-backdrop"></div>
+  <aside class="customize-drawer" id="customize-drawer" role="dialog" aria-label="Customize search" aria-modal="true">
+    <div class="customize-drawer-header">
+      <span class="customize-drawer-title">Customize Search</span>
+      <button class="customize-drawer-close" id="customize-close-btn" aria-label="Close">
+        <i data-lucide="x"></i>
+      </button>
+    </div>
+    <div class="customize-drawer-body">
+      <div class="cz-section">
+        <p class="cz-section-label">Search Settings</p>
+        <div class="cz-row">
+          <div class="cz-row-info">
+            <div class="cz-row-label">Safe Search</div>
+            <div class="cz-row-desc">Filter explicit content from results</div>
+          </div>
+          <select class="cz-select" id="cz-safe-search">
+            <option value="0">Off</option>
+            <option value="1" selected>Moderate</option>
+            <option value="2">Strict</option>
+          </select>
+        </div>
+        <div class="cz-row">
+          <div class="cz-row-info">
+            <div class="cz-row-label">Results per Page</div>
+            <div class="cz-row-desc">How many results to load at once</div>
+          </div>
+          <select class="cz-select" id="cz-results-per-page">
+            <option value="10" selected>10</option>
+            <option value="20">20</option>
+            <option value="50">50</option>
+          </select>
+        </div>
+        <div class="cz-row">
+          <div class="cz-row-info">
+            <div class="cz-row-label">Language</div>
+            <div class="cz-row-desc">Preferred language for results</div>
+          </div>
+          <select class="cz-select" id="cz-language">
+            <option value="auto" selected>Auto</option>
+            <option value="en">English</option>
+            <option value="es">Spanish</option>
+            <option value="fr">French</option>
+            <option value="de">German</option>
+            <option value="zh">Chinese</option>
+            <option value="ja">Japanese</option>
+          </select>
+        </div>
+      </div>
+      <div class="cz-section">
+        <p class="cz-section-label">Current Search</p>
+        <div class="cz-row">
+          <div class="cz-row-info">
+            <div class="cz-row-label">Category</div>
+          </div>
+          <span style="font-size:0.8125rem;color:#ededed;font-weight:500;">{{ category | capitalize }}</span>
+        </div>
+        <div class="cz-row">
+          <div class="cz-row-info">
+            <div class="cz-row-label">Results found</div>
+          </div>
+          <span style="font-size:0.8125rem;color:#ededed;font-weight:500;">{{ number_of_results }}</span>
+        </div>
+        <div class="cz-row">
+          <div class="cz-row-info">
+            <div class="cz-row-label">Search time</div>
+          </div>
+          <span style="font-size:0.8125rem;color:#ededed;font-weight:500;">{{ search_time_ms }}ms{% if from_cache %} · cached{% endif %}</span>
+        </div>
+      </div>
+      <div class="cz-section">
+        <p class="cz-section-label">Privacy</p>
+        <div class="cz-row">
+          <div class="cz-row-info">
+            <div class="cz-row-label">No tracking</div>
+            <div class="cz-row-desc">We never store your searches</div>
+          </div>
+          <span style="font-size:0.75rem;color:#50e3c2;">Always on</span>
+        </div>
+      </div>
+    </div>
+    <div class="customize-drawer-footer">
+      <button class="btn btn-primary" id="cz-save-btn" style="flex:1;">Save Preferences</button>
+      <a href="/preferences" class="btn btn-secondary" style="flex:1;justify-content:center;">All Settings</a>
+    </div>
+  </aside>
+
   <!-- ── Infinite Scroll Script ─────────────────────────────── -->
   {% if number_of_results > 10 %}
   <script>
@@ -618,6 +681,79 @@
         list.hidden = false;
         input.setAttribute('aria-expanded', 'true');
       }
+    });
+  }());
+  </script>
+
+  <!-- ── Loading bar + Customize panel ──────────────────────── -->
+  <script>
+  (function () {
+    /* ── Loading bar ── */
+    var bar = document.getElementById('page-loading-bar');
+    var form = document.getElementById('search-form');
+    if (form && bar) {
+      form.addEventListener('submit', function () {
+        bar.classList.add('active');
+      });
+    }
+    /* complete bar when page is about to unload */
+    window.addEventListener('beforeunload', function () {
+      if (bar) { bar.classList.add('complete'); }
+    });
+
+    /* ── Customize drawer ── */
+    var backdrop    = document.getElementById('customize-backdrop');
+    var drawer      = document.getElementById('customize-drawer');
+    var openBtn     = document.getElementById('customize-open-btn');
+    var closeBtn    = document.getElementById('customize-close-btn');
+    var saveBtn     = document.getElementById('cz-save-btn');
+    var czSafe      = document.getElementById('cz-safe-search');
+    var czRpp       = document.getElementById('cz-results-per-page');
+    var czLang      = document.getElementById('cz-language');
+
+    function openDrawer() {
+      if (!drawer || !backdrop) return;
+      loadCzPrefs();
+      drawer.classList.add('open');
+      backdrop.classList.add('open');
+      document.body.style.overflow = 'hidden';
+      if (window.lucide) lucide.createIcons({ nodes: [drawer] });
+    }
+    function closeDrawer() {
+      if (!drawer || !backdrop) return;
+      drawer.classList.remove('open');
+      backdrop.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+    function loadCzPrefs() {
+      var p = JSON.parse(localStorage.getItem('metasearch-prefs') || '{}');
+      if (czSafe && p.safeSearch)       czSafe.value = p.safeSearch;
+      if (czRpp  && p.resultsPerPage)   czRpp.value  = p.resultsPerPage;
+      if (czLang && p.language)         czLang.value = p.language;
+    }
+    function saveCzPrefs() {
+      var p = JSON.parse(localStorage.getItem('metasearch-prefs') || '{}');
+      if (czSafe) p.safeSearch      = czSafe.value;
+      if (czRpp)  p.resultsPerPage  = czRpp.value;
+      if (czLang) p.language        = czLang.value;
+      localStorage.setItem('metasearch-prefs', JSON.stringify(p));
+      if (saveBtn) {
+        var orig = saveBtn.textContent;
+        saveBtn.textContent = 'Saved!';
+        saveBtn.disabled = true;
+        setTimeout(function () {
+          saveBtn.textContent = orig;
+          saveBtn.disabled = false;
+        }, 1500);
+      }
+    }
+
+    if (openBtn)  openBtn.addEventListener('click', openDrawer);
+    if (closeBtn) closeBtn.addEventListener('click', closeDrawer);
+    if (backdrop) backdrop.addEventListener('click', closeDrawer);
+    if (saveBtn)  saveBtn.addEventListener('click', saveCzPrefs);
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closeDrawer();
     });
   }());
   </script>

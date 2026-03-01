@@ -119,17 +119,17 @@ impl SearchOrchestrator {
                     Ok(Ok(results)) => {
                         health.record_success(&name, latency_ms);
                         tracing::debug!(engine = %name, count = results.len(), latency_ms, "Engine responded");
-                        Some((name, weight, results))
+                        (name, Some((weight, results)))
                     }
                     Ok(Err(e)) => {
                         health.record_failure(&name);
                         tracing::warn!(engine = %name, error = %e, "Engine error");
-                        None
+                        (name, None)
                     }
                     Err(_) => {
                         health.record_failure(&name);
                         tracing::warn!(engine = %name, timeout_ms = timeout_dur.as_millis(), "Engine timeout");
-                        None
+                        (name, None)
                     }
                 }
             });
@@ -142,9 +142,9 @@ impl SearchOrchestrator {
         let mut engines_used: Vec<String> = Vec::new();
         let mut engines_failed: Vec<String> = Vec::new();
 
-        while let Some(result) = futures.next().await {
-            match result {
-                Some((engine_name, weight, results)) => {
+        while let Some((engine_name, outcome)) = futures.next().await {
+            match outcome {
+                Some((weight, results)) => {
                     engines_used.push(engine_name.clone());
                     for mut r in results {
                         let score = weight * (1.0 / (r.engine_rank as f64 + 1.0));
@@ -161,9 +161,8 @@ impl SearchOrchestrator {
                     }
                 }
                 None => {
-                    // Engine failed/timed out — name already logged; record as failed
-                    // (we can't get the name back here, so just count the failure)
-                    engines_failed.push("unknown".to_string());
+                    // Engine failed or timed out — preserve the actual engine name
+                    engines_failed.push(engine_name);
                 }
             }
         }
