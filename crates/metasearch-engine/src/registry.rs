@@ -95,9 +95,15 @@ impl EngineRegistry {
         // Note: reqwest::Client is already Arc-backed internally — no need to wrap
 
         // ── Original engines ──────────────────────────────
-        registry.register(Arc::new(Google::new(client.clone())));
-        registry.register(Arc::new(DuckDuckGo::new(client.clone())));
-        registry.register(Arc::new(Brave::new(client.clone(), None)));
+        // Google: Blocked by TLS fingerprinting (only 25/91 SearXNG instances work)
+        // registry.register(Arc::new(Google::new(client.clone())));
+        
+        // DuckDuckGo: Blocked by CAPTCHA challenges
+        // registry.register(Arc::new(DuckDuckGo::new(client.clone())));
+        
+        // Brave scraping: Blocked by bot detection (use API instead)
+        // registry.register(Arc::new(Brave::new(client.clone(), None)));
+        
         registry.register(Arc::new(Wikipedia::new(client.clone())));
 
         // ── Batch 1: SearXNG translations ─────────────────

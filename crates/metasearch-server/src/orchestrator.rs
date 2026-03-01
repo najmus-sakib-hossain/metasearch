@@ -119,17 +119,17 @@ impl SearchOrchestrator {
                     Ok(Ok(results)) => {
                         health.record_success(&name, latency_ms);
                         tracing::debug!(engine = %name, count = results.len(), latency_ms, "Engine responded");
-                        Some((name, weight, results))
+                        (name.clone(), Some((name, weight, results)))
                     }
                     Ok(Err(e)) => {
                         health.record_failure(&name);
                         tracing::warn!(engine = %name, error = %e, "Engine error");
-                        None
+                        (name, None)
                     }
                     Err(_) => {
                         health.record_failure(&name);
                         tracing::warn!(engine = %name, timeout_ms = timeout_dur.as_millis(), "Engine timeout");
-                        None
+                        (name, None)
                     }
                 }
             });
@@ -147,10 +147,10 @@ impl SearchOrchestrator {
         const MIN_RESULTS: usize = 50; // Or 50 unique results
         const MAX_WAIT_MS: u128 = 800; // But never wait more than 800ms
 
-        while let Some(result) = futures.next().await {
+        while let Some((engine_name, result)) = futures.next().await {
             match result {
-                Some((engine_name, weight, results)) => {
-                    engines_used.push(engine_name.clone());
+                Some((_, weight, results)) => {
+                    engines_used.push(engine_name);
                     for mut r in results {
                         // Base score from engine rank and weight
                         let base_score = weight * (1.0 / (r.engine_rank as f64 + 1.0));
@@ -175,8 +175,7 @@ impl SearchOrchestrator {
                 }
                 None => {
                     // Engine failed/timed out — name already logged; record as failed
-                    // (we can't get the name back here, so just count the failure)
-                    engines_failed.push("unknown".to_string());
+                    engines_failed.push(engine_name);
                 }
             }
 
