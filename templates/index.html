@@ -1,51 +1,193 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Metasearch — Privacy-respecting Search</title>
-    <link rel="stylesheet" href="/static/css/style.css">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔍</text></svg>">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Metasearch — Privacy-respecting Search</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230070f3' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><circle cx='11' cy='11' r='8'/><path d='m21 21-4.35-4.35'/></svg>">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
+  <script>document.addEventListener('DOMContentLoaded', () => lucide.createIcons())</script>
 </head>
-<body>
-    <main class="home">
-        <div class="logo-icon">🔍</div>
-        <h1 class="logo">Metasearch</h1>
-        <p class="tagline">Privacy-respecting metasearch engine, built in Rust 🦀</p>
-        
-        <div class="search-box">
-            <form action="/search" method="get" class="search-form">
-                <input 
-                    type="text" 
-                    name="q" 
-                    class="search-input"
-                    placeholder="Search the web privately..." 
-                    autocomplete="off"
-                    autofocus
-                >
-                <button type="submit" class="search-btn">Search</button>
-            </form>
-        </div>
-        
+<body class="home-page">
+
+  <!-- Nav Bar -->
+  <nav class="home-nav">
+    <div class="home-nav-inner">
+      <a href="/" class="brand">
+        <span class="brand-icon"><i data-lucide="search"></i></span>
+        <span class="brand-name">Metasearch</span>
+      </a>
+      <div class="home-nav-links">
+        <a href="/about" class="nav-link">About</a>
+        <a href="/api/v1/engines" class="nav-link">Engines</a>
+        <a href="https://github.com/najmus-sakib-hossain/metasearch" target="_blank" rel="noopener" class="nav-link nav-link--icon" title="GitHub">
+          <i data-lucide="github"></i>
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <main class="home">
+
+    <section class="hero">
+      <div class="hero-badge">
+        <i data-lucide="shield-check"></i>
+        <span>Zero tracking · Zero profiling · Zero ads</span>
+      </div>
+
+      <h1 class="hero-title">
+        Search the web<br>
+        <span class="hero-title-accent">privately.</span>
+      </h1>
+      <p class="hero-sub">
+        Aggregating 200+ sources. All in one place. None of it about you.
+      </p>
+
+      <!-- Search Box -->
+      <div class="hero-search-wrap">
+        <form action="/search" method="get" class="hero-form">
+          <div class="hero-input-wrap">
+            <span class="hero-input-icon"><i data-lucide="search"></i></span>
+            <input
+              type="text"
+              name="q"
+              class="hero-input"
+              placeholder="Search anything…"
+              autocomplete="off"
+              autofocus
+            >
+            <button type="submit" class="hero-btn">
+              <i data-lucide="arrow-right"></i>
+            </button>
+          </div>
+        </form>
+
         <div class="category-pills">
-            <a href="/search?category=general" class="category-pill">🌐 General</a>
-            <a href="/search?category=images" class="category-pill">🖼️ Images</a>
-            <a href="/search?category=videos" class="category-pill">🎬 Videos</a>
-            <a href="/search?category=news" class="category-pill">📰 News</a>
-            <a href="/search?category=science" class="category-pill">🔬 Science</a>
-            <a href="/search?category=music" class="category-pill">🎵 Music</a>
-            <a href="/search?category=files" class="category-pill">📁 Files</a>
+          <a href="/search?category=general" class="pill">
+            <i data-lucide="globe"></i><span>General</span>
+          </a>
+          <a href="/search?category=images" class="pill">
+            <i data-lucide="image"></i><span>Images</span>
+          </a>
+          <a href="/search?category=videos" class="pill">
+            <i data-lucide="play-circle"></i><span>Videos</span>
+          </a>
+          <a href="/search?category=news" class="pill">
+            <i data-lucide="newspaper"></i><span>News</span>
+          </a>
+          <a href="/search?category=science" class="pill">
+            <i data-lucide="flask-conical"></i><span>Science</span>
+          </a>
+          <a href="/search?category=music" class="pill">
+            <i data-lucide="music"></i><span>Music</span>
+          </a>
+          <a href="/search?category=files" class="pill">
+            <i data-lucide="folder-open"></i><span>Files</span>
+          </a>
+          <a href="/search?category=it" class="pill">
+            <i data-lucide="terminal"></i><span>IT</span>
+          </a>
         </div>
-        
-        <footer class="footer mt-8">
-            <div class="footer-links">
-                <a href="/about">About</a>
-                <a href="/preferences">Preferences</a>
-                <a href="/api/v1/engines">Engines</a>
-                <a href="https://github.com/najmus-sakib-hossain/metasearch" target="_blank">GitHub</a>
-            </div>
-            <p>No tracking. No profiling. No ads. Just results.</p>
-        </footer>
-    </main>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section">
+      <p class="section-label">Why Metasearch</p>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon feature-icon--blue">
+            <i data-lucide="shield"></i>
+          </div>
+          <h3 class="feature-title">No Tracking</h3>
+          <p class="feature-desc">We don't store your searches, set cookies, or build profiles. Your queries disappear after you leave.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon feature-icon--purple">
+            <i data-lucide="zap"></i>
+          </div>
+          <h3 class="feature-title">Lightning Fast</h3>
+          <p class="feature-desc">Built in Rust. All 200+ engines queried in parallel and results merged in under 100ms.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon feature-icon--green">
+            <i data-lucide="layers"></i>
+          </div>
+          <h3 class="feature-title">200+ Sources</h3>
+          <p class="feature-desc">Google, Bing, DuckDuckGo, Brave, academic databases, torrent trackers, social platforms, and more.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon feature-icon--orange">
+            <i data-lucide="sliders-horizontal"></i>
+          </div>
+          <h3 class="feature-title">Category Search</h3>
+          <p class="feature-desc">Dedicated modes for images, videos, news, science, music, files, IT, and social media.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon feature-icon--red">
+            <i data-lucide="code-2"></i>
+          </div>
+          <h3 class="feature-title">Open Source</h3>
+          <p class="feature-desc">Every line of code is public. Self-host in minutes. Audit it, fork it, improve it.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon feature-icon--cyan">
+            <i data-lucide="refresh-cw"></i>
+          </div>
+          <h3 class="feature-title">Smart Ranking</h3>
+          <p class="feature-desc">Results are deduplicated and ranked by relevance across sources, not by who paid more.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats-section">
+      <div class="stats-grid">
+        <div class="stat-item">
+          <span class="stat-number">200+</span>
+          <span class="stat-label">Search engines</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <span class="stat-number">&lt;100ms</span>
+          <span class="stat-label">Typical response</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <span class="stat-number">0</span>
+          <span class="stat-label">Tracking cookies</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <span class="stat-number">100%</span>
+          <span class="stat-label">Open source</span>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="home-footer">
+    <div class="home-footer-inner">
+      <div class="footer-brand">
+        <span class="brand-icon-sm"><i data-lucide="search"></i></span>
+        <span>Metasearch</span>
+      </div>
+      <nav class="footer-links">
+        <a href="/about">About</a>
+        <a href="/preferences">Preferences</a>
+        <a href="/api/v1/engines">Engines</a>
+        <a href="https://github.com/najmus-sakib-hossain/metasearch" target="_blank" rel="noopener">GitHub</a>
+      </nav>
+      <p class="footer-copy">No tracking. No profiling. No ads.</p>
+    </div>
+  </footer>
+
 </body>
 </html>
