@@ -257,7 +257,6 @@
     var list  = document.getElementById('autocomplete-list');
     var form  = document.getElementById('search-form');
     
-    console.log('Autocomplete initialized:', { input: !!input, list: !!list, form: !!form });
     if (!input || !list) return;
 
     var activeIdx = -1;
@@ -273,12 +272,9 @@
     }
 
     function renderSuggestions(query, suggestions) {
-      console.log('Rendering suggestions:', { query: query, count: suggestions.length, suggestions: suggestions });
       clearDropdown();
-      if (!suggestions || suggestions.length === 0) {
-        console.log('No suggestions to render');
-        return;
-      }
+      if (!suggestions || suggestions.length === 0) return;
+      
       suggestions.forEach(function (text, i) {
         var li = document.createElement('li');
         li.setAttribute('role', 'option');
@@ -311,35 +307,9 @@
         });
         list.appendChild(li);
       });
+      
       list.hidden = false;
       input.setAttribute('aria-expanded', 'true');
-      
-      // Debug: Check computed styles
-      var styles = window.getComputedStyle(list);
-      var parentStyles = window.getComputedStyle(list.parentElement);
-      console.log('Dropdown styles:', {
-        display: styles.display,
-        position: styles.position,
-        zIndex: styles.zIndex,
-        top: styles.top,
-        left: styles.left,
-        visibility: styles.visibility,
-        opacity: styles.opacity,
-        hidden: list.hidden,
-        childCount: list.children.length,
-        width: styles.width,
-        height: styles.height
-      });
-      console.log('Parent element styles:', {
-        overflow: parentStyles.overflow,
-        position: parentStyles.position,
-        zIndex: parentStyles.zIndex,
-        transform: parentStyles.transform
-      });
-      console.log('Dropdown element:', list);
-      console.log('Dropdown bounding rect:', list.getBoundingClientRect());
-      
-      console.log('Dropdown shown with', suggestions.length, 'items');
     }
 
     function setActiveItem(idx) {
@@ -356,36 +326,29 @@
     }
 
     function fetchSuggestions(query) {
-      console.log('Fetching suggestions for:', query);
       if (currentFetch) currentFetch = null;
       fetch('/autocomplete?q=' + encodeURIComponent(query))
         .then(function (r) { 
-          console.log('Autocomplete response status:', r.status);
           return r.json(); 
         })
         .then(function (data) {
-          console.log('Autocomplete data received:', data);
           // data = [query, [suggestion, ...]]
           if (Array.isArray(data) && data.length >= 2) {
             renderSuggestions(data[0], data[1]);
-          } else {
-            console.error('Invalid autocomplete response format:', data);
           }
         })
         .catch(function (err) { 
-          console.error('Autocomplete fetch error:', err);
+          // Silent fail - autocomplete is optional
         });
     }
 
     input.addEventListener('input', function () {
       var q = input.value.trim();
-      console.log('Input event:', q);
       if (q === lastQuery) return;
       lastQuery = q;
       activeIdx = -1;
       clearTimeout(timer);
       if (q.length < 2) { 
-        console.log('Query too short, clearing dropdown');
         clearDropdown(); 
         return; 
       }
@@ -401,12 +364,20 @@
       } else if (e.key === 'ArrowUp') {
         e.preventDefault();
         var prev = Math.max(activeIdx - 1, -1);
-        if (prev === -1) { input.value = lastQuery; items.forEach(function(el){ el.removeAttribute('aria-selected'); }); activeIdx = -1; }
-        else setActiveItem(prev);
+        if (prev === -1) { 
+          input.value = lastQuery; 
+          items.forEach(function(el){ el.removeAttribute('aria-selected'); }); 
+          activeIdx = -1; 
+        } else {
+          setActiveItem(prev);
+        }
       } else if (e.key === 'Escape') {
         clearDropdown();
       } else if (e.key === 'Enter') {
-        if (activeIdx >= 0) { e.preventDefault(); form.submit(); }
+        if (activeIdx >= 0) { 
+          e.preventDefault(); 
+          form.submit(); 
+        }
       }
     });
 
@@ -422,8 +393,6 @@
         input.setAttribute('aria-expanded', 'true');
       }
     });
-    
-    console.log('Autocomplete event listeners attached');
   }());
   </script>
 </body>
