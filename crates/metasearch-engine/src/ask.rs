@@ -14,7 +14,7 @@ use metasearch_core::{
     result::SearchResult,
 };
 use reqwest::Client;
-use scraper::{Html, Selector};
+// Removed unused imports - using regex and JSON parsing instead
 use tracing::info;
 
 pub struct Ask {

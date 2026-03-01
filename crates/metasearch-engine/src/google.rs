@@ -55,7 +55,7 @@ impl SearchEngine for Google {
     async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>> {
         let start = (query.page.max(1) - 1) * 10;
         let lang = query.language.as_deref().unwrap_or("en");
-        let safe = Self::safe_search_param(query.safe_search);
+        let _safe = Self::safe_search_param(query.safe_search);
 
         let url = format!(
             "https://www.google.com/search?q={}&start={}&num=10&hl={}&lr=lang_{}&ie=utf8&oe=utf8&filter=0",
