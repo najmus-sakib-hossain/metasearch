@@ -8,7 +8,7 @@ use async_trait::async_trait;
 use metasearch_core::{
     category::SearchCategory,
     engine::{EngineMetadata, SearchEngine},
-    error::{MetasearchError, Result},
+    error::Result,
     query::SearchQuery,
     result::SearchResult,
 };
@@ -70,9 +70,10 @@ impl SearchEngine for ThreeSixtySearchVideos {
             start,
         );
 
-        let resp = self
+        let resp = match self
             .client
             .get(&url)
+            .timeout(std::time::Duration::from_secs(6))
             .header(
                 "User-Agent",
                 "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:120.0) Gecko/20100101 Firefox/120.0",
@@ -82,16 +83,19 @@ impl SearchEngine for ThreeSixtySearchVideos {
             .header("Referer", "https://tv.360kan.com/")
             .send()
             .await
-            .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
+        {
+            Ok(r) => r,
+            Err(_) => return Ok(Vec::new()),
+        };
 
         if !resp.status().is_success() {
             return Ok(Vec::new());
         }
 
-        let api: ApiResponse = resp
-            .json()
-            .await
-            .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
+        let api: ApiResponse = match resp.json().await {
+            Ok(v) => v,
+            Err(_) => return Ok(Vec::new()),
+        };
 
         let items = api.data.and_then(|d| d.result).unwrap_or_default();
 

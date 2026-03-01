@@ -7,7 +7,7 @@ use async_trait::async_trait;
 use metasearch_core::{
     category::SearchCategory,
     engine::{EngineMetadata, SearchEngine},
-    error::MetasearchError,
+    error::Result,
     query::SearchQuery,
     result::SearchResult,
 };
@@ -41,26 +41,30 @@ impl SearchEngine for DuckDuckGoExtra {
         self.metadata.clone()
     }
 
-    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
+    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>> {
         let encoded = urlencoding::encode(&query.query);
 
         // Step 1: Obtain VQD token from the DuckDuckGo search page.
         let token_url = format!("https://duckduckgo.com/?q={}", encoded);
-        let token_resp = self
+        let token_resp = match self
             .client
             .get(&token_url)
+            .timeout(std::time::Duration::from_secs(7))
             .header(
                 "User-Agent",
                 "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
             )
             .send()
             .await
-            .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
+        {
+            Ok(r) => r,
+            Err(_) => return Ok(Vec::new()),
+        };
 
-        let token_html = token_resp
-            .text()
-            .await
-            .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
+        let token_html = match token_resp.text().await {
+            Ok(t) => t,
+            Err(_) => return Ok(Vec::new()),
+        };
 
         // Extract vqd token using simple string search (handles both quote styles)
         let vqd = {
@@ -91,11 +95,7 @@ impl SearchEngine for DuckDuckGoExtra {
 
                 match sq {
                     Some(v) => v,
-                    None => {
-                        return Err(MetasearchError::ParseError(
-                            "Could not extract VQD token from DuckDuckGo".to_string(),
-                        ));
-                    }
+                    None => return Ok(Vec::new()),
                 }
             }
         };
@@ -107,9 +107,10 @@ impl SearchEngine for DuckDuckGoExtra {
             encoded, offset, vqd,
         );
 
-        let resp = self
+        let resp = match self
             .client
             .get(&search_url)
+            .timeout(std::time::Duration::from_secs(7))
             .header("Referer", "https://duckduckgo.com/")
             .header("Cookie", "p=-2")
             .header(
@@ -118,17 +119,20 @@ impl SearchEngine for DuckDuckGoExtra {
             )
             .send()
             .await
-            .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
+        {
+            Ok(r) => r,
+            Err(_) => return Ok(Vec::new()),
+        };
 
         // DDG may block / rate-limit and return HTML instead of JSON
         if !resp.status().is_success() {
             return Ok(Vec::new());
         }
 
-        let text = resp
-            .text()
-            .await
-            .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
+        let text = match resp.text().await {
+            Ok(t) => t,
+            Err(_) => return Ok(Vec::new()),
+        };
 
         if text.trim_start().starts_with('<') {
             return Ok(Vec::new());

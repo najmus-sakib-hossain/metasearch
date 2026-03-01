@@ -84,7 +84,7 @@ impl SearchEngine for GoogleScholar {
         }
 
         let document = Html::parse_document(&text);
-        let result_sel = Selector::parse("div[data-rp]").unwrap();
+        let result_sel = Selector::parse("div.gs_r.gs_or.gs_scl").unwrap();
         let title_link_sel = Selector::parse("h3 a").unwrap();
         let content_sel = Selector::parse("div.gs_rs").unwrap();
         let meta_sel = Selector::parse("div.gs_a").unwrap();

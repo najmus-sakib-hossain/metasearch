@@ -9,7 +9,7 @@ use chrono::Utc;
 use metasearch_core::{
     category::SearchCategory,
     engine::{EngineMetadata, SearchEngine},
-    error::MetasearchError,
+    error::Result,
     query::SearchQuery,
     result::SearchResult,
 };
@@ -54,7 +54,7 @@ impl SearchEngine for Reuters {
         self.metadata.clone()
     }
 
-    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
+    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>> {
         let page = query.page.max(1);
         let offset = (page - 1) * 20;
 
@@ -74,8 +74,10 @@ impl SearchEngine for Reuters {
             query_args["start_date"] = serde_json::Value::String(start_date);
         }
 
-        let json_str = serde_json::to_string(&query_args)
-            .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
+        let json_str = match serde_json::to_string(&query_args) {
+            Ok(s) => s,
+            Err(_) => return Ok(Vec::new()),
+        };
         let encoded_args = urlencoding::encode(&json_str);
 
         let url = format!(
@@ -83,7 +85,7 @@ impl SearchEngine for Reuters {
             encoded_args
         );
 
-        let resp = self
+        let resp = match self
             .client
             .get(&url)
             .header(
@@ -91,14 +93,18 @@ impl SearchEngine for Reuters {
                 "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
             )
             .header("Accept", "application/json")
+            .timeout(std::time::Duration::from_secs(7))
             .send()
             .await
-            .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
+        {
+            Ok(r) => r,
+            Err(_) => return Ok(Vec::new()),
+        };
 
-        let data: serde_json::Value = resp
-            .json()
-            .await
-            .map_err(|e| MetasearchError::ParseError(format!("JSON error: {}", e)))?;
+        let data: serde_json::Value = match resp.json().await {
+            Ok(v) => v,
+            Err(_) => return Ok(Vec::new()),
+        };
 
         let mut results = Vec::new();
 

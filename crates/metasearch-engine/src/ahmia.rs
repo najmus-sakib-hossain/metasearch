@@ -11,7 +11,7 @@ use url::Url;
 
 use metasearch_core::category::SearchCategory;
 use metasearch_core::engine::{EngineMetadata, SearchEngine};
-use metasearch_core::error::MetasearchError;
+use metasearch_core::error::Result;
 use metasearch_core::query::SearchQuery;
 use metasearch_core::result::SearchResult;
 
@@ -45,35 +45,35 @@ impl SearchEngine for Ahmia {
         self.metadata.clone()
     }
 
-    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
+    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>> {
         let url = format!(
             "{}/search/?q={}",
             BASE_URL,
             urlencoding::encode(&query.query),
         );
 
-        let resp = self
+        let resp = match self
             .client
             .get(&url)
-            .header("User-Agent", "Mozilla/5.0")
+            .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:120.0) Gecko/20100101 Firefox/120.0")
+            .timeout(std::time::Duration::from_secs(7))
             .send()
             .await
-            .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
+        {
+            Ok(r) => r,
+            Err(_) => return Ok(Vec::new()),
+        };
 
-        let body = resp
-            .text()
-            .await
-            .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
+        let body = match resp.text().await {
+            Ok(t) => t,
+            Err(_) => return Ok(Vec::new()),
+        };
 
         let document = Html::parse_document(&body);
-        let result_sel = Selector::parse("li.result")
-            .map_err(|e| MetasearchError::ParseError(format!("{e:?}")))?;
-        let link_sel =
-            Selector::parse("h4 a").map_err(|e| MetasearchError::ParseError(format!("{e:?}")))?;
-        let title_sel =
-            Selector::parse("h4").map_err(|e| MetasearchError::ParseError(format!("{e:?}")))?;
-        let desc_sel =
-            Selector::parse("p").map_err(|e| MetasearchError::ParseError(format!("{e:?}")))?;
+        let result_sel = Selector::parse("li.result").unwrap();
+        let link_sel = Selector::parse("h4 a").unwrap();
+        let title_sel = Selector::parse("h4").unwrap();
+        let desc_sel = Selector::parse("p").unwrap();
 
         let mut results = Vec::new();
 

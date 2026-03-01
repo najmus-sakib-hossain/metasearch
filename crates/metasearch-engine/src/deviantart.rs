@@ -8,7 +8,7 @@ use async_trait::async_trait;
 use metasearch_core::{
     category::SearchCategory,
     engine::{EngineMetadata, SearchEngine},
-    error::{MetasearchError, Result},
+    error::Result,
     query::SearchQuery,
     result::SearchResult,
 };
@@ -49,24 +49,36 @@ impl SearchEngine for DeviantArt {
             urlencoding::encode(&query.query),
         );
 
-        let resp = self
+        let resp = match self
             .client
             .get(&url)
-            .header("User-Agent", "Mozilla/5.0")
+            .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+            .timeout(std::time::Duration::from_secs(7))
             .send()
             .await
-            .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
+        {
+            Ok(r) => r,
+            Err(_) => return Ok(Vec::new()),
+        };
 
-        let body = resp
-            .text()
-            .await
-            .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
+        if !resp.status().is_success() {
+            return Ok(Vec::new());
+        }
+
+        let body = match resp.text().await {
+            Ok(t) => t,
+            Err(_) => return Ok(Vec::new()),
+        };
 
         let document = Html::parse_document(&body);
-        let result_sel = Selector::parse("a[data-hook='deviation_link']")
-            .map_err(|e| MetasearchError::ParseError(format!("{e:?}")))?;
-        let img_sel =
-            Selector::parse("img").map_err(|e| MetasearchError::ParseError(format!("{e:?}")))?;
+        let result_sel = match Selector::parse("a[data-hook='deviation_link']") {
+            Ok(s) => s,
+            Err(_) => return Ok(Vec::new()),
+        };
+        let img_sel = match Selector::parse("img") {
+            Ok(s) => s,
+            Err(_) => return Ok(Vec::new()),
+        };
 
         let mut results = Vec::new();
 

@@ -79,11 +79,10 @@ impl SearchEngine for Seznam {
 
         let mut results = Vec::new();
 
-        // Try multiple selector strategies for Seznam results
-        // Strategy 1: Look for result containers with data-dot-data attribute
-        let result_sel = Selector::parse("[data-dot-data] h3 a")
-            .or_else(|_| Selector::parse("div.Layout--left h3 a"))
-            .or_else(|_| Selector::parse(".result h3 a"))
+        // Use stable data-e-a="heading" attribute on result anchors
+        // Falls back to generic h3 a if that fails
+        let result_sel = Selector::parse("a[data-e-a='heading']")
+            .or_else(|_| Selector::parse("[data-dot-data] h3 a"))
             .or_else(|_| Selector::parse("h3 a"))
             .unwrap_or_else(|_| Selector::parse("a").expect("basic selector should parse"));
 
@@ -92,7 +91,10 @@ impl SearchEngine for Seznam {
             if href.is_empty()
                 || href.starts_with('#')
                 || href.starts_with("javascript:")
-                || href.contains("seznam.cz")
+                || href.starts_with("https://search.seznam.cz")
+                || href.starts_with("//search.seznam.cz")
+                || href.starts_with("https://napoveda.seznam.cz")
+                || href.starts_with("https://o-seznam.cz")
             {
                 continue;
             }
@@ -145,7 +147,9 @@ impl SearchEngine for Seznam {
                 let href = link.value().attr("href").unwrap_or_default();
                 if href.is_empty()
                     || !href.starts_with("http")
-                    || href.contains("seznam.cz")
+                    || href.starts_with("https://search.seznam.cz")
+                    || href.starts_with("https://napoveda.seznam.cz")
+                    || href.starts_with("https://o-seznam.cz")
                 {
                     continue;
                 }

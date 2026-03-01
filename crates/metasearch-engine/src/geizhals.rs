@@ -6,7 +6,7 @@ use async_trait::async_trait;
 use metasearch_core::{
     category::SearchCategory,
     engine::{EngineMetadata, SearchEngine},
-    error::{MetasearchError, Result},
+    error::Result,
     query::SearchQuery,
     result::SearchResult,
 };
@@ -47,28 +47,35 @@ impl SearchEngine for Geizhals {
             urlencoding::encode(&query.query)
         );
 
-        let resp = self
+        let resp = match self
             .client
             .get(&url)
-            .header("User-Agent", "Mozilla/5.0")
+            .timeout(std::time::Duration::from_secs(7))
+            .header(
+                "User-Agent",
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:120.0) Gecko/20100101 Firefox/120.0",
+            )
             .send()
             .await
-            .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
+        {
+            Ok(r) => r,
+            Err(_) => return Ok(Vec::new()),
+        };
 
-        let body = resp
-            .text()
-            .await
-            .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
+        if !resp.status().is_success() {
+            return Ok(Vec::new());
+        }
+
+        let body = match resp.text().await {
+            Ok(b) => b,
+            Err(_) => return Ok(Vec::new()),
+        };
 
         let document = Html::parse_document(&body);
-        let item_sel = Selector::parse("div.listview__item, article.listview__item")
-            .map_err(|e| MetasearchError::ParseError(format!("{e:?}")))?;
-        let link_sel = Selector::parse("a.listview__name-link")
-            .map_err(|e| MetasearchError::ParseError(format!("{e:?}")))?;
-        let price_sel = Selector::parse("span.price")
-            .map_err(|e| MetasearchError::ParseError(format!("{e:?}")))?;
-        let img_sel =
-            Selector::parse("img").map_err(|e| MetasearchError::ParseError(format!("{e:?}")))?;
+        let item_sel = Selector::parse("div.listview__item, article.listview__item").unwrap();
+        let link_sel = Selector::parse("a.listview__name-link").unwrap();
+        let price_sel = Selector::parse("span.price").unwrap();
+        let img_sel = Selector::parse("img").unwrap();
 
         let mut results = Vec::new();
 

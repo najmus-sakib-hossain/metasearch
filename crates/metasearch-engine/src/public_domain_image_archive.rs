@@ -8,7 +8,7 @@ use async_trait::async_trait;
 use metasearch_core::{
     category::SearchCategory,
     engine::{EngineMetadata, SearchEngine},
-    error::MetasearchError,
+    error::Result,
     query::SearchQuery,
     result::SearchResult,
 };
@@ -43,34 +43,35 @@ impl SearchEngine for PublicDomainImageArchive {
         self.metadata.clone()
     }
 
-    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
+    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>> {
         let url = format!(
             "https://pdimagearchive.org/?s={}",
             urlencoding::encode(&query.query),
         );
 
-        let resp = self
+        let resp = match self
             .client
             .get(&url)
             .header("User-Agent", "Mozilla/5.0")
+            .timeout(std::time::Duration::from_secs(7))
             .send()
             .await
-            .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
+        {
+            Ok(r) => r,
+            Err(_) => return Ok(Vec::new()),
+        };
 
-        let body = resp
-            .text()
-            .await
-            .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
+        let body = match resp.text().await {
+            Ok(t) => t,
+            Err(_) => return Ok(Vec::new()),
+        };
 
         let document = Html::parse_document(&body);
 
         // Try article elements first, then fall back to div.gallery items
-        let article_sel = Selector::parse("article")
-            .map_err(|e| MetasearchError::ParseError(format!("{e:?}")))?;
-        let link_sel =
-            Selector::parse("a").map_err(|e| MetasearchError::ParseError(format!("{e:?}")))?;
-        let img_sel =
-            Selector::parse("img").map_err(|e| MetasearchError::ParseError(format!("{e:?}")))?;
+        let article_sel = Selector::parse("article").unwrap();
+        let link_sel = Selector::parse("a").unwrap();
+        let img_sel = Selector::parse("img").unwrap();
 
         let mut results = Vec::new();
 

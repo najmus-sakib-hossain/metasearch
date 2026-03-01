@@ -5,7 +5,7 @@ use async_trait::async_trait;
 use metasearch_core::{
     category::SearchCategory,
     engine::{EngineMetadata, SearchEngine},
-    error::MetasearchError,
+    error::Result,
     query::SearchQuery,
     result::SearchResult,
 };
@@ -39,7 +39,7 @@ impl SearchEngine for Fyyd {
         self.metadata.clone()
     }
 
-    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
+    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>> {
         let page = query.page;
         let page_index = (page as i32) - 1;
         let count = 10;
@@ -51,7 +51,7 @@ impl SearchEngine for Fyyd {
             page_index,
         );
 
-        let resp = self
+        let resp = match self
             .client
             .get(&url)
             .header("Accept", "application/json")
@@ -59,19 +59,23 @@ impl SearchEngine for Fyyd {
                 "User-Agent",
                 "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:120.0) Gecko/20100101 Firefox/120.0",
             )
+            .timeout(std::time::Duration::from_secs(6))
             .send()
             .await
-            .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
+        {
+            Ok(r) => r,
+            Err(_) => return Ok(Vec::new()),
+        };
 
         if !resp.status().is_success() {
             return Ok(Vec::new());
         }
 
         // Use text() to handle non-UTF-8 encoding issues, then parse manually
-        let text = resp
-            .text()
-            .await
-            .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
+        let text = match resp.text().await {
+            Ok(t) => t,
+            Err(_) => return Ok(Vec::new()),
+        };
 
         let data: serde_json::Value = match serde_json::from_str(&text) {
             Ok(v) => v,

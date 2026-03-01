@@ -1,6 +1,7 @@
 //! Niconico video search engine implementation.
 //!
-//! HTML scraping: <https://www.nicovideo.jp/search/>
+//! Uses the public Niconico Snapshot Search API v2.
+//! API docs: https://snapshot.search.nicovideo.jp/api/v2/snapshot/version
 //! Website: https://www.nicovideo.jp
 //! Features: Paging
 
@@ -13,7 +14,6 @@ use metasearch_core::{
     result::SearchResult,
 };
 use reqwest::Client;
-use scraper::{Html, Selector};
 use tracing::info;
 
 pub struct Niconico {
@@ -47,10 +47,16 @@ impl SearchEngine for Niconico {
     async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>> {
         let encoded = urlencoding::encode(&query.query);
         let page = query.page.max(1);
+        let limit: u32 = 20;
+        let offset = (page - 1) * limit;
 
+        // Use the public Niconico Snapshot Search API v2
         let url = format!(
-            "https://www.nicovideo.jp/search/{}?page={}",
-            encoded, page
+            "https://snapshot.search.nicovideo.jp/api/v2/snapshot/video/contents/search\
+             ?q={}&targets=title,description,tags\
+             &fields=contentId,title,description,thumbnailUrl\
+             &_limit={}&_offset={}&_sort=-viewCounter",
+            encoded, limit, offset
         );
 
         let resp = match self
@@ -72,79 +78,43 @@ impl SearchEngine for Niconico {
             return Ok(Vec::new());
         }
 
-        let body = match resp.text().await {
-            Ok(t) => t,
+        let data: serde_json::Value = match resp.json().await {
+            Ok(v) => v,
             Err(_) => return Ok(Vec::new()),
         };
 
-        let document = Html::parse_document(&body);
-
-        let item_selector = match Selector::parse("li[data-video-item]") {
-            Ok(s) => s,
-            Err(_) => return Ok(Vec::new()),
-        };
-        let thumb_link_selector = match Selector::parse("a.itemThumbWrap") {
-            Ok(s) => s,
-            Err(_) => return Ok(Vec::new()),
-        };
-        let title_selector = match Selector::parse("p.itemTitle a") {
-            Ok(s) => s,
-            Err(_) => return Ok(Vec::new()),
-        };
-        let desc_selector = match Selector::parse("p.itemDescription") {
-            Ok(s) => s,
-            Err(_) => return Ok(Vec::new()),
-        };
-        let img_selector = match Selector::parse("img.thumb") {
-            Ok(s) => s,
-            Err(_) => return Ok(Vec::new()),
+        let items = match data["data"].as_array() {
+            Some(arr) => arr,
+            None => return Ok(Vec::new()),
         };
 
         let mut results = Vec::new();
 
-        for (i, item) in document.select(&item_selector).enumerate() {
-            // Extract video ID from thumbnail link
-            let video_id = match item.select(&thumb_link_selector).next() {
-                Some(el) => {
-                    let href = el.value().attr("href").unwrap_or_default();
-                    // href may be like /watch/sm12345 or just sm12345
-                    let id = href
-                        .rsplit('/')
-                        .next()
-                        .unwrap_or(href)
-                        .trim()
-                        .to_string();
-                    if id.is_empty() {
-                        continue;
-                    }
-                    id
-                }
-                None => continue,
-            };
+        for (i, item) in items.iter().enumerate() {
+            let content_id = item["contentId"].as_str().unwrap_or_default();
+            if content_id.is_empty() {
+                continue;
+            }
 
-            let result_url = format!("https://www.nicovideo.jp/watch/{}", video_id);
-
-            let title = match item.select(&title_selector).next() {
-                Some(el) => el.text().collect::<String>().trim().to_string(),
-                None => continue,
-            };
-
+            let title = item["title"].as_str().unwrap_or_default();
             if title.is_empty() {
                 continue;
             }
 
-            let content = item
-                .select(&desc_selector)
-                .next()
-                .map(|el| el.text().collect::<String>().trim().to_string())
-                .unwrap_or_default();
+            let result_url = format!("https://www.nicovideo.jp/watch/{}", content_id);
 
-            let thumbnail = item
-                .select(&img_selector)
-                .next()
-                .and_then(|el| el.value().attr("src").map(|s| s.to_string()));
+            let description = item["description"]
+                .as_str()
+                .unwrap_or("")
+                .chars()
+                .take(200)
+                .collect::<String>();
 
-            let mut r = SearchResult::new(&title, &result_url, &content, "niconico");
+            let thumbnail = item["thumbnailUrl"]
+                .as_str()
+                .map(|s| s.to_string());
+
+            let mut r = SearchResult::new(title, &result_url, &description, "niconico");
             r.engine_rank = i as u32;
             r.category = SearchCategory::Videos.to_string();
             r.thumbnail = thumbnail;

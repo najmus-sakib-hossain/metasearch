@@ -42,13 +42,19 @@ impl SearchEngine for WolframAlphaNoapi {
     }
 
     async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>> {
-        // Step 1: Get proxy token
-        let token_url =
-            "https://www.wolframalpha.com/input/api/v1/code?ts=9999999999999999999";
+        // Step 1: Get proxy token (ts must be current timestamp in milliseconds)
+        let ts = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap_or_default()
+            .as_millis();
+        let token_url = format!(
+            "https://www.wolframalpha.com/input/api/v1/code?ts={}",
+            ts
+        );
 
         let token_resp = self
             .client
-            .get(token_url)
+            .get(&token_url)
             .timeout(std::time::Duration::from_secs(3))
             .header(
                 "User-Agent",

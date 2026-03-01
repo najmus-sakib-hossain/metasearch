@@ -7,7 +7,7 @@ use async_trait::async_trait;
 use metasearch_core::{
     category::SearchCategory,
     engine::{EngineMetadata, SearchEngine},
-    error::{MetasearchError, Result},
+    error::Result,
     query::SearchQuery,
     result::SearchResult,
 };
@@ -87,17 +87,25 @@ impl SearchEngine for DuckDuckGoDefinitions {
             urlencoding::encode(&query.query)
         );
 
-        let resp = self
+        let resp = match self
             .client
             .get(&url)
+            .timeout(std::time::Duration::from_secs(7))
             .send()
             .await
-            .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
+        {
+            Ok(r) => r,
+            Err(_) => return Ok(Vec::new()),
+        };
 
-        let data: DdgResponse = resp
-            .json()
-            .await
-            .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
+        if !resp.status().is_success() {
+            return Ok(Vec::new());
+        }
+
+        let data: DdgResponse = match resp.json().await {
+            Ok(v) => v,
+            Err(_) => return Ok(Vec::new()),
+        };
 
         let mut results = Vec::new();
         let mut rank = 1u32;

@@ -8,14 +8,14 @@ use reqwest::Client;
 use metasearch_core::{
     category::SearchCategory,
     engine::{EngineMetadata, SearchEngine},
-    error::{MetasearchError, Result},
+    error::Result,
     query::SearchQuery,
     result::SearchResult,
 };
 
 const GRAPHQL_URL: &str = "https://apollo.senscritique.com/";
 
-const GRAPHQL_QUERY: &str = r#"query SearchProductExplorer($query: String!, $offset: Int, $limit: Int, $sortBy: SearchSortBy) { searchProductExplorer(query: $query, offset: $offset, limit: $limit, sortBy: $sortBy) { items { title yearOfProduction originalTitle url medias { picture } category directors { name } countries { name } genresInfos { label } duration rating stats { ratingCount } } } }"#;
+const GRAPHQL_QUERY: &str = r#"query SearchProductExplorer($query: String!, $offset: Int, $limit: Int) { searchProductExplorer(query: $query, offset: $offset, limit: $limit) { items { title yearOfProduction originalTitle url medias { picture } category directors { name } countries { name } genresInfos { label } duration rating stats { ratingCount } } } }"#;
 
 pub struct SensCritique {
     metadata: EngineMetadata,
@@ -54,25 +54,32 @@ impl SearchEngine for SensCritique {
             "variables": {
                 "query": query.query,
                 "offset": offset,
-                "limit": limit,
-                "sortBy": "RELEVANCE"
+                "limit": limit
             }
         });
 
-        let resp = self
+        let resp = match self
             .client
             .post(GRAPHQL_URL)
             .header("Content-Type", "application/json")
             .header("User-Agent", "Mozilla/5.0")
+            .timeout(std::time::Duration::from_secs(6))
             .json(&body)
             .send()
             .await
-            .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
+        {
+            Ok(r) => r,
+            Err(_) => return Ok(Vec::new()),
+        };
 
-        let data: serde_json::Value = resp
-            .json()
-            .await
-            .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
+        if !resp.status().is_success() {
+            return Ok(Vec::new());
+        }
+
+        let data: serde_json::Value = match resp.json().await {
+            Ok(v) => v,
+            Err(_) => return Ok(Vec::new()),
+        };
 
         let mut results = Vec::new();
 

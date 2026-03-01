@@ -6,7 +6,7 @@ use async_trait::async_trait;
 use metasearch_core::{
     category::SearchCategory,
     engine::{EngineMetadata, SearchEngine},
-    error::{MetasearchError, Result},
+    error::Result,
     query::SearchQuery,
     result::SearchResult,
 };
@@ -58,9 +58,10 @@ impl SearchEngine for Grokipedia {
         let page = query.page;
         let offset = (page.saturating_sub(1)) * 10;
 
-        let resp = self
+        let resp = match self
             .client
             .get("https://grokipedia.com/api/full-text-search")
+            .timeout(std::time::Duration::from_secs(6))
             .query(&[
                 ("q", query.query.as_str()),
                 ("offset", &offset.to_string()),
@@ -68,12 +69,19 @@ impl SearchEngine for Grokipedia {
             ])
             .send()
             .await
-            .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
+        {
+            Ok(r) => r,
+            Err(_) => return Ok(Vec::new()),
+        };
 
-        let api: ApiResponse = resp
-            .json()
-            .await
-            .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
+        if !resp.status().is_success() {
+            return Ok(Vec::new());
+        }
+
+        let api: ApiResponse = match resp.json().await {
+            Ok(v) => v,
+            Err(_) => return Ok(Vec::new()),
+        };
 
         let results = api
             .results

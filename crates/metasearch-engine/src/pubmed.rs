@@ -184,7 +184,7 @@ impl SearchEngine for Pubmed {
 
             // Extract authors
             let mut authors = Vec::new();
-            for author_chunk in article.split("<Author").skip(1) {
+            for author_chunk in article.split("<Author ").skip(1) {
                 let author_block = match author_chunk.split("</Author>").next() {
                     Some(a) => a,
                     None => continue,

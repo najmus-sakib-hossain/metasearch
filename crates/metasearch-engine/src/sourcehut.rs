@@ -9,7 +9,7 @@ use async_trait::async_trait;
 use metasearch_core::{
     category::SearchCategory,
     engine::{EngineMetadata, SearchEngine},
-    error::{MetasearchError, Result},
+    error::Result,
     query::SearchQuery,
     result::SearchResult,
 };
@@ -51,28 +51,32 @@ impl SearchEngine for Sourcehut {
             query.page,
         );
 
-        let resp = self
+        let resp = match self
             .client
             .get(&url)
-            .header("User-Agent", "Mozilla/5.0")
+            .timeout(std::time::Duration::from_secs(7))
+            .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:120.0) Gecko/20100101 Firefox/120.0")
             .send()
             .await
-            .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
+        {
+            Ok(r) => r,
+            Err(_) => return Ok(Vec::new()),
+        };
 
-        let body = resp
-            .text()
-            .await
-            .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
+        if !resp.status().is_success() {
+            return Ok(Vec::new());
+        }
+
+        let body = match resp.text().await {
+            Ok(b) => b,
+            Err(_) => return Ok(Vec::new()),
+        };
 
         let document = Html::parse_document(&body);
-        let event_sel = Selector::parse("div.event-list div.event")
-            .map_err(|e| MetasearchError::ParseError(format!("{e:?}")))?;
-        let h4_sel =
-            Selector::parse("h4").map_err(|e| MetasearchError::ParseError(format!("{e:?}")))?;
-        let link_sel =
-            Selector::parse("h4 a").map_err(|e| MetasearchError::ParseError(format!("{e:?}")))?;
-        let desc_sel =
-            Selector::parse("p").map_err(|e| MetasearchError::ParseError(format!("{e:?}")))?;
+        let event_sel = Selector::parse("div.event-list div.event").unwrap();
+        let h4_sel = Selector::parse("h4").unwrap();
+        let link_sel = Selector::parse("h4 a").unwrap();
+        let desc_sel = Selector::parse("p").unwrap();
 
         let mut results = Vec::new();
 

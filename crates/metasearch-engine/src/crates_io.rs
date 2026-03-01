@@ -66,6 +66,10 @@ impl SearchEngine for CratesIo {
             Err(_) => return Ok(Vec::new()),
         };
 
+        if !resp.status().is_success() {
+            return Ok(Vec::new());
+        }
+
         let data: serde_json::Value = match resp.json().await {
             Ok(v) => v,
             Err(_) => return Ok(Vec::new()),

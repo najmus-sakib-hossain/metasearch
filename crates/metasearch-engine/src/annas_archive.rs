@@ -6,7 +6,7 @@ use async_trait::async_trait;
 use metasearch_core::{
     category::SearchCategory,
     engine::{EngineMetadata, SearchEngine},
-    error::{MetasearchError, Result},
+    error::Result,
     query::SearchQuery,
     result::SearchResult,
 };
@@ -49,9 +49,10 @@ impl SearchEngine for AnnasArchive {
             page
         );
 
-        let resp = self
+        let resp = match self
             .client
             .get(&url)
+            .timeout(std::time::Duration::from_secs(7))
             .header(
                 "User-Agent",
                 "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:120.0) Gecko/20100101 Firefox/120.0",
@@ -59,24 +60,27 @@ impl SearchEngine for AnnasArchive {
             .header("Accept-Language", "en-US,en;q=0.9")
             .send()
             .await
-            .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
+        {
+            Ok(r) => r,
+            Err(_) => return Ok(Vec::new()),
+        };
 
-        let body: String = resp
-            .text()
-            .await
-            .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
+        if !resp.status().is_success() {
+            return Ok(Vec::new());
+        }
+
+        let body: String = match resp.text().await {
+            Ok(t) => t,
+            Err(_) => return Ok(Vec::new()),
+        };
 
         let document = Html::parse_document(&body);
 
         // Anna's Archive wraps each result in a div inside js-aarecord-list-outer
-        let item_sel = Selector::parse("main div.js-aarecord-list-outer > div")
-            .map_err(|e| MetasearchError::ParseError(format!("selector: {:?}", e)))?;
-        let link_sel = Selector::parse("a[href^='/md5']")
-            .map_err(|e| MetasearchError::ParseError(format!("selector: {:?}", e)))?;
-        let desc_sel = Selector::parse("div.relative")
-            .map_err(|e| MetasearchError::ParseError(format!("selector: {:?}", e)))?;
-        let img_sel = Selector::parse("img")
-            .map_err(|e| MetasearchError::ParseError(format!("selector: {:?}", e)))?;
+        let item_sel = Selector::parse("main div.js-aarecord-list-outer > div").unwrap();
+        let link_sel = Selector::parse("a[href^='/md5']").unwrap();
+        let desc_sel = Selector::parse("div.relative").unwrap();
+        let img_sel = Selector::parse("img").unwrap();
 
         let mut results = Vec::new();
 

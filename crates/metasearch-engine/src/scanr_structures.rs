@@ -91,7 +91,9 @@ impl SearchEngine for ScanrStructures {
 
                 let item_url = format!("{}/structure/{}", SCANR_BASE, id);
 
-                let title = item["label"].as_str().unwrap_or_default();
+                let title = item["label"]["default"].as_str()
+                    .or_else(|| item["label"]["fr"].as_str())
+                    .unwrap_or_default();
                 if title.is_empty() {
                     continue;
                 }

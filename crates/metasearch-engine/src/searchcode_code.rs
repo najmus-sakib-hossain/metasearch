@@ -4,7 +4,7 @@ use async_trait::async_trait;
 use metasearch_core::{
     category::SearchCategory,
     engine::{EngineMetadata, SearchEngine},
-    error::MetasearchError,
+    error::Result,
     query::SearchQuery,
     result::SearchResult,
 };
@@ -38,27 +38,31 @@ impl SearchEngine for SearchcodeCode {
         self.metadata.clone()
     }
 
-    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
+    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>> {
         let url = format!(
             "https://searchcode.com/api/codesearch_I/?q={}",
             urlencoding::encode(&query.query),
         );
 
-        let resp = self
+        let resp = match self
             .client
             .get(&url)
+            .timeout(std::time::Duration::from_secs(7))
             .send()
             .await
-            .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
+        {
+            Ok(r) => r,
+            Err(_) => return Ok(Vec::new()),
+        };
 
         if !resp.status().is_success() {
             return Ok(Vec::new());
         }
 
-        let text = resp
-            .text()
-            .await
-            .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
+        let text = match resp.text().await {
+            Ok(t) => t,
+            Err(_) => return Ok(Vec::new()),
+        };
 
         if text.trim_start().starts_with('<') {
             return Ok(Vec::new());

@@ -5,7 +5,7 @@ use async_trait::async_trait;
 use metasearch_core::{
     category::SearchCategory,
     engine::{EngineMetadata, SearchEngine},
-    error::MetasearchError,
+    error::Result,
     query::SearchQuery,
     result::SearchResult,
 };
@@ -40,7 +40,7 @@ impl SearchEngine for Fdroid {
         self.metadata.clone()
     }
 
-    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
+    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>> {
         let page = query.page;
         let url = format!(
             "https://search.f-droid.org/?q={}&page={}&lang=",
@@ -48,17 +48,29 @@ impl SearchEngine for Fdroid {
             page,
         );
 
-        let resp = self
+        let resp = match self
             .client
             .get(&url)
+            .timeout(std::time::Duration::from_secs(7))
+            .header(
+                "User-Agent",
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:120.0) Gecko/20100101 Firefox/120.0",
+            )
             .send()
             .await
-            .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
+        {
+            Ok(r) => r,
+            Err(_) => return Ok(Vec::new()),
+        };
 
-        let html_text = resp
-            .text()
-            .await
-            .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
+        if !resp.status().is_success() {
+            return Ok(Vec::new());
+        }
+
+        let html_text = match resp.text().await {
+            Ok(t) => t,
+            Err(_) => return Ok(Vec::new()),
+        };
 
         let document = Html::parse_document(&html_text);
         let app_sel = Selector::parse("a.package-header").unwrap();

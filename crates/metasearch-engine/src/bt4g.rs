@@ -105,11 +105,17 @@ impl SearchEngine for Bt4g {
 }
 
 fn extract_tag(xml: &str, tag: &str) -> Option<String> {
-    let open = format!("<{}>", tag);
+    // Match opening tag with optional attributes: <tag> or <tag ...>
+    let simple = format!("<{}>", tag);
+    let with_attr = format!("<{} ", tag);
     let close = format!("</{}>", tag);
-    let start = xml.find(&open)? + open.len();
-    let end = xml[start..].find(&close)? + start;
-    let content = &xml[start..end];
+
+    // Find the start of the opening tag
+    let tag_start = xml.find(&simple).or_else(|| xml.find(&with_attr))?;
+    // Find the end of the opening tag (skip past '>')
+    let content_start = xml[tag_start..].find('>')? + tag_start + 1;
+    let end = xml[content_start..].find(&close)? + content_start;
+    let content = &xml[content_start..end];
     // Handle CDATA
     if content.starts_with("<![CDATA[") && content.ends_with("]]>") {
         Some(content[9..content.len() - 3].to_string())

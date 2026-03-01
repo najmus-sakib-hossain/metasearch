@@ -6,7 +6,7 @@ use async_trait::async_trait;
 use metasearch_core::{
     category::SearchCategory,
     engine::{EngineMetadata, SearchEngine},
-    error::{MetasearchError, Result},
+    error::Result,
     query::SearchQuery,
     result::SearchResult,
 };
@@ -49,23 +49,32 @@ impl SearchEngine for SvgRepo {
             page
         );
 
-        let body = self
+        let resp = match self
             .client
             .get(&url)
+            .timeout(std::time::Duration::from_secs(6))
             .send()
             .await
-            .map_err(|e| MetasearchError::HttpError(e.to_string()))?
-            .text()
-            .await
-            .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
+        {
+            Ok(r) => r,
+            Err(_) => return Ok(Vec::new()),
+        };
+
+        if !resp.status().is_success() {
+            return Ok(Vec::new());
+        }
+
+        let body = match resp.text().await {
+            Ok(t) => t,
+            Err(_) => return Ok(Vec::new()),
+        };
 
         let document = Html::parse_document(&body);
-        let item_sel = Selector::parse("div.style_nodeListing__7Nmro > div")
-            .map_err(|e| MetasearchError::ParseError(format!("{e:?}")))?;
-        let link_sel =
-            Selector::parse("a").map_err(|e| MetasearchError::ParseError(format!("{e:?}")))?;
-        let img_sel =
-            Selector::parse("img").map_err(|e| MetasearchError::ParseError(format!("{e:?}")))?;
+        // CSS module class names change with each deploy; try multiple selectors
+        let item_sel = Selector::parse("[class*='nodeListing'] > div, [class*='node-listing'] > div, [class*='NodeListing'] > div")
+            .unwrap_or_else(|_| Selector::parse("div").expect("div"));
+        let link_sel = Selector::parse("a").expect("a");
+        let img_sel = Selector::parse("img").expect("img");
 
         let mut results = Vec::new();
 

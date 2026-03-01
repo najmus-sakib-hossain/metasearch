@@ -8,7 +8,7 @@ use async_trait::async_trait;
 use metasearch_core::{
     category::SearchCategory,
     engine::{EngineMetadata, SearchEngine},
-    error::MetasearchError,
+    error::Result,
     query::SearchQuery,
     result::SearchResult,
 };
@@ -44,16 +44,17 @@ impl SearchEngine for Pdbe {
         self.metadata.clone()
     }
 
-    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
+    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>> {
         let page = query.page.max(1);
         let rows = 20;
         let start = (page - 1) * rows;
 
-        let resp = self
+        let resp = match self
             .client
             .post(format!("{}/search/pdb/select", PDBE_BASE))
             .header("Content-Type", "application/x-www-form-urlencoded")
             .header("Accept", "application/json")
+            .timeout(std::time::Duration::from_secs(7))
             .body(format!(
                 "q={}&wt=json&rows={}&start={}",
                 urlencoding::encode(&query.query),
@@ -62,12 +63,19 @@ impl SearchEngine for Pdbe {
             ))
             .send()
             .await
-            .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
+        {
+            Ok(r) => r,
+            Err(_) => return Ok(Vec::new()),
+        };
 
-        let data: serde_json::Value = resp
-            .json()
-            .await
-            .map_err(|e| MetasearchError::ParseError(format!("JSON error: {}", e)))?;
+        if !resp.status().is_success() {
+            return Ok(Vec::new());
+        }
+
+        let data: serde_json::Value = match resp.json().await {
+            Ok(d) => d,
+            Err(_) => return Ok(Vec::new()),
+        };
 
         let mut results = Vec::new();
 
