@@ -48,7 +48,13 @@ pub async fn run(state: Arc<AppState>) -> anyhow::Result<()> {
 
     let app = build_router(state);
 
-    info!("Metasearch server listening on http://{}", addr);
+    // Display localhost in logs instead of 0.0.0.0 for better UX
+    let display_addr = if addr.ip().is_unspecified() {
+        format!("localhost:{}", addr.port())
+    } else {
+        addr.to_string()
+    };
+    info!("Metasearch server listening on http://{}", display_addr);
 
     let listener = tokio::net::TcpListener::bind(addr).await?;
     axum::serve(listener, app).await?;
