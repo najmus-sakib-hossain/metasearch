@@ -1,0 +1,389 @@
+/**
+ * Metasearch - shadcn/Vercel Design System
+ * Inspired by shadcn/ui and Vercel's Geist design language
+ * 
+ * Key principles:
+ * - Clean, minimal, modern
+ * - Subtle borders and shadows
+ * - Smooth transitions
+ * - Excellent contrast and readability
+ */
+
+/* ═══════════════════════════════════════════════════════════════
+   CSS VARIABLES - shadcn/Vercel Color System
+   ═══════════════════════════════════════════════════════════════ */
+
+:root {
+  /* Background colors */
+  --background: 0 0% 100%;
+  --foreground: 0 0% 3.9%;
+  
+  /* Card colors */
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 3.9%;
+  
+  /* Popover colors */
+  --popover: 0 0% 100%;
+  --popover-foreground: 0 0% 3.9%;
+  
+  /* Primary colors */
+  --primary: 0 0% 9%;
+  --primary-foreground: 0 0% 98%;
+  
+  /* Secondary colors */
+  --secondary: 0 0% 96.1%;
+  --secondary-foreground: 0 0% 9%;
+  
+  /* Muted colors */
+  --muted: 0 0% 96.1%;
+  --muted-foreground: 0 0% 45.1%;
+  
+  /* Accent colors */
+  --accent: 0 0% 96.1%;
+  --accent-foreground: 0 0% 9%;
+  
+  /* Destructive colors */
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 0 0% 98%;
+  
+  /* Border colors */
+  --border: 0 0% 89.8%;
+  --input: 0 0% 89.8%;
+  --ring: 0 0% 3.9%;
+  
+  /* Radius */
+  --radius: 0.5rem;
+  
+  /* Vercel-specific */
+  --geist-foreground: #000;
+  --geist-background: #fff;
+  --accents-1: #fafafa;
+  --accents-2: #eaeaea;
+  --accents-3: #999;
+  --accents-4: #888;
+  --accents-5: #666;
+  --accents-6: #444;
+  --accents-7: #333;
+  --accents-8: #111;
+  
+  /* Blue accent (Vercel blue) */
+  --blue: #0070f3;
+  --blue-dark: #0761d1;
+  --blue-light: #3291ff;
+}
+
+.dark {
+  --background: 0 0% 3.9%;
+  --foreground: 0 0% 98%;
+  
+  --card: 0 0% 3.9%;
+  --card-foreground: 0 0% 98%;
+  
+  --popover: 0 0% 3.9%;
+  --popover-foreground: 0 0% 98%;
+  
+  --primary: 0 0% 98%;
+  --primary-foreground: 0 0% 9%;
+  
+  --secondary: 0 0% 14.9%;
+  --secondary-foreground: 0 0% 98%;
+  
+  --muted: 0 0% 14.9%;
+  --muted-foreground: 0 0% 63.9%;
+  
+  --accent: 0 0% 14.9%;
+  --accent-foreground: 0 0% 98%;
+  
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 0 0% 98%;
+  
+  --border: 0 0% 14.9%;
+  --input: 0 0% 14.9%;
+  --ring: 0 0% 83.1%;
+  
+  --geist-foreground: #fff;
+  --geist-background: #000;
+  --accents-1: #111;
+  --accents-2: #333;
+  --accents-3: #444;
+  --accents-4: #666;
+  --accents-5: #888;
+  --accents-6: #999;
+  --accents-7: #eaeaea;
+  --accents-8: #fafafa;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   TYPOGRAPHY - Geist Font System
+   ═══════════════════════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  color: hsl(var(--foreground));
+  background: hsl(var(--background));
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   AUTOCOMPLETE DROPDOWN - shadcn/Vercel Style
+   ═══════════════════════════════════════════════════════════════ */
+
+.autocomplete-dropdown {
+  position: absolute !important;
+  top: calc(100% + 4px) !important;
+  left: 0 !important;
+  right: 0 !important;
+  background: hsl(var(--popover)) !important;
+  border: 1px solid hsl(var(--border)) !important;
+  border-radius: calc(var(--radius) + 2px) !important;
+  box-shadow: 
+    0 0 0 1px rgba(0, 0, 0, 0.03),
+    0 2px 4px rgba(0, 0, 0, 0.05),
+    0 12px 24px rgba(0, 0, 0, 0.05) !important;
+  list-style: none !important;
+  margin: 0 !important;
+  padding: 4px !important;
+  z-index: 50 !important;
+  max-height: 400px !important;
+  overflow-y: auto !important;
+  animation: slideDown 0.15s ease-out !important;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.autocomplete-dropdown[hidden] {
+  display: none !important;
+}
+
+.autocomplete-dropdown:not([hidden]) {
+  display: block !important;
+}
+
+.autocomplete-dropdown li {
+  padding: 8px 12px !important;
+  cursor: pointer !important;
+  font-size: 14px !important;
+  color: hsl(var(--foreground)) !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  border-radius: var(--radius) !important;
+  transition: all 0.12s ease !important;
+  font-weight: 400 !important;
+}
+
+.autocomplete-dropdown li:hover,
+.autocomplete-dropdown li[aria-selected="true"] {
+  background: hsl(var(--accent)) !important;
+  color: hsl(var(--accent-foreground)) !important;
+}
+
+.autocomplete-dropdown li .ac-icon {
+  opacity: 0.5 !important;
+  flex-shrink: 0 !important;
+  width: 16px !important;
+  height: 16px !important;
+  color: hsl(var(--muted-foreground)) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SEARCH INPUT - shadcn/Vercel Style
+   ═══════════════════════════════════════════════════════════════ */
+
+.hero-input-wrap {
+  position: relative !important;
+  display: flex !important;
+  align-items: center !important;
+  background: hsl(var(--background)) !important;
+  border: 1px solid hsl(var(--input)) !important;
+  border-radius: calc(var(--radius) + 4px) !important;
+  transition: all 0.15s ease !important;
+  overflow: visible !important;
+  height: 56px !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
+}
+
+.hero-input-wrap:hover {
+  border-color: hsl(var(--ring)) !important;
+  box-shadow: 0 0 0 1px hsl(var(--ring)) !important;
+}
+
+.hero-input-wrap:focus-within {
+  border-color: hsl(var(--ring)) !important;
+  box-shadow: 0 0 0 2px hsl(var(--ring) / 0.2) !important;
+  outline: none !important;
+}
+
+.hero-input {
+  flex: 1 !important;
+  border: none !important;
+  background: transparent !important;
+  font-size: 15px !important;
+  color: hsl(var(--foreground)) !important;
+  outline: none !important;
+  padding: 0 16px !important;
+  font-weight: 400 !important;
+}
+
+.hero-input::placeholder {
+  color: hsl(var(--muted-foreground)) !important;
+}
+
+.hero-input-icon {
+  padding: 0 0 0 16px !important;
+  color: hsl(var(--muted-foreground)) !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+.hero-input-icon svg {
+  width: 18px !important;
+  height: 18px !important;
+}
+
+.hero-btn {
+  margin: 0 4px 0 0 !important;
+  padding: 10px 20px !important;
+  background: hsl(var(--primary)) !important;
+  color: hsl(var(--primary-foreground)) !important;
+  border: none !important;
+  border-radius: var(--radius) !important;
+  cursor: pointer !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  transition: all 0.15s ease !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  height: 40px !important;
+}
+
+.hero-btn:hover {
+  background: hsl(var(--primary) / 0.9) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+.hero-btn:active {
+  transform: translateY(0) !important;
+}
+
+.hero-btn svg {
+  width: 16px !important;
+  height: 16px !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   BUTTONS - shadcn/Vercel Style
+   ═══════════════════════════════════════════════════════════════ */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: var(--radius);
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.15s ease;
+  cursor: pointer;
+  border: 1px solid transparent;
+  padding: 0 16px;
+  height: 36px;
+  white-space: nowrap;
+}
+
+.btn-primary {
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  border-color: hsl(var(--primary));
+}
+
+.btn-primary:hover {
+  background: hsl(var(--primary) / 0.9);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn-secondary {
+  background: hsl(var(--secondary));
+  color: hsl(var(--secondary-foreground));
+  border-color: hsl(var(--border));
+}
+
+.btn-secondary:hover {
+  background: hsl(var(--secondary) / 0.8);
+  border-color: hsl(var(--ring));
+}
+
+.btn-ghost {
+  background: transparent;
+  color: hsl(var(--foreground));
+}
+
+.btn-ghost:hover {
+  background: hsl(var(--accent));
+  color: hsl(var(--accent-foreground));
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   LOADING SPINNER - shadcn/Vercel Style
+   ═══════════════════════════════════════════════════════════════ */
+
+.loading-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid hsl(var(--muted));
+  border-top-color: hsl(var(--primary));
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   UTILITY CLASSES
+   ═══════════════════════════════════════════════════════════════ */
+
+.text-muted {
+  color: hsl(var(--muted-foreground));
+}
+
+.text-sm {
+  font-size: 13px;
+}
+
+.text-xs {
+  font-size: 12px;
+}
+
+.font-medium {
+  font-weight: 500;
+}
+
+.font-semibold {
+  font-weight: 600;
+}

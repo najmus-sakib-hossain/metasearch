@@ -8,64 +8,12 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css">
+  <link rel="stylesheet" href="/static/css/shadcn-vercel.css">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230070f3' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><circle cx='11' cy='11' r='8'/><path d='m21 21-4.35-4.35'/></svg>">
   <link rel="search" type="application/opensearchdescription+xml" title="Metasearch" href="/opensearch.xml">
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
   <script>document.addEventListener('DOMContentLoaded', () => lucide.createIcons())</script>
-  <style>
-    /* ── Autocomplete dropdown ────────────────────────── */
-    .hero-input-wrap {
-      position: relative !important;
-    }
-    .autocomplete-dropdown {
-      position: absolute !important;
-      top: calc(100% + 8px) !important;
-      left: 0 !important;
-      right: 0 !important;
-      background: #1a1a2e !important;
-      border: 1px solid rgba(255,255,255,0.2) !important;
-      border-radius: 12px !important;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.8) !important;
-      list-style: none !important;
-      margin: 0 !important;
-      padding: 8px 0 !important;
-      z-index: 9999 !important;
-      backdrop-filter: blur(12px) !important;
-      overflow: hidden !important;
-      max-height: 400px !important;
-      overflow-y: auto !important;
-    }
-    .autocomplete-dropdown[hidden] {
-      display: none !important;
-    }
-    .autocomplete-dropdown:not([hidden]) {
-      display: block !important;
-    }
-    .autocomplete-dropdown li {
-      padding: 12px 20px !important;
-      cursor: pointer !important;
-      font-size: 0.95rem !important;
-      color: rgba(255,255,255,0.9) !important;
-      display: flex !important;
-      align-items: center !important;
-      gap: 12px !important;
-      transition: background 0.15s !important;
-    }
-    .autocomplete-dropdown li:hover,
-    .autocomplete-dropdown li[aria-selected="true"] {
-      background: rgba(0, 112, 243, 0.25) !important;
-      color: #fff !important;
-    }
-    .autocomplete-dropdown li .ac-icon {
-      opacity: 0.6 !important;
-      flex-shrink: 0 !important;
-      width: 18px !important;
-      height: 18px !important;
-    }
-    #search-input-wrap {
-      position: relative !important;
-    }
-  </style>
 </head>
 <body class="home-page">
 
@@ -120,8 +68,10 @@
               aria-controls="autocomplete-list"
               aria-expanded="false"
             >
-            <button type="submit" class="hero-btn">
-              <i data-lucide="arrow-right"></i>
+            <button type="submit" class="hero-btn" id="search-btn">
+              <span id="btn-text">Search</span>
+              <i data-lucide="arrow-right" id="btn-icon"></i>
+              <span class="loading-spinner" id="btn-spinner" style="display:none;"></span>
             </button>
             <!-- Autocomplete Dropdown -->
             <ul id="autocomplete-list" class="autocomplete-dropdown" role="listbox" hidden></ul>
@@ -263,6 +213,19 @@
     var lastQuery = '';
     var timer;
     var currentFetch;
+
+    // Loading state for search button
+    form.addEventListener('submit', function() {
+      var btnText = document.getElementById('btn-text');
+      var btnIcon = document.getElementById('btn-icon');
+      var btnSpinner = document.getElementById('btn-spinner');
+      var searchBtn = document.getElementById('search-btn');
+      
+      if (btnText) btnText.style.display = 'none';
+      if (btnIcon) btnIcon.style.display = 'none';
+      if (btnSpinner) btnSpinner.style.display = 'inline-block';
+      if (searchBtn) searchBtn.disabled = true;
+    });
 
     function clearDropdown() {
       list.innerHTML = '';
