@@ -11,7 +11,7 @@ use metasearch_server::{app, cache::SearchCache, state::AppState, templates::Tem
 
 #[derive(Parser)]
 #[command(name = "metasearch")]
-#[command(about = "🔍 A blazing-fast, privacy-respecting metasearch engine")]
+#[command(about = "A blazing-fast, privacy-respecting metasearch engine")]
 #[command(version)]
 struct Cli {
     #[command(subcommand)]
@@ -66,12 +66,12 @@ async fn main() -> anyhow::Result<()> {
     let engine_count = registry.count();
 
     // Load templates
-    let templates = Arc::new(Templates::new(&cli.templates)?);
+    let templates = Templates::new(&cli.templates)?;
 
     let state = Arc::new(AppState {
         cache: SearchCache::new(settings.cache.max_entries, settings.cache.ttl_secs),
         engine_registry: Arc::new(registry),
-        templates,
+        templates: Arc::new(templates),
         settings,
     });
 

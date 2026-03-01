@@ -76,7 +76,7 @@ async fn test_all_engines_parallel() {
             let mut count = completed.lock().await;
             *count += 1;
             if *count % 20 == 0 || *count == total {
-                println!("  ⚡ Progress: {}/{} engines tested ({:.1}%)", 
+                println!("  Progress: {}/{} engines tested ({:.1}%)", 
                     *count, total, (*count as f64 / total as f64) * 100.0);
             }
         });

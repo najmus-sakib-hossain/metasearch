@@ -50,7 +50,7 @@ async fn index(State(state): State<Arc<AppState>>) -> Html<String> {
             Html(format!(
                 r#"<!DOCTYPE html><html><head><meta charset="utf-8"><title>Metasearch</title></head>
                 <body style="background:#0a0a1a;color:#fff;font-family:sans-serif;display:flex;justify-content:center;align-items:center;min-height:100vh;">
-                <div style="text-align:center"><h1>🔍 Metasearch</h1><p>Template error: {}</p>
+                <div style="text-align:center"><h1>Metasearch</h1><p>Template error: {}</p>
                 <p>Make sure you're running from the project root directory.</p></div></body></html>"#,
                 e
             ))

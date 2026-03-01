@@ -32,7 +32,7 @@ pub async fn run(state: Arc<AppState>) -> anyhow::Result<()> {
 
     let app = build_router(state);
 
-    info!("🔍 Metasearch listening on http://{}", addr);
+    info!("Metasearch server listening on http://{}", addr);
 
     let listener = tokio::net::TcpListener::bind(addr).await?;
     axum::serve(listener, app).await?;
