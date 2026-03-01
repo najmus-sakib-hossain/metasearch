@@ -74,7 +74,7 @@ impl SearchEngine for Piped {
         }
 
         let url = format!(
-            "{}/search?q={}&filter=videos",
+            "{}/search?q={}&filter=all",
             self.backend_url,
             urlencoding::encode(&query.query),
         );

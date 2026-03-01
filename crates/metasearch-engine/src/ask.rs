@@ -68,46 +68,54 @@ impl SearchEngine for Ask {
             .await
             .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
 
-        let document = Html::parse_document(&body);
+        // Ask.com embeds results in JavaScript: window.MESON.initialState = {...}
+        let start_tag = "window.MESON.initialState = {";
+        let end_tag = "}};";
 
-        // Ask.com results are in <div class="PartialSearchResults-item">
-        let result_selector = Selector::parse(".PartialSearchResults-item, .result").unwrap();
-        let title_selector =
-            Selector::parse(".PartialSearchResults-item-title a, .result-title a, a.result-link")
-                .unwrap();
-        let snippet_selector = Selector::parse(
-            ".PartialSearchResults-item-abstract, .result-abstract, p.result-url + p",
-        )
-        .unwrap();
+        let start_pos = match body.find(start_tag) {
+            Some(pos) => pos + start_tag.len() - 1,
+            None => return Ok(Vec::new()),
+        };
+
+        let remaining = &body[start_pos..];
+        let end_pos = match remaining.find(end_tag) {
+            Some(pos) => pos + end_tag.len() - 1,
+            None => return Ok(Vec::new()),
+        };
+
+        let json_str = &remaining[..end_pos];
+
+        // Parse the JSON
+        let data: serde_json::Value = match serde_json::from_str(json_str) {
+            Ok(v) => v,
+            Err(_) => return Ok(Vec::new()),
+        };
 
         let mut results = Vec::new();
 
-        for (i, element) in document.select(&result_selector).enumerate() {
-            let title_el = match element.select(&title_selector).next() {
-                Some(el) => el,
-                None => continue,
-            };
+        // Navigate to search.webResults.results
+        if let Some(items) = data
+            .get("search")
+            .and_then(|s| s.get("webResults"))
+            .and_then(|w| w.get("results"))
+            .and_then(|r| r.as_array())
+        {
+            for (i, item) in items.iter().enumerate() {
+                let title = item["title"].as_str().unwrap_or_default();
+                let mut url = item["url"].as_str().unwrap_or_default().to_string();
+                let abstract_text = item["abstract"].as_str().unwrap_or_default();
 
-            let title: String = title_el.text().collect();
-            let mut result_url = match title_el.value().attr("href") {
-                Some(href) => href.to_string(),
-                None => continue,
-            };
+                if title.is_empty() || url.is_empty() {
+                    continue;
+                }
 
-            // Ask.com often wraps URLs with a redirect — strip &ueid suffix
-            if let Some(idx) = result_url.find("&ueid") {
-                result_url.truncate(idx);
-            }
+                // Strip &ueid parameter
+                if let Some(idx) = url.find("&ueid") {
+                    url.truncate(idx);
+                }
 
-            let snippet: String = element
-                .select(&snippet_selector)
-                .next()
-                .map(|el| el.text().collect())
-                .unwrap_or_default();
-
-            if !title.is_empty() && !result_url.is_empty() {
-                let mut r = SearchResult::new(&title, &result_url, &snippet, "ask");
-                r.engine_rank = i as u32;
+                let mut r = SearchResult::new(title, &url, abstract_text, "ask");
+                r.engine_rank = (i + 1) as u32;
                 r.category = SearchCategory::General.to_string();
                 results.push(r);
             }

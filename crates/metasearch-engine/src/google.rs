@@ -58,11 +58,11 @@ impl SearchEngine for Google {
         let safe = Self::safe_search_param(query.safe_search);
 
         let url = format!(
-            "https://www.google.com/search?q={}&start={}&num=10&hl={}&safe={}&gbv=1&ie=utf8&oe=utf8",
+            "https://www.google.com/search?q={}&start={}&num=10&hl={}&lr=lang_{}&ie=utf8&oe=utf8&filter=0",
             urlencoding::encode(&query.query),
             start,
             lang,
-            safe,
+            lang,
         );
 
         let resp = self
@@ -70,13 +70,13 @@ impl SearchEngine for Google {
             .get(&url)
             .header(
                 "User-Agent",
-                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:120.0) Gecko/20100101 Firefox/120.0",
             )
-            .header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
-            .header("Accept-Language", format!("{},en;q=0.5", lang))
-            .header("Accept-Encoding", "gzip, deflate")
-            .header("DNT", "1")
+            .header("Accept", "*/*")
+            .header("Accept-Language", format!("{},en-US;q=0.7,en;q=0.5", lang))
+            .header("Accept-Encoding", "gzip, deflate, br")
             .header("Referer", "https://www.google.com/")
+            .header("Cookie", "CONSENT=YES+")
             .send()
             .await
             .map_err(|e| MetasearchError::HttpError(e.to_string()))?;

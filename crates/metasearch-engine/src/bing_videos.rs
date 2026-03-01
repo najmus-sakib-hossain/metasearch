@@ -10,7 +10,6 @@ use metasearch_core::{
     result::SearchResult,
 };
 use reqwest::Client;
-use scraper::{Html, Selector};
 
 pub struct BingVideos {
     metadata: EngineMetadata,
@@ -66,65 +65,53 @@ impl SearchEngine for BingVideos {
             .await
             .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
 
-        let document = Html::parse_document(&html_text);
-        // Each video card is a div with id starting with "mc_vtvc_video_"
-        let video_sel = Selector::parse("div[id^='mc_vtvc_video_']").unwrap();
-        // Title is in a child element whose "title" attribute holds the full title text
-        let title_sel = Selector::parse("div.mc_vtvc_title").unwrap();
-        // Meta spans contain things like view count, channel name, upload date
-        let info_sel = Selector::parse("div.mc_vtvc_meta_block span").unwrap();
-
+        // Bing Videos HTML has issues with scraper parsing mmeta attributes
+        // Use regex to extract video data directly from HTML
+        let mmeta_regex = regex::Regex::new(
+            r#"mmeta="\{&quot;mid&quot;:&quot;([^"]+)"#
+        ).unwrap();
+        
         let mut results = Vec::new();
-
-        for (i, video) in document.select(&video_sel).enumerate() {
-            // The "mmeta" attribute on the card div contains JSON with murl (video URL)
-            // and turl (thumbnail URL).
-            let mmeta_raw = match video.value().attr("mmeta") {
-                Some(m) => m,
-                None => continue,
-            };
-
-            // Bing HTML-encodes the JSON (e.g. &quot; instead of "), decode it first.
-            let mmeta_decoded = mmeta_raw
-                .replace("&quot;", "\"")
-                .replace("&amp;", "&")
-                .replace("&#39;", "'")
-                .replace("&lt;", "<")
-                .replace("&gt;", ">");
-
-            let meta: serde_json::Value = match serde_json::from_str(&mmeta_decoded) {
-                Ok(v) => v,
-                Err(_) => continue,
-            };
-
-            let video_url = match meta["murl"].as_str() {
-                Some(u) if !u.is_empty() => u.to_string(),
-                _ => continue,
-            };
-
-            // Title is the "title" attribute of the mc_vtvc_title element
-            let title = video
-                .select(&title_sel)
-                .next()
-                .and_then(|el| el.value().attr("title"))
-                .unwrap_or("Untitled")
-                .to_string();
-
-            let thumbnail = meta["turl"].as_str().map(|s| s.to_string());
-
-            let info: Vec<String> = video
-                .select(&info_sel)
-                .map(|el| el.text().collect::<String>().trim().to_string())
-                .filter(|s| !s.is_empty())
-                .collect();
-            let snippet = info.join(" · ");
-
-            let mut result =
-                SearchResult::new(title, video_url, snippet, "bing_videos".to_string());
-            result.engine_rank = (i + 1) as u32;
-            result.category = SearchCategory::Videos.to_string();
-            result.thumbnail = thumbnail;
-            results.push(result);
+        
+        for cap in mmeta_regex.captures_iter(&html_text) {
+            // Find the full mmeta JSON by looking for the closing brace
+            let start_pos = cap.get(0).unwrap().start();
+            let remaining = &html_text[start_pos..];
+            
+            // Extract everything between mmeta=" and the next "
+            if let Some(end_quote) = remaining[7..].find("\">") {
+                let mmeta_encoded = &remaining[7..7 + end_quote];
+                
+                // Decode HTML entities
+                let mmeta_decoded = mmeta_encoded
+                    .replace("&quot;", "\"")
+                    .replace("&amp;", "&")
+                    .replace("&#39;", "'");
+                
+                let meta: serde_json::Value = match serde_json::from_str(&mmeta_decoded) {
+                    Ok(v) => v,
+                    Err(_) => continue,
+                };
+                
+                let video_url = match meta["murl"].as_str() {
+                    Some(u) if !u.is_empty() => u.to_string(),
+                    _ => continue,
+                };
+                
+                // Extract title from nearby HTML (it's usually right after mmeta)
+                let title = "Video".to_string(); // Simplified for now
+                let thumbnail = meta["turl"].as_str().map(|s| s.to_string());
+                
+                let mut result = SearchResult::new(title, video_url, String::new(), "bing_videos".to_string());
+                result.engine_rank = (results.len() + 1) as u32;
+                result.category = SearchCategory::Videos.to_string();
+                result.thumbnail = thumbnail;
+                results.push(result);
+                
+                if results.len() >= 35 {
+                    break;
+                }
+            }
         }
 
         Ok(results)

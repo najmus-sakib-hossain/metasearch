@@ -57,13 +57,10 @@ impl SearchEngine for Presearch {
             .client
             .get(&search_url)
             .header(
-                "Cookie",
-                "b=1; presearch_session=; use_local_search_results=false",
-            )
-            .header(
                 "User-Agent",
-                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:120.0) Gecko/20100101 Firefox/120.0",
             )
+            .header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
             .send()
             .await
             .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
@@ -95,13 +92,10 @@ impl SearchEngine for Presearch {
             .client
             .get(&results_url)
             .header(
-                "Cookie",
-                "b=1; presearch_session=; use_local_search_results=false",
-            )
-            .header(
                 "User-Agent",
-                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:120.0) Gecko/20100101 Firefox/120.0",
             )
+            .header("Accept", "application/json")
             .send()
             .await
             .map_err(|e| MetasearchError::HttpError(e.to_string()))?;

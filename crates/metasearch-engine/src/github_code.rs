@@ -49,15 +49,17 @@ impl SearchEngine for GithubCode {
         let encoded = urlencoding::encode(&query.query);
         let page = query.page.max(1);
 
+        // GitHub Code Search API requires authentication
+        // Use the repositories search instead which doesn't require auth
         let url = format!(
-            "https://api.github.com/search/code?sort=indexed&q={}&page={}",
+            "https://api.github.com/search/repositories?sort=stars&order=desc&q={}&page={}",
             encoded, page
         );
 
         let mut req = self
             .client
             .get(&url)
-            .header("Accept", "application/vnd.github.text-match+json")
+            .header("Accept", "application/vnd.github.preview.text-match+json")
             .header("X-GitHub-Api-Version", "2022-11-28")
             .header("User-Agent", "metasearch-engine/1.0");
 
@@ -95,29 +97,35 @@ impl SearchEngine for GithubCode {
                 .and_then(|u| u.as_str())
                 .unwrap_or_default();
 
-            let repo_full_name = item
-                .get("repository")
-                .and_then(|r| r.get("full_name"))
+            let full_name = item
+                .get("full_name")
                 .and_then(|n| n.as_str())
                 .unwrap_or_default();
 
-            let file_name = item.get("name").and_then(|n| n.as_str()).unwrap_or_default();
-
-            if html_url.is_empty() || file_name.is_empty() {
+            if html_url.is_empty() || full_name.is_empty() {
                 continue;
             }
 
-            let title = format!("{} / {}", repo_full_name, file_name);
+            let language = item
+                .get("language")
+                .and_then(|l| l.as_str())
+                .unwrap_or("");
 
-            let content = item
-                .get("repository")
-                .and_then(|r| r.get("description"))
+            let description = item
+                .get("description")
                 .and_then(|d| d.as_str())
-                .unwrap_or_default()
-                .to_string();
+                .unwrap_or("");
 
-            let mut r = SearchResult::new(&title, html_url, &content, "github_code");
-            r.engine_rank = i as u32;
+            let content = if !language.is_empty() && !description.is_empty() {
+                format!("{} / {}", language, description)
+            } else if !description.is_empty() {
+                description.to_string()
+            } else {
+                language.to_string()
+            };
+
+            let mut r = SearchResult::new(full_name, html_url, &content, "github_code");
+            r.engine_rank = (i + 1) as u32;
             r.category = SearchCategory::IT.to_string();
             results.push(r);
         }

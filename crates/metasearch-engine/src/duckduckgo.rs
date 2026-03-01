@@ -65,8 +65,19 @@ impl SearchEngine for DuckDuckGo {
             .header("Content-Type", "application/x-www-form-urlencoded")
             .header(
                 "User-Agent",
-                "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0",
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:120.0) Gecko/20100101 Firefox/120.0",
             )
+            .header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
+            .header("Accept-Language", "en-US,en;q=0.5")
+            .header("Accept-Encoding", "gzip, deflate, br")
+            .header("Referer", "https://html.duckduckgo.com/")
+            .header("Origin", "https://html.duckduckgo.com")
+            .header("DNT", "1")
+            .header("Connection", "keep-alive")
+            .header("Upgrade-Insecure-Requests", "1")
+            .header("Sec-Fetch-Dest", "document")
+            .header("Sec-Fetch-Mode", "navigate")
+            .header("Sec-Fetch-Site", "same-origin")
             .body(body)
             .send()
             .await
@@ -79,17 +90,15 @@ impl SearchEngine for DuckDuckGo {
 
         let document = Html::parse_document(&html_text);
 
-        // Each organic result is a <div class="result results_links results_links_deep web-result ">
-        let result_sel =
-            Selector::parse("div.result.results_links_deep.web-result > div.links_main")
-                .unwrap_or_else(|_| Selector::parse("div.links_main").unwrap());
-        let title_sel = Selector::parse("h2.result__title a.result__a").unwrap();
+        // DDG-lite uses simpler class names: div.web-result > div.links_main
+        let result_sel = Selector::parse("div.web-result").unwrap();
+        let title_sel = Selector::parse("a.result__a").unwrap();
         let snippet_sel = Selector::parse("a.result__snippet").unwrap();
-        let url_sel = Selector::parse("span.result__url").unwrap();
 
         let mut results = Vec::new();
 
         for (i, item) in document.select(&result_sel).enumerate() {
+            // Get title and URL from the same <a> element
             let title_el = match item.select(&title_sel).next() {
                 Some(el) => el,
                 None => continue,
@@ -101,28 +110,25 @@ impl SearchEngine for DuckDuckGo {
                 continue;
             }
 
-            // The href on DDG is wrapped in a redirect — get the actual URL from the span
-            let displayed_url: String = item
-                .select(&url_sel)
-                .next()
-                .map(|e| e.text().collect::<String>().trim().to_string())
-                .unwrap_or_default();
+            // Get the href attribute directly
+            let href = title_el.value().attr("href").unwrap_or_default();
+            if href.is_empty() || href.starts_with("//duckduckgo.com") {
+                continue;
+            }
 
-            // Try to build a canonical URL from the displayed domain
-            let canonical_url = if displayed_url.starts_with("http") {
-                displayed_url.clone()
-            } else if !displayed_url.is_empty() {
-                format!("https://{}", displayed_url)
+            // DDG-lite uses uddg parameter for the actual URL
+            let canonical_url = if href.contains("uddg=") {
+                // Extract URL from uddg parameter
+                href.split("uddg=")
+                    .nth(1)
+                    .and_then(|s| urlencoding::decode(s).ok())
+                    .map(|s| s.to_string())
+                    .unwrap_or_else(|| href.to_string())
             } else {
-                // Fall back to the href on the result title
-                title_el
-                    .value()
-                    .attr("href")
-                    .unwrap_or_default()
-                    .to_string()
+                href.to_string()
             };
 
-            if canonical_url.is_empty() {
+            if canonical_url.is_empty() || !canonical_url.starts_with("http") {
                 continue;
             }
 
