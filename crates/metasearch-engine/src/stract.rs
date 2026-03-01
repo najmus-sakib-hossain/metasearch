@@ -37,8 +37,7 @@ impl Stract {
 struct SearchRequest {
     query: String,
     page: u32,
-    #[serde(rename = "selectedRegion")]
-    selected_region: String,
+    num_results: u32,
 }
 
 #[derive(Deserialize)]
@@ -63,32 +62,22 @@ impl SearchEngine for Stract {
         let body = SearchRequest {
             query: query.query.clone(),
             page: query.page.saturating_sub(1),
-            selected_region: "All".to_string(),
+            num_results: 10,
         };
 
-        // Try the API endpoint
         let resp = self
             .client
             .post("https://stract.com/beta/api/search")
             .header("Accept", "application/json")
             .header("Content-Type", "application/json")
-            .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
             .json(&body)
             .send()
             .await
             .map_err(|e| MetasearchError::Engine(format!("Stract request failed: {e}")))?;
 
-        let text = resp
-            .text()
+        let api: ApiResponse = resp
+            .json()
             .await
-            .map_err(|e| MetasearchError::Engine(format!("Stract read failed: {e}")))?;
-
-        // Handle non-JSON responses gracefully
-        if text.trim().is_empty() || text.starts_with("<!") || text.starts_with("<html") {
-            return Ok(Vec::new());
-        }
-
-        let api: ApiResponse = serde_json::from_str(&text)
             .map_err(|e| MetasearchError::Engine(format!("Stract parse failed: {e}")))?;
 
         let results = api

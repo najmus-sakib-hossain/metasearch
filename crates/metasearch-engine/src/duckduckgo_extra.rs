@@ -45,13 +45,13 @@ impl SearchEngine for DuckDuckGoExtra {
         let encoded = urlencoding::encode(&query.query);
 
         // Step 1: Obtain VQD token from the DuckDuckGo search page.
-        let token_url = format!("https://duckduckgo.com/?q={}&iar=images&t=h_", encoded);
+        let token_url = format!("https://duckduckgo.com/?q={}", encoded);
         let token_resp = self
             .client
             .get(&token_url)
             .header(
                 "User-Agent",
-                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
             )
             .send()
             .await
@@ -89,28 +89,12 @@ impl SearchEngine for DuckDuckGoExtra {
                     })
                     .filter(|s| !s.is_empty());
 
-                if let Some(v) = sq {
-                    v
-                } else {
-                    // Try vqd= without quotes (newer format)
-                    let nq = token_html
-                        .find("vqd=")
-                        .map(|i| {
-                            let start = i + 4;
-                            let rest = &token_html[start..];
-                            // Skip any quote character
-                            let rest = rest.trim_start_matches(|c| c == '"' || c == '\'');
-                            let end = rest.find(|c: char| c == '"' || c == '\'' || c == '&' || c == ';' || c.is_whitespace()).unwrap_or(rest.len());
-                            rest[..end].to_string()
-                        })
-                        .filter(|s| !s.is_empty() && s.len() > 2);
-
-                    match nq {
-                        Some(v) => v,
-                        None => {
-                            // DDG captcha or changed format - return empty instead of error
-                            return Ok(Vec::new());
-                        }
+                match sq {
+                    Some(v) => v,
+                    None => {
+                        return Err(MetasearchError::ParseError(
+                            "Could not extract VQD token from DuckDuckGo".to_string(),
+                        ));
                     }
                 }
             }
@@ -119,7 +103,7 @@ impl SearchEngine for DuckDuckGoExtra {
         // Step 2: Fetch image results with the VQD token
         let offset = (query.page.saturating_sub(1)) * 100;
         let search_url = format!(
-            "https://duckduckgo.com/i.js?o=json&q={}&u=bing&l=us-en&bpia=1&s={}&vqd={}&a=h_",
+            "https://duckduckgo.com/i.js?o=json&q={}&u=bing&l=us-en&s={}&vqd={}",
             encoded, offset, vqd,
         );
 
@@ -127,29 +111,19 @@ impl SearchEngine for DuckDuckGoExtra {
             .client
             .get(&search_url)
             .header("Referer", "https://duckduckgo.com/")
-            .header("Accept", "*/*")
-            .header("Host", "duckduckgo.com")
-            .header("Cookie", "p=-2; ad=en_US; ah=us-en; l=us-en")
+            .header("Cookie", "p=-2")
             .header(
                 "User-Agent",
-                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
             )
             .send()
             .await
             .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
 
-        let text = resp.text().await
+        let json: serde_json::Value = resp
+            .json()
+            .await
             .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
-
-        // DDG sometimes returns empty or error responses
-        if text.trim().is_empty() || text.starts_with("<!DOCTYPE") || text.starts_with("<html") {
-            return Ok(Vec::new());
-        }
-
-        let json: serde_json::Value = match serde_json::from_str(&text) {
-            Ok(v) => v,
-            Err(_) => return Ok(Vec::new()),
-        };
 
         let items = match json.get("results").and_then(|r| r.as_array()) {
             Some(arr) => arr,

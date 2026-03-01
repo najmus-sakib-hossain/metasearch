@@ -127,13 +127,6 @@ impl SearchEngine for Baidu {
             .await
             .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
 
-        // Baidu sometimes returns HTML instead of JSON when it detects bots
-        // Check if response starts with HTML
-        if body.trim_start().starts_with('<') {
-            warn!(engine = "baidu", "Received HTML instead of JSON (likely bot detection)");
-            return Ok(Vec::new()); // Return empty results instead of error
-        }
-
         // Baidu's JSON sometimes contains raw control characters (like Python's strict=False).
         // Sanitize by replacing ASCII control chars (except tab/newline/carriage-return) with space.
         let sanitized: String = body
@@ -147,13 +140,8 @@ impl SearchEngine for Baidu {
             })
             .collect();
 
-        let data: BaiduResponse = match serde_json::from_str(&sanitized) {
-            Ok(d) => d,
-            Err(e) => {
-                warn!(engine = "baidu", error = %e, "JSON parse failed, likely bot detection");
-                return Ok(Vec::new()); // Return empty instead of error
-            }
-        };
+        let data: BaiduResponse = serde_json::from_str(&sanitized)
+            .map_err(|e| MetasearchError::ParseError(format!("JSON parse error: {}", e)))?;
 
         let mut results = Vec::new();
 
