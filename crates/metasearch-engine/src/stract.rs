@@ -9,7 +9,6 @@ use metasearch_core::{
     result::SearchResult,
 };
 use reqwest::Client;
-use serde::{Deserialize, Serialize};
 use smallvec::smallvec;
 
 pub struct Stract {
@@ -34,25 +33,6 @@ impl Stract {
     }
 }
 
-#[derive(Serialize)]
-struct SearchRequest {
-    query: String,
-    page: u32,
-    num_results: u32,
-}
-
-#[derive(Deserialize)]
-struct ApiResponse {
-    webpages: Option<Vec<WebPage>>,
-}
-
-#[derive(Deserialize)]
-struct WebPage {
-    title: Option<String>,
-    url: Option<String>,
-    snippet: Option<serde_json::Value>,
-}
-
 #[async_trait]
 impl SearchEngine for Stract {
     fn metadata(&self) -> EngineMetadata {
@@ -60,72 +40,77 @@ impl SearchEngine for Stract {
     }
 
     async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
-        let body = SearchRequest {
-            query: query.query.clone(),
-            page: query.page.saturating_sub(1),
-            num_results: 10,
-        };
+        // URL and selectors ported directly from metasearch2/src/engines/search/stract.rs
+        let url = reqwest::Url::parse_with_params(
+            "https://stract.com/search",
+            &[
+                ("ss", "false"),
+                // Not a tracking token — this is Stract's default search-rankings parameter
+                ("sr", "N4IgNglg1gpgJiAXAbQLoBoRwgZ0rBFDEAIzAHsBjApNAXyA"),
+                ("q", query.query.as_str()),
+                ("optic", ""),
+            ],
+        )
+        .map_err(|e| MetasearchError::Engine(format!("Stract URL error: {e}")))?;
 
         let resp = self
             .client
-            .post("https://stract.com/beta/api/search")
-            .header("Accept", "application/json")
-            .header("Content-Type", "application/json")
-            .json(&body)
+            .get(url)
+            .header(
+                "User-Agent",
+                "Mozilla/5.0 (X11; Linux x86_64; rv:121.0) Gecko/20100101 Firefox/121.0",
+            )
+            .header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8")
+            .header("Accept-Language", "en-US,en;q=0.5")
             .send()
             .await
             .map_err(|e| MetasearchError::Engine(format!("Stract request failed: {e}")))?;
 
-        // Handle non-success HTTP status (e.g., 503 Service Unavailable)
-        if !resp.status().is_success() {
-            return Ok(Vec::new());
-        }
-
-        let text = resp
+        let body = resp
             .text()
             .await
             .map_err(|e| MetasearchError::Engine(format!("Stract read failed: {e}")))?;
 
-        // Guard against HTML error pages (bot detection, server errors)
-        if text.trim_start().starts_with('<') {
-            return Ok(Vec::new());
+        let document = scraper::Html::parse_document(&body);
+        let mut results = Vec::new();
+
+        // metasearch2 selectors
+        let result_sel = scraper::Selector::parse(
+            "div.grid.w-full.grid-cols-1.space-y-10.place-self-start > div > div.flex.min-w-0.grow.flex-col"
+        ).unwrap();
+        let title_sel = scraper::Selector::parse("a[title]").unwrap();
+        let link_sel  = scraper::Selector::parse("a[href]").unwrap();
+        let desc_sel  = scraper::Selector::parse("#snippet-text").unwrap();
+
+        for (i, element) in document.select(&result_sel).enumerate() {
+            let title = element
+                .select(&title_sel)
+                .next()
+                .map(|el| el.text().collect::<String>().trim().to_string())
+                .unwrap_or_default();
+
+            let url = element
+                .select(&link_sel)
+                .next()
+                .and_then(|el| el.value().attr("href"))
+                .unwrap_or_default()
+                .to_string();
+
+            let description = element
+                .select(&desc_sel)
+                .next()
+                .map(|el| el.text().collect::<String>().trim().to_string())
+                .unwrap_or_default();
+
+            if title.is_empty() || url.is_empty() {
+                continue;
+            }
+
+            let mut r = SearchResult::new(&title, &url, &description, "stract");
+            r.engine_rank = (i + 1) as u32;
+            r.category = SearchCategory::General.to_string();
+            results.push(r);
         }
-
-        let api: ApiResponse = match serde_json::from_str(&text) {
-            Ok(v) => v,
-            Err(_) => return Ok(Vec::new()),
-        };
-
-        let results = api
-            .webpages
-            .unwrap_or_default()
-            .into_iter()
-            .enumerate()
-            .filter_map(|(i, page)| {
-                let title = page.title.filter(|t| !t.is_empty())?;
-                let url = page.url.filter(|u| !u.is_empty())?;
-                // Stract returns snippet as { text: { fragments: [{text: "..."}] } }
-                let content = page.snippet
-                    .as_ref()
-                    .and_then(|s| s["text"]["fragments"].as_array())
-                    .map(|frags| {
-                        frags
-                            .iter()
-                            .filter_map(|f| f["text"].as_str())
-                            .collect::<Vec<_>>()
-                            .join("")
-                    })
-                    .unwrap_or_default();
-                let mut result = SearchResult::new(
-                    title,
-                    url,
-                    content,
-                    "stract",
-                );
-                result.engine_rank = (i + 1) as u32;
-                Some(result)
-            })
-            .collect();
 
         Ok(results)
     }

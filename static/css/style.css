@@ -232,7 +232,7 @@ svg.lucide {
   border: 1px solid var(--border);
   border-radius: var(--r-lg);
   transition: border-color 0.2s, box-shadow 0.2s;
-  overflow: hidden;
+  overflow: visible;
 }
 .hero-input-wrap:focus-within {
   border-color: var(--blue);

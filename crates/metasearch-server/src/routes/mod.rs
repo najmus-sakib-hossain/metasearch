@@ -3,6 +3,7 @@
 pub mod api;
 pub mod autocomplete;
 pub mod health;
+pub mod opensearch;
 pub mod search;
 
 use crate::state::AppState;
@@ -30,4 +31,8 @@ pub fn static_routes() -> Router<Arc<AppState>> {
 
 pub fn health_routes() -> Router<Arc<AppState>> {
     health::routes()
+}
+
+pub fn opensearch_routes() -> Router<Arc<AppState>> {
+    opensearch::routes()
 }

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Autocomplete Test</title>
+    <style>
+        body { font-family: Arial; padding: 40px; max-width: 600px; margin: 0 auto; }
+        input { width: 100%; padding: 12px; font-size: 16px; border: 2px solid #ddd; border-radius: 8px; }
+        #results { margin-top: 20px; padding: 20px; background: #f5f5f5; border-radius: 8px; }
+        .suggestion { padding: 8px; margin: 4px 0; background: white; border-radius: 4px; }
+        .error { color: red; }
+        .success { color: green; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Autocomplete Endpoint Test</h1>
+    <p>Type something to test the /autocomplete endpoint:</p>
+    
+    <input type="text" id="query" placeholder="Type 'rust', 'python', etc..." />
+    
+    <div id="results">
+        <p>Results will appear here...</p>
+    </div>
+
+    <script>
+        const input = document.getElementById('query');
+        const results = document.getElementById('results');
+        let timer;
+
+        input.addEventListener('input', function() {
+            const q = input.value.trim();
+            
+            clearTimeout(timer);
+            
+            if (q.length < 2) {
+                results.innerHTML = '<p>Type at least 2 characters...</p>';
+                return;
+            }
+            
+            results.innerHTML = '<p>Fetching suggestions for "' + q + '"...</p>';
+            
+            timer = setTimeout(function() {
+                console.log('Fetching:', '/autocomplete?q=' + encodeURIComponent(q));
+                
+                fetch('/autocomplete?q=' + encodeURIComponent(q))
+                    .then(function(response) {
+                        console.log('Response status:', response.status);
+                        if (!response.ok) {
+                            throw new Error('HTTP ' + response.status);
+                        }
+                        return response.json();
+                    })
+                    .then(function(data) {
+                        console.log('Data received:', data);
+                        
+                        if (!Array.isArray(data) || data.length < 2) {
+                            results.innerHTML = '<p class="error">Invalid response format</p><pre>' + JSON.stringify(data, null, 2) + '</pre>';
+                            return;
+                        }
+                        
+                        const query = data[0];
+                        const suggestions = data[1];
+                        
+                        if (!suggestions || suggestions.length === 0) {
+                            results.innerHTML = '<p class="error">No suggestions found for "' + query + '"</p>';
+                            return;
+                        }
+                        
+                        let html = '<p class="success">✅ Found ' + suggestions.length + ' suggestions for "' + query + '":</p>';
+                        suggestions.forEach(function(s) {
+                            html += '<div class="suggestion">🔍 ' + s + '</div>';
+                        });
+                        
+                        results.innerHTML = html;
+                    })
+                    .catch(function(error) {
+                        console.error('Error:', error);
+                        results.innerHTML = '<p class="error">❌ Error: ' + error.message + '</p><p>Make sure the server is running on http://localhost:8888</p>';
+                    });
+            }, 300);
+        });
+    </script>
+</body>
+</html>

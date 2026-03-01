@@ -35,6 +35,20 @@ impl Yep {
     }
 }
 
+// Structs for Yep JSON response — ported from metasearch2/src/engines/search/yep.rs
+#[allow(dead_code)]
+#[derive(serde::Deserialize, Debug)]
+struct YepApiResponse {
+    pub results: Vec<YepApiResult>,
+}
+
+#[derive(serde::Deserialize, Debug)]
+struct YepApiResult {
+    pub url: String,
+    pub title: String,
+    pub snippet: String,
+}
+
 #[async_trait]
 impl SearchEngine for Yep {
     fn metadata(&self) -> EngineMetadata {
@@ -42,16 +56,23 @@ impl SearchEngine for Yep {
     }
 
     async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>> {
-        let url = format!(
-            "https://api.yep.com/fs/2/search?client=web&no_correct=false&q={}&safeSearch=moderate&type=web",
-            urlencoding::encode(&query.query)
-        );
+        // URL and JSON parsing ported directly from metasearch2/src/engines/search/yep.rs
+        let url = reqwest::Url::parse_with_params(
+            "https://api.yep.com/fs/2/search",
+            &[
+                ("client", "web"),
+                ("gl", "all"),
+                ("no_correct", "true"),
+                ("q", query.query.as_str()),
+                ("safeSearch", "off"),
+                ("type", "web"),
+            ],
+        )
+        .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
 
         let resp = self
             .client
-            .get(&url)
-            .header("Referer", "https://yep.com/")
-            .header("Origin", "https://yep.com")
+            .get(url)
             .send()
             .await
             .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
@@ -61,51 +82,30 @@ impl SearchEngine for Yep {
             .await
             .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
 
-        // Handle non-JSON / empty responses
-        if text.trim().is_empty() || text.starts_with("<!") || text.starts_with("<html") {
+        // Response is a tuple: ["Ok", {results: [...]}]
+        let (code, api): (String, YepApiResponse) = match serde_json::from_str(&text) {
+            Ok(v) => v,
+            Err(_) => return Ok(Vec::new()),
+        };
+
+        if code != "Ok" {
             return Ok(Vec::new());
         }
 
-        let resp: serde_json::Value = serde_json::from_str(&text)
-            .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
-
-        // Yep returns an array: [metadata, {results: [...]}]
-        let empty = vec![];
-        let items = resp
-            .get(1)
-            .and_then(|v| v.get("results"))
-            .and_then(|v| v.as_array())
-            // Fallback: try 'results' at top level
-            .or_else(|| resp.get("results").and_then(|v| v.as_array()))
-            .unwrap_or(&empty);
-
-        let mut results = Vec::new();
-        let mut rank = 0u32;
-
-        for item in items {
-            let result_type = item.get("type").and_then(|v| v.as_str()).unwrap_or("");
-            if result_type != "Organic" {
-                continue;
-            }
-
-            rank += 1;
-            let title = item
-                .get("title")
-                .and_then(|v| v.as_str())
-                .unwrap_or("")
-                .to_string();
-            let page_url = item
-                .get("url")
-                .and_then(|v| v.as_str())
-                .unwrap_or("")
-                .to_string();
-            let snippet_raw = item.get("snippet").and_then(|v| v.as_str()).unwrap_or("");
-            let snippet = html_escape::decode_html_entities(snippet_raw).to_string();
-
-            let mut r = SearchResult::new(title, page_url, snippet, self.metadata.name.clone());
-            r.engine_rank = rank;
-            results.push(r);
-        }
+        let results = api
+            .results
+            .into_iter()
+            .enumerate()
+            .map(|(i, item)| {
+                // Strip HTML from snippet (metasearch2 does the same)
+                let snippet_doc = scraper::Html::parse_document(&item.snippet);
+                let description: String = snippet_doc.root_element().text().collect();
+                let mut r = SearchResult::new(&item.title, &item.url, &description, "yep");
+                r.engine_rank = (i + 1) as u32;
+                r.category = SearchCategory::General.to_string();
+                r
+            })
+            .collect();
 
         Ok(results)
     }

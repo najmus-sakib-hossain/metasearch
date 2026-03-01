@@ -12,8 +12,8 @@ image_proxy = true
 safe_search = 1
 default_language = "en"
 max_page = 10
-request_timeout_ms = 5000
-max_concurrent_engines = 10
+request_timeout_ms = 10000
+max_concurrent_engines = 50
 
 [cache]
 enabled = true

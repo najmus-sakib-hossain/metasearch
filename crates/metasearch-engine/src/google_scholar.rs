@@ -8,13 +8,13 @@ use async_trait::async_trait;
 use metasearch_core::{
     category::SearchCategory,
     engine::{EngineMetadata, SearchEngine},
-    error::Result,
+    error::{MetasearchError, Result},
     query::SearchQuery,
     result::SearchResult,
 };
 use reqwest::Client;
 use scraper::{Html, Selector};
-use tracing::{info, warn};
+use tracing::info;
 use smallvec::smallvec;
 
 pub struct GoogleScholar {
@@ -46,108 +46,76 @@ impl SearchEngine for GoogleScholar {
     }
 
     async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>> {
-        let start = (query.page.max(1) - 1) * 10;
-        let url = format!(
-            "https://scholar.google.com/scholar?q={}&start={}&as_sdt=2007&as_vis=0",
-            urlencoding::encode(&query.query),
-            start
-        );
+        // URL and selectors ported directly from metasearch2/src/engines/search/google_scholar.rs
+        let url = reqwest::Url::parse_with_params(
+            "https://scholar.google.com/scholar",
+            &[
+                ("hl", "en"),
+                ("as_sdt", "0,5"),
+                ("q", query.query.as_str()),
+                ("btnG", ""),
+            ],
+        )
+        .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
 
-        let resp = match self
+        let resp = self
             .client
-            .get(&url)
-            .timeout(std::time::Duration::from_secs(7))
+            .get(url)
             .header(
                 "User-Agent",
-                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                "Mozilla/5.0 (X11; Linux x86_64; rv:121.0) Gecko/20100101 Firefox/121.0",
             )
-            .header("Accept-Language", "en-US,en;q=0.9")
+            .header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8")
+            .header("Accept-Language", "en-US,en;q=0.5")
             .send()
             .await
-        {
-            Ok(r) => r,
-            Err(_) => return Ok(Vec::new()),
-        };
+            .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
 
-        if !resp.status().is_success() {
-            return Ok(Vec::new());
-        }
+        let body = resp
+            .text()
+            .await
+            .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
 
-        let text = match resp.text().await {
-            Ok(t) => t,
-            Err(_) => return Ok(Vec::new()),
-        };
-
-        // Check for captcha
-        if text.contains("gs_captcha_f") || text.contains("/sorry/index") {
-            warn!(engine = "google_scholar", "Captcha detected");
-            return Ok(Vec::new());
-        }
-
-        let document = Html::parse_document(&text);
-        let result_sel = Selector::parse("div.gs_r.gs_or.gs_scl").unwrap();
-        let title_link_sel = Selector::parse("h3 a").unwrap();
-        let content_sel = Selector::parse("div.gs_rs").unwrap();
-        let meta_sel = Selector::parse("div.gs_a").unwrap();
-
-        // Compile regex once outside the loop
-        let year_regex = regex::Regex::new(r"\b(19|20)\d{2}\b").ok();
-
+        let document = Html::parse_document(&body);
         let mut results = Vec::new();
-        for (i, result_el) in document.select(&result_sel).enumerate() {
-            // Get title and URL from h3 > a
-            let title_el = match result_el.select(&title_link_sel).next() {
-                Some(el) => el,
-                None => continue,
-            };
-            let title: String = title_el.text().collect();
-            let href = title_el.value().attr("href").unwrap_or("");
-            if title.is_empty() || href.is_empty() {
+
+        // metasearch2 selectors
+        let result_sel = Selector::parse("div.gs_r").unwrap();
+        let title_sel  = Selector::parse("h3").unwrap();
+        let link_sel   = Selector::parse("h3 > a[href]").unwrap();
+        let desc_sel   = Selector::parse("div.gs_rs").unwrap();
+
+        for (i, element) in document.select(&result_sel).enumerate() {
+            let title = element
+                .select(&title_sel)
+                .next()
+                .map(|el| el.text().collect::<String>().trim().to_string())
+                .unwrap_or_default();
+
+            let url = element
+                .select(&link_sel)
+                .next()
+                .and_then(|el| el.value().attr("href"))
+                .unwrap_or_default()
+                .to_string();
+
+            let description = element
+                .select(&desc_sel)
+                .next()
+                .map(|el| el.text().collect::<String>().trim().to_string())
+                .unwrap_or_default();
+
+            if title.is_empty() || url.is_empty() {
                 continue;
             }
 
-            // Get abstract / content
-            let content: String = result_el
-                .select(&content_sel)
-                .next()
-                .map(|el| el.text().collect())
-                .unwrap_or_default();
-
-            // Get metadata line (authors - journal, year - publisher)
-            let meta: String = result_el
-                .select(&meta_sel)
-                .next()
-                .map(|el| el.text().collect())
-                .unwrap_or_default();
-
-            let snippet = if content.is_empty() { &meta } else { &content };
-
-            let mut r = SearchResult::new(&title, href, snippet, "google_scholar");
+            let mut r = SearchResult::new(&title, &url, &description, "google_scholar");
             r.engine_rank = (i + 1) as u32;
             r.category = SearchCategory::General.to_string();
-
-            // Try to extract year from metadata (e.g., "Author - Journal, 2024 - Publisher")
-            if let Some(caps) = year_regex.as_ref().and_then(|re| re.find(&meta)) {
-                if let Ok(year) = caps.as_str().parse::<i32>() {
-                    if let Some(date) = chrono::NaiveDate::from_ymd_opt(year, 1, 1) {
-                        r.published_date = date.and_hms_opt(0, 0, 0).map(|ndt| {
-                            chrono::DateTime::<chrono::Utc>::from_naive_utc_and_offset(
-                                ndt,
-                                chrono::Utc,
-                            )
-                        });
-                    }
-                }
-            }
-
             results.push(r);
         }
 
-        info!(
-            engine = "google_scholar",
-            count = results.len(),
-            "Search complete"
-        );
+        info!(engine = "google_scholar", count = results.len(), "Search complete");
         Ok(results)
     }
 }

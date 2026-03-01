@@ -22,6 +22,7 @@ pub fn build_router(state: Arc<AppState>) -> Router {
         .merge(routes::search_routes())
         .merge(routes::api_routes())
         .merge(routes::autocomplete_routes())
+        .merge(routes::opensearch_routes())
         .merge(routes::static_routes())
         .merge(routes::health_routes())
         .layer(
@@ -47,9 +48,15 @@ pub async fn run(state: Arc<AppState>) -> anyhow::Result<()> {
         state.settings.server.port,
     ));
 
-    let app = build_router(state);
+    // Display localhost instead of 0.0.0.0 for better UX
+    let display_host = if state.settings.server.host == "0.0.0.0" {
+        "localhost"
+    } else {
+        &state.settings.server.host
+    };
+    info!("Metasearch server listening on http://{}:{}", display_host, state.settings.server.port);
 
-    info!("Metasearch server listening on http://{}", addr);
+    let app = build_router(state);
 
     let listener = tokio::net::TcpListener::bind(addr).await?;
     axum::serve(listener, app).await?;

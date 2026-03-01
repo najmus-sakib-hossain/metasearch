@@ -57,7 +57,7 @@ impl Default for Settings {
                 safe_search: 1,
                 default_language: "en".to_string(),
                 max_page: 10,
-                request_timeout_ms: 1000,  // Aggressive 1 second timeout
+                request_timeout_ms: 10000,  // 10 second timeout for slow engines
                 max_concurrent_engines: 50,  // Query 50 engines in parallel
             },
             cache: CacheSettings {
