@@ -24,7 +24,7 @@ impl AnnasArchive {
             metadata: EngineMetadata {
                 name: "annas_archive".to_string(),
                 display_name: "Anna's Archive".to_string(),
-                homepage: "https://annas-archive.org".to_string(),
+                homepage: "https://annas-archive.li".to_string(),
                 categories: vec![SearchCategory::Files],
                 enabled: true,
                 timeout_ms: 6000,
@@ -44,7 +44,7 @@ impl SearchEngine for AnnasArchive {
     async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>> {
         let page = query.page;
         let url = format!(
-            "https://annas-archive.org/search?q={}&page={}",
+            "https://annas-archive.li/search?q={}&page={}",
             urlencoding::encode(&query.query),
             page
         );
@@ -52,6 +52,11 @@ impl SearchEngine for AnnasArchive {
         let resp = self
             .client
             .get(&url)
+            .header(
+                "User-Agent",
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:120.0) Gecko/20100101 Firefox/120.0",
+            )
+            .header("Accept-Language", "en-US,en;q=0.9")
             .send()
             .await
             .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
@@ -100,7 +105,7 @@ impl SearchEngine for AnnasArchive {
                 .and_then(|el| el.value().attr("src"))
                 .map(|s| s.to_string());
 
-            let full_url = format!("https://annas-archive.org{}", href);
+            let full_url = format!("https://annas-archive.li{}", href);
 
             let mut result =
                 SearchResult::new(title, full_url, content, "Anna's Archive".to_string());

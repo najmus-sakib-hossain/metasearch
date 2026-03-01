@@ -62,7 +62,19 @@ impl SearchEngine for Searchcode {
         );
 
         let resp = self.client.get(&url).send().await.map_err(|e| MetasearchError::Engine(e.to_string()))?;
-        let data: ApiResponse = resp.json().await.map_err(|e| MetasearchError::Engine(e.to_string()))?;
+
+        if !resp.status().is_success() {
+            return Ok(Vec::new());
+        }
+
+        let text = resp.text().await.map_err(|e| MetasearchError::Engine(e.to_string()))?;
+        if text.trim_start().starts_with('<') {
+            return Ok(Vec::new());
+        }
+        let data: ApiResponse = match serde_json::from_str(&text) {
+            Ok(v) => v,
+            Err(_) => return Ok(Vec::new()),
+        };
 
         let results = data
             .results

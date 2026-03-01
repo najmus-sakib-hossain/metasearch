@@ -59,24 +59,31 @@ impl SearchEngine for Qwant {
             .get(&url)
             .header(
                 "User-Agent",
-                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:120.0) Gecko/20100101 Firefox/120.0",
             )
+            .header("Accept", "application/json")
             .send()
             .await
             .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
 
-        let data: serde_json::Value = resp
-            .json()
+        // Qwant may return non-JSON on bot detection – treat as empty
+        let text = resp
+            .text()
             .await
             .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
 
-        // Check API status
+        if text.trim_start().starts_with('<') {
+            return Ok(Vec::new());
+        }
+
+        let data: serde_json::Value = match serde_json::from_str(&text) {
+            Ok(v) => v,
+            Err(_) => return Ok(Vec::new()),
+        };
+
+        // Check API status – return empty on rate-limit/error rather than propagating
         if data["status"].as_str() != Some("success") {
-            let error_code = data["data"]["error_code"].as_u64().unwrap_or(0);
-            return Err(MetasearchError::Other(format!(
-                "Qwant API error (code: {})",
-                error_code
-            )));
+            return Ok(Vec::new());
         }
 
         let mut results = Vec::new();

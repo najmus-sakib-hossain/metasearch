@@ -40,18 +40,34 @@ impl SearchEngine for Reddit {
     }
 
     async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
+        // Reddit's API is very strict about User-Agent and rate limiting
+        // Use www.reddit.com with .json suffix (more reliable than old.reddit.com)
         let url = format!(
-            "https://www.reddit.com/search.json?q={}&limit=25",
+            "https://www.reddit.com/search.json?q={}&limit=25&sort=relevance&raw_json=1",
             urlencoding::encode(&query.query),
         );
 
         let resp = self
             .client
             .get(&url)
-            .header("User-Agent", "metasearch-engine/1.0")
+            .header(
+                "User-Agent",
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:120.0) Gecko/20100101 Firefox/120.0",
+            )
+            .header("Accept", "application/json")
+            .header("Accept-Language", "en-US,en;q=0.9")
             .send()
             .await
             .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
+
+        // Check if we got HTML instead of JSON (rate limited)
+        let content_type = resp.headers().get("content-type")
+            .and_then(|v| v.to_str().ok())
+            .unwrap_or("");
+        
+        if content_type.contains("text/html") {
+            return Ok(Vec::new()); // Rate limited, return empty
+        }
 
         let data: serde_json::Value = resp
             .json()

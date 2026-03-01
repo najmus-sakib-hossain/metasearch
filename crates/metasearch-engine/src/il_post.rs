@@ -61,7 +61,12 @@ impl SearchEngine for IlPost {
         let resp = self
             .client
             .get("https://api.ilpost.org/search/api/site_search/")
-            .query(&[("q", query.query.as_str()), ("page", &page.to_string())])
+            .query(&[
+                ("qs", query.query.as_str()),
+                ("pg", &page.to_string()),
+                ("sort", "date_d"),
+                ("filters", "ctype:articoli"),
+            ])
             .send()
             .await
             .map_err(|e| MetasearchError::HttpError(e.to_string()))?;

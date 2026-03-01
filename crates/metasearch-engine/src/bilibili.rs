@@ -95,6 +95,7 @@ impl SearchEngine for Bilibili {
             page, results_per_page, encoded
         );
 
+        // Bilibili requires specific cookies to work properly
         let resp = self
             .client
             .get(&url)
@@ -103,6 +104,7 @@ impl SearchEngine for Bilibili {
                 "User-Agent",
                 "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
             )
+            .header("Cookie", "innersign=0; buvid3=0123456789ABCDEFinfoc; i-wanna-go-back=-1; b_ut=7; FEED_LIVE_VERSION=V8; header_theme_version=undefined; home_feed_column=4")
             .send()
             .await
             .map_err(|e| MetasearchError::HttpError(e.to_string()))?;

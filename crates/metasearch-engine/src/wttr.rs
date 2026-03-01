@@ -115,15 +115,18 @@ impl SearchEngine for Wttr {
             .await
             .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
 
-        // Handle 404 (unknown location) by returning empty results
-        if resp.status().as_u16() == 404 {
+        // Handle any non-success response (e.g., 404 = unknown location, 500 = server error)
+        if !resp.status().is_success() {
             return Ok(Vec::new());
         }
 
-        let data: serde_json::Value = resp
+        let data: serde_json::Value = match resp
             .json()
             .await
-            .map_err(|e| MetasearchError::ParseError(format!("JSON error: {}", e)))?;
+        {
+            Ok(v) => v,
+            Err(_) => return Ok(Vec::new()),
+        };
 
         let mut results = Vec::new();
 

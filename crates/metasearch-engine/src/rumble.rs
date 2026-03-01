@@ -53,10 +53,15 @@ impl SearchEngine for Rumble {
                 "User-Agent",
                 "Mozilla/5.0 (X11; Linux x86_64; rv:120.0) Gecko/20100101 Firefox/120.0",
             )
-            .header("Accept", "text/html")
+            .header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
+            .header("Accept-Language", "en-US,en;q=0.9")
             .send()
             .await
             .map_err(|e| MetasearchError::Engine(format!("Rumble request failed: {e}")))?;
+
+        if !resp.status().is_success() {
+            return Ok(Vec::new());
+        }
 
         let html_text = resp
             .text()

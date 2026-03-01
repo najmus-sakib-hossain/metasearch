@@ -40,14 +40,13 @@ impl SearchEngine for Pinterest {
     }
 
     async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
+        // Match SearXNG's Pinterest implementation: minimal options without page_size/scope
         let data = serde_json::json!({
             "options": {
                 "query": query.query,
-                "page_size": 25,
                 "bookmarks": [],
-                "field_set_key": "unauth_react",
-                "scope": "pins"
-            }
+            },
+            "context": {}
         });
         let data_str = serde_json::to_string(&data)
             .map_err(|e| MetasearchError::Engine(format!("Pinterest serialize failed: {e}")))?;
@@ -65,14 +64,26 @@ impl SearchEngine for Pinterest {
                 "User-Agent",
                 "Mozilla/5.0 (X11; Linux x86_64; rv:120.0) Gecko/20100101 Firefox/120.0",
             )
+            .header("X-Pinterest-AppState", "active")
+            .header("X-Pinterest-Source-Url", "/ideas/")
+            .header("X-Pinterest-PWS-Handler", "www/ideas.js")
             .send()
             .await
             .map_err(|e| MetasearchError::Engine(format!("Pinterest request failed: {e}")))?;
 
-        let json: Value = resp
-            .json()
+        let text = resp
+            .text()
             .await
-            .map_err(|e| MetasearchError::Engine(format!("Pinterest parse failed: {e}")))?;
+            .map_err(|e| MetasearchError::Engine(format!("Pinterest read failed: {e}")))?;
+
+        if text.trim_start().starts_with('<') {
+            return Ok(Vec::new());
+        }
+
+        let json: Value = match serde_json::from_str(&text) {
+            Ok(v) => v,
+            Err(_) => return Ok(Vec::new()),
+        };
 
         let empty = vec![];
         let results_arr = json["resource_response"]["data"]["results"]

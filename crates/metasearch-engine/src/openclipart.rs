@@ -52,10 +52,20 @@ impl SearchEngine for Openclipart {
         let resp = self
             .client
             .get(&url)
-            .header("User-Agent", "Mozilla/5.0")
+            .header(
+                "User-Agent",
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:120.0) Gecko/20100101 Firefox/120.0",
+            )
             .send()
             .await
-            .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
+            .map_err(|_| {
+                // Site may be down – return empty results gracefully
+                MetasearchError::HttpError("openclipart.org unreachable".to_string())
+            })?;
+
+        if !resp.status().is_success() {
+            return Ok(Vec::new());
+        }
 
         let body = resp
             .text()

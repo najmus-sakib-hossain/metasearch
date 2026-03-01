@@ -63,7 +63,54 @@ impl SearchEngine for AdobeStock {
 
         let mut results = Vec::new();
 
-        if let Some(items) = json.get("items").and_then(|v| v.as_object()) {
+        // Adobe Stock returns items as an object (not array), check if it's a list first
+        if let Some(items_array) = json.get("items").and_then(|v| v.as_array()) {
+            // Handle array format
+            for item in items_array {
+                let title = item
+                    .get("title")
+                    .and_then(|v| v.as_str())
+                    .unwrap_or_default();
+                let content_url = item
+                    .get("content_url")
+                    .and_then(|v| v.as_str())
+                    .unwrap_or_default();
+                let asset_type = item
+                    .get("asset_type")
+                    .and_then(|v| v.as_str())
+                    .unwrap_or_default();
+                let thumbnail = item
+                    .get("thumbnail_url")
+                    .and_then(|v| v.as_str())
+                    .unwrap_or_default();
+                let author = item
+                    .get("author")
+                    .and_then(|v| v.as_str())
+                    .unwrap_or_default();
+
+                if content_url.is_empty() {
+                    continue;
+                }
+
+                let snippet = if author.is_empty() {
+                    asset_type.to_string()
+                } else {
+                    format!("{} — by {}", asset_type, author)
+                };
+
+                let mut result = SearchResult::new(
+                    title.to_string(),
+                    content_url.to_string(),
+                    snippet,
+                    "Adobe Stock".to_string(),
+                );
+                result.category = SearchCategory::Images.to_string();
+                if !thumbnail.is_empty() {
+                    result.thumbnail = Some(thumbnail.to_string());
+                }
+                results.push(result);
+            }
+        } else if let Some(items) = json.get("items").and_then(|v| v.as_object()) {
             for (_key, item) in items {
                 let title = item
                     .get("title")

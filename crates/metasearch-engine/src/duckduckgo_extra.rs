@@ -11,7 +11,6 @@ use metasearch_core::{
     query::SearchQuery,
     result::SearchResult,
 };
-use regex::Regex;
 use reqwest::Client;
 
 pub struct DuckDuckGoExtra {
@@ -63,23 +62,35 @@ impl SearchEngine for DuckDuckGoExtra {
             .await
             .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
 
-        let vqd_re = Regex::new(r#"vqd=['"](  [^'"]+)['"]"#)
-            .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
+        // Extract vqd token using simple string search (handles both quote styles)
+        let vqd = {
+            // Try double-quote: vqd="..."
+            let dq = token_html
+                .find("vqd=\"")
+                .map(|i| {
+                    let start = i + 5;
+                    let rest = &token_html[start..];
+                    let end = rest.find('"').unwrap_or(0);
+                    rest[..end].to_string()
+                })
+                .filter(|s| !s.is_empty());
 
-        let vqd = match vqd_re.captures(&token_html) {
-            Some(caps) => caps
-                .get(1)
-                .map(|m| m.as_str().to_string())
-                .unwrap_or_default(),
-            None => {
-                // Try alternative pattern
-                let alt_re = Regex::new(r"vqd=([0-9]+-[0-9a-f]+)")
-                    .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
-                match alt_re.captures(&token_html) {
-                    Some(caps) => caps
-                        .get(1)
-                        .map(|m| m.as_str().to_string())
-                        .unwrap_or_default(),
+            if let Some(v) = dq {
+                v
+            } else {
+                // Try single-quote: vqd='...'
+                let sq = token_html
+                    .find("vqd='")
+                    .map(|i| {
+                        let start = i + 5;
+                        let rest = &token_html[start..];
+                        let end = rest.find('\'').unwrap_or(0);
+                        rest[..end].to_string()
+                    })
+                    .filter(|s| !s.is_empty());
+
+                match sq {
+                    Some(v) => v,
                     None => {
                         return Err(MetasearchError::ParseError(
                             "Could not extract VQD token from DuckDuckGo".to_string(),
@@ -92,7 +103,7 @@ impl SearchEngine for DuckDuckGoExtra {
         // Step 2: Fetch image results with the VQD token
         let offset = (query.page.saturating_sub(1)) * 100;
         let search_url = format!(
-            "https://duckduckgo.com/i.js?o=json&q={}&u=bing&l=us-en&s={}&vqd={}",
+            "https://duckduckgo.com/i.js?o=json&q={}&u=bing&l=us-en&bpia=1&s={}&vqd={}&a=h_",
             encoded, offset, vqd,
         );
 
@@ -100,7 +111,9 @@ impl SearchEngine for DuckDuckGoExtra {
             .client
             .get(&search_url)
             .header("Referer", "https://duckduckgo.com/")
-            .header("Cookie", "p=-2")
+            .header("Accept", "*/*")
+            .header("Host", "duckduckgo.com")
+            .header("Cookie", "p=-2; ad=en_US; ah=us-en; l=us-en")
             .header(
                 "User-Agent",
                 "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
@@ -109,10 +122,16 @@ impl SearchEngine for DuckDuckGoExtra {
             .await
             .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
 
-        let json: serde_json::Value = resp
-            .json()
-            .await
+        let text = resp.text().await
             .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
+
+        // DDG sometimes returns empty or error responses
+        if text.trim().is_empty() || text.starts_with("<!DOCTYPE") {
+            return Ok(Vec::new());
+        }
+
+        let json: serde_json::Value = serde_json::from_str(&text)
+            .map_err(|e| MetasearchError::ParseError(format!("JSON parse: {}", e)))?;
 
         let items = match json.get("results").and_then(|r| r.as_array()) {
             Some(arr) => arr,

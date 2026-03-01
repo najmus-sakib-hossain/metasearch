@@ -57,8 +57,9 @@ impl SearchEngine for PodcastIndex {
     }
 
     async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
+        // Use the public (no-auth) podcastindex.org API endpoint
         let url = format!(
-            "https://api.podcastindex.org/api/1.0/search/byterm?q={}",
+            "https://podcastindex.org/api/search/byterm?q={}",
             urlencoding::encode(&query.query)
         );
 
@@ -67,7 +68,6 @@ impl SearchEngine for PodcastIndex {
             .get(&url)
             .header("Accept", "application/json")
             .header("User-Agent", "metasearch/1.0")
-            .header("X-Auth-Key", "YVGGBAYRHFYQARRT4BYQ")
             .send()
             .await
             .map_err(|e| MetasearchError::Engine(format!("PodcastIndex request failed: {e}")))?;

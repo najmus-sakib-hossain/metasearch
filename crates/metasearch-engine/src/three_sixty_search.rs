@@ -69,11 +69,19 @@ impl SearchEngine for ThreeSixtySearch {
             .get(&url)
             .header(
                 "User-Agent",
-                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:120.0) Gecko/20100101 Firefox/120.0",
             )
+            .header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
+            .header("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8")
+            .header("Referer", "https://www.so.com/")
             .send()
             .await
             .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
+
+        // Handle redirect detection (e.g., CAPTCHA or geo-block)
+        if !resp.status().is_success() {
+            return Ok(Vec::new());
+        }
 
         let html_text = resp
             .text()

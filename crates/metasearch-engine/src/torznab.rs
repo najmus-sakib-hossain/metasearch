@@ -25,11 +25,16 @@ impl Torznab {
     pub fn new(client: Client, base_url: &str, api_key: Option<String>) -> Self {
         let base = base_url.trim_end_matches('/').to_string();
         let enabled = !base.is_empty();
+        let homepage = if base.is_empty() {
+            "https://github.com/Prowlarr/Prowlarr".to_string()
+        } else {
+            base.clone()
+        };
         Self {
             metadata: EngineMetadata {
                 name: "torznab".to_string(),
                 display_name: "Torznab".to_string(),
-                homepage: String::new(),
+                homepage,
                 categories: vec![SearchCategory::Files],
                 enabled,
                 timeout_ms: 8000,

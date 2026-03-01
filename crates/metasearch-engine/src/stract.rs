@@ -37,7 +37,8 @@ impl Stract {
 struct SearchRequest {
     query: String,
     page: u32,
-    num_results: u32,
+    #[serde(rename = "selectedRegion")]
+    selected_region: String,
 }
 
 #[derive(Deserialize)]
@@ -49,7 +50,7 @@ struct ApiResponse {
 struct WebPage {
     title: Option<String>,
     url: Option<String>,
-    snippet: Option<String>,
+    snippet: Option<serde_json::Value>,
 }
 
 #[async_trait]
@@ -62,7 +63,7 @@ impl SearchEngine for Stract {
         let body = SearchRequest {
             query: query.query.clone(),
             page: query.page.saturating_sub(1),
-            num_results: 10,
+            selected_region: "all".to_string(),
         };
 
         let resp = self
@@ -70,6 +71,7 @@ impl SearchEngine for Stract {
             .post("https://stract.com/beta/api/search")
             .header("Accept", "application/json")
             .header("Content-Type", "application/json")
+            .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
             .json(&body)
             .send()
             .await
@@ -88,10 +90,22 @@ impl SearchEngine for Stract {
             .filter_map(|(i, page)| {
                 let title = page.title.filter(|t| !t.is_empty())?;
                 let url = page.url.filter(|u| !u.is_empty())?;
+                // Stract returns snippet as { text: { fragments: [{text: "..."}] } }
+                let content = page.snippet
+                    .as_ref()
+                    .and_then(|s| s["text"]["fragments"].as_array())
+                    .map(|frags| {
+                        frags
+                            .iter()
+                            .filter_map(|f| f["text"].as_str())
+                            .collect::<Vec<_>>()
+                            .join("")
+                    })
+                    .unwrap_or_default();
                 let mut result = SearchResult::new(
                     title,
                     url,
-                    page.snippet.unwrap_or_default(),
+                    content,
                     "stract",
                 );
                 result.engine_rank = (i + 1) as u32;

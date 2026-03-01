@@ -16,7 +16,7 @@ use reqwest::Client;
 use scraper::{Html, Selector};
 use tracing::info;
 
-const BASE_URL: &str = "https://zlibrary-global.se";
+const BASE_URL: &str = "https://z-lib.fm";
 
 pub struct Zlibrary {
     metadata: EngineMetadata,
@@ -57,8 +57,10 @@ impl SearchEngine for Zlibrary {
             .get(&url)
             .header(
                 "User-Agent",
-                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:120.0) Gecko/20100101 Firefox/120.0",
             )
+            .header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
+            .header("Accept-Language", "en-US,en;q=0.9")
             .send()
             .await
             .map_err(|e| MetasearchError::HttpError(e.to_string()))?;

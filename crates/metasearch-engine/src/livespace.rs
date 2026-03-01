@@ -52,14 +52,22 @@ impl SearchEngine for LiveSpace {
                 ("size", "10"),
             ])
             .header("Accept", "application/json")
+            .header(
+                "User-Agent",
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:120.0) Gecko/20100101 Firefox/120.0",
+            )
             .send()
             .await
-            .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
+            .map_err(|_| MetasearchError::HttpError("live.space unreachable".to_string()))?;
 
-        let json: serde_json::Value = resp
-            .json()
-            .await
-            .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
+        if !resp.status().is_success() {
+            return Ok(Vec::new());
+        }
+
+        let json: serde_json::Value = match resp.json().await {
+            Ok(v) => v,
+            Err(_) => return Ok(Vec::new()),
+        };
 
         let mut results = Vec::new();
 
