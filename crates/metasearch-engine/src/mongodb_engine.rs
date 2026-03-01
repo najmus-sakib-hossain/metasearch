@@ -33,6 +33,7 @@ use metasearch_core::{
 pub struct MongoDbEngine {
     metadata: EngineMetadata,
     host: String,
+    #[allow(dead_code)]
     port: u16,
     username: Option<String>,
     password: Option<String>,

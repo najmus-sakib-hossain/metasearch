@@ -33,9 +33,12 @@ use metasearch_core::{
 pub struct PostgresEngine {
     metadata: EngineMetadata,
     host: String,
+    #[allow(dead_code)]
     port: u16,
     database: String,
+    #[allow(dead_code)]
     username: String,
+    #[allow(dead_code)]
     password: String,
     query_str: String,
     limit: usize,

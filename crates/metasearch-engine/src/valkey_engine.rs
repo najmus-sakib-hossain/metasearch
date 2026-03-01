@@ -32,8 +32,10 @@ use metasearch_core::{
 pub struct ValkeyEngine {
     metadata: EngineMetadata,
     host: String,
+    #[allow(dead_code)]
     port: u16,
     password: Option<String>,
+    #[allow(dead_code)]
     db: u8,
     exact_match_only: bool,
 }

@@ -44,6 +44,7 @@ pub struct SqliteEngine {
     metadata: EngineMetadata,
     database_path: String,
     query_str: String,
+    #[allow(dead_code)]
     result_type: SqliteResultType,
     limit: usize,
 }
