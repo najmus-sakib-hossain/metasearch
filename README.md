@@ -182,4 +182,3 @@ AGPL-3.0 — Same as SearXNG. Free as in freedom.
 ## 🙏 Acknowledgements
 
 Inspired by [SearXNG](https://github.com/searxng/searxng) — the OG privacy-respecting metasearch engine.
-

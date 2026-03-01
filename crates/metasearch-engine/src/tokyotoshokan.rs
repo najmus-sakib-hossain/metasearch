@@ -100,14 +100,14 @@ impl SearchEngine for TokyoToshokan {
                 content
             };
 
-            results.push(SearchResult {
+            let mut result = SearchResult::new(
                 title,
-                url: href,
+                href,
                 content,
-                engine: "Tokyo Toshokan".to_string(),
-                engine_rank: rank,
-                thumbnail: None,
-            });
+                "tokyotoshokan",
+            );
+            result.engine_rank = rank;
+            results.push(result);
             rank += 1;
         }
 

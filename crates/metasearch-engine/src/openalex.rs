@@ -185,14 +185,14 @@ impl SearchEngine for OpenAlex {
                     content.push_str(&abstract_text);
                 }
 
-                Some(SearchResult {
+                let mut result = SearchResult::new(
                     title,
-                    url: result_url,
+                    result_url,
                     content,
-                    engine: "OpenAlex".to_string(),
-                    engine_rank: (i + 1) as u32,
-                    thumbnail: None,
-                })
+                    "openalex",
+                );
+                result.engine_rank = (i + 1) as u32;
+                Some(result)
             })
             .collect();
 

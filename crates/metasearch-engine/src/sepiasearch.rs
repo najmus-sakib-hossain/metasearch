@@ -132,7 +132,7 @@ impl SearchEngine for SepiaSearch {
 
                 let mut result = SearchResult::new(&title, &video_url, &snippet, "sepiasearch");
                 result.engine_rank = (i + 1) as u32;
-                result.category = Some(SearchCategory::Videos);
+                result.category = SearchCategory::Videos.to_string();
                 result.thumbnail = thumbnail;
                 Some(result)
             })

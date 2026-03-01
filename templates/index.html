@@ -3,24 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Metasearch</title>
+    <title>Metasearch — Privacy-respecting Search</title>
     <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔍</text></svg>">
 </head>
 <body>
-    <div class="container">
-        <h1>🔍 Metasearch</h1>
-        <p class="tagline">Privacy-respecting metasearch, built in Rust.</p>
-        <form action="/search" method="get" class="search-form">
-            <input type="text" name="q" placeholder="Search the web..." autofocus>
-            <button type="submit">Search</button>
-        </form>
-        <div class="categories">
-            <a href="/search?categories=general">General</a>
-            <a href="/search?categories=images">Images</a>
-            <a href="/search?categories=news">News</a>
-            <a href="/search?categories=videos">Videos</a>
-            <a href="/search?categories=science">Science</a>
+    <main class="home">
+        <div class="logo-icon">🔍</div>
+        <h1 class="logo">Metasearch</h1>
+        <p class="tagline">Privacy-respecting metasearch engine, built in Rust 🦀</p>
+        
+        <div class="search-box">
+            <form action="/search" method="get" class="search-form">
+                <input 
+                    type="text" 
+                    name="q" 
+                    class="search-input"
+                    placeholder="Search the web privately..." 
+                    autocomplete="off"
+                    autofocus
+                >
+                <button type="submit" class="search-btn">Search</button>
+            </form>
         </div>
-    </div>
+        
+        <div class="category-pills">
+            <a href="/search?category=general" class="category-pill">🌐 General</a>
+            <a href="/search?category=images" class="category-pill">🖼️ Images</a>
+            <a href="/search?category=videos" class="category-pill">🎬 Videos</a>
+            <a href="/search?category=news" class="category-pill">📰 News</a>
+            <a href="/search?category=science" class="category-pill">🔬 Science</a>
+            <a href="/search?category=music" class="category-pill">🎵 Music</a>
+            <a href="/search?category=files" class="category-pill">📁 Files</a>
+        </div>
+        
+        <footer class="footer mt-8">
+            <div class="footer-links">
+                <a href="/about">About</a>
+                <a href="/preferences">Preferences</a>
+                <a href="/api/v1/engines">Engines</a>
+                <a href="https://github.com/najmus-sakib-hossain/metasearch" target="_blank">GitHub</a>
+            </div>
+            <p>No tracking. No profiling. No ads. Just results.</p>
+        </footer>
+    </main>
 </body>
 </html>

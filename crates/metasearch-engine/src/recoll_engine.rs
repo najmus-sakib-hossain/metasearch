@@ -54,13 +54,13 @@ struct RecollResult {
 impl SearchEngine for RecollEngine {
     fn metadata(&self) -> EngineMetadata {
         EngineMetadata {
-            name: "Recoll".to_string(),
+            name: "recoll".to_string(),
             display_name: "Recoll".to_string(),
-            homepage: "https://Recoll.com".to_string(),
-                "Recoll desktop full-text search via recoll-webui — configurable instance URL"
-                    .to_string(),
-            categories: vec![metasearch_core::category::SearchCategory::General],
+            homepage: "https://www.recoll.org".to_string(),
+            categories: vec![SearchCategory::General],
             enabled: !self.base_url.is_empty(),
+            timeout_ms: 5000,
+            weight: 0.8,
         }
     }
 

@@ -98,14 +98,14 @@ impl SearchEngine for PkgGoDev {
                 .unwrap_or_default();
 
             if !title.is_empty() {
-                results.push(SearchResult {
+                let mut result = SearchResult::new(
                     title,
-                    url: result_url,
-                    content,
-                    engine: "pkg_go_dev".to_string(),
-                    engine_rank: (i + 1) as u32,
-                    thumbnail: None,
-                });
+                    result_url,
+                    snippet,
+                    "pkg_go_dev",
+                );
+                result.engine_rank = (i + 1) as u32;
+                results.push(result);
             }
         }
 

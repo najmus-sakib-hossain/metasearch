@@ -110,12 +110,13 @@ impl SearchEngine for CurrencyConvert {
 
         let ddg_url = format!("https://duckduckgo.com/?q={}+to+{}", from, to);
 
-        Ok(vec![SearchResult {
-            title: format!("{} {} → {} {}", amount, from, converted, to),
-            url: ddg_url,
-            content: answer,
-            engine: "currency_convert".to_string(),
-            engine_rank: 1,
-        }])
+        let mut result = SearchResult::new(
+            format!("{} {} → {} {}", amount, from, converted, to),
+            ddg_url,
+            answer,
+            "currency_convert",
+        );
+        result.engine_rank = 1;
+        Ok(vec![result])
     }
 }

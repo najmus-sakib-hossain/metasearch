@@ -102,14 +102,15 @@ impl SearchEngine for Rumble {
                 .and_then(|img| img.value().attr("src").map(|s| s.to_string()));
 
             if !title.is_empty() && !href.is_empty() {
-                results.push(SearchResult {
+                let mut result = SearchResult::new(
                     title,
-                    url: result_url,
-                    content,
-                    engine: "rumble".to_string(),
-                    engine_rank: (i + 1) as u32,
-                    thumbnail,
-                });
+                    result_url,
+                    snippet,
+                    "rumble",
+                );
+                result.engine_rank = (i + 1) as u32;
+                result.thumbnail = thumbnail_url;
+                results.push(result);
             }
         }
 

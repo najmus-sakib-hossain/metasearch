@@ -119,7 +119,7 @@ impl SearchEngine for SolidTorrents {
 
             let mut result = SearchResult::new(&title, &result_url, &snippet, "solidtorrents");
             result.engine_rank = (i + 1) as u32;
-            result.category = Some(SearchCategory::Files);
+            result.category = SearchCategory::Files.to_string();
             results.push(result);
         }
 

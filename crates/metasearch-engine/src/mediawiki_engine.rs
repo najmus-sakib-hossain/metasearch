@@ -57,11 +57,13 @@ fn strip_search_highlight(s: &str) -> String {
 impl SearchEngine for MediaWikiEngine {
     fn metadata(&self) -> EngineMetadata {
         EngineMetadata {
-            name: "MediaWiki".to_string(),
+            name: "mediawiki".to_string(),
             display_name: "MediaWiki".to_string(),
-            homepage: "https://MediaWiki.com".to_string(),
-            categories: vec![metasearch_core::category::SearchCategory::General],
+            homepage: "https://www.mediawiki.org".to_string(),
+            categories: vec![SearchCategory::General],
             enabled: !self.base_url.is_empty(),
+            timeout_ms: 5000,
+            weight: 1.0,
         }
     }
 
@@ -101,23 +103,19 @@ impl SearchEngine for MediaWikiEngine {
                 urlencoding::encode(&title.replace(' ', "_")),
             );
             let content = item
-                .snippet
+                .content
                 .as_deref()
                 .map(strip_search_highlight)
                 .unwrap_or_default();
 
-            results.push(SearchResult {
+            let mut result = SearchResult::new(
                 title,
-                url: page_url,
+                page_url,
                 content,
-                engine: "MediaWiki".to_string(),
-                engine_rank: (i + 1) as u32,
-                    score: 0.0,
-                    thumbnail: None,
-                    published_date: None,
-                    category: String::new(),
-                    metadata: serde_json::Value::Null,
-                });
+                "mediawiki",
+            );
+            result.engine_rank = (i + 1) as u32;
+            results.push(result);
         }
         Ok(results)
     }

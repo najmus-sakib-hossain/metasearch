@@ -76,14 +76,15 @@ impl SearchEngine for Openverse {
                     Some(c) => format!("By {} — Creative Commons", c),
                     None => "Creative Commons licensed image".to_string(),
                 };
-                Some(SearchResult {
+                let mut result = SearchResult::new(
                     title,
                     url,
                     content,
-                    engine: "Openverse".to_string(),
-                    engine_rank: (i + 1) as u32,
-                    thumbnail: Some(img_src),
-                })
+                    "openverse",
+                );
+                result.engine_rank = (i + 1) as u32;
+                result.thumbnail = Some(img_src);
+                Some(result)
             })
             .collect();
 

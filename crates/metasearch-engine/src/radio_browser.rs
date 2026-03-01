@@ -89,9 +89,9 @@ impl SearchEngine for RadioBrowser {
             .filter_map(|(i, station)| {
                 let name = station.name.filter(|n| !n.is_empty())?;
 
-                // Prefer homepage URL, fall back to stream URL
+                // Prefer base_url, fall back to stream URL
                 let url = station
-                    .homepage
+                    .base_url
                     .filter(|h| !h.is_empty())
                     .or(station.url_resolved)?;
 

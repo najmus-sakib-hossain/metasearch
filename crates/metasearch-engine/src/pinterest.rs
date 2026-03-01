@@ -96,14 +96,15 @@ impl SearchEngine for Pinterest {
                     .or_else(|| pin["images"]["orig"]["url"].as_str())
                     .map(|s| s.to_string());
 
-                Some(SearchResult {
+                let mut result = SearchResult::new(
                     title,
-                    url: result_url,
-                    content,
-                    engine: "pinterest".to_string(),
-                    engine_rank: (i + 1) as u32,
-                    thumbnail,
-                })
+                    result_url,
+                    snippet,
+                    "pinterest",
+                );
+                result.engine_rank = (i + 1) as u32;
+                result.thumbnail = thumbnail_url;
+                Some(result)
             })
             .collect();
 

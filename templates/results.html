@@ -3,30 +3,294 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> query  — Metasearch</title>
+    <title>{{ query }} — Metasearch</title>
     <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔍</text></svg>">
 </head>
 <body>
-    <header>
-        <a href="/" class="logo">🔍 Metasearch</a>
-        <form action="/search" method="get" class="search-form-inline">
-            <input type="text" name="q" value=" query ">
-            <button type="submit">Search</button>
-        </form>
-    </header>
-    <main>
-        <div class="results-info">
-             number_of_results  results in  search_time_ms ms
-            (engines:  engines_used | join(sep=", ") )
+    <!-- Header -->
+    <header class="header">
+        <div class="container-wide header-inner">
+            <a href="/" class="header-logo">🔍 Metasearch</a>
+            
+            <div class="header-search">
+                <form action="/search" method="get" class="search-form">
+                    <input 
+                        type="text" 
+                        name="q" 
+                        class="search-input"
+                        value="{{ query }}"
+                        autocomplete="off"
+                    >
+                    <input type="hidden" name="category" value="{{ category }}">
+                    <button type="submit" class="search-btn">Search</button>
+                </form>
+            </div>
         </div>
-        {% for result in results %}
-        <article class="result">
-            <a href=" result.url " class="result-title"> result.title </a>
-            <cite class="result-url"> result.url </cite>
-            <p class="result-snippet"> result.snippet </p>
-            <span class="result-engine"> result.engine </span>
-        </article>
-        {% endfor %}
-    </main>
+    </header>
+
+    <!-- Category Tabs -->
+    <nav class="tabs">
+        <div class="container-wide">
+            <ul class="tabs-list">
+                <li><a href="/search?q={{ query | urlencode }}&category=general" class="tab {% if category == 'general' %}active{% endif %}">🌐 General</a></li>
+                <li><a href="/search?q={{ query | urlencode }}&category=images" class="tab {% if category == 'images' %}active{% endif %}">🖼️ Images</a></li>
+                <li><a href="/search?q={{ query | urlencode }}&category=videos" class="tab {% if category == 'videos' %}active{% endif %}">🎬 Videos</a></li>
+                <li><a href="/search?q={{ query | urlencode }}&category=news" class="tab {% if category == 'news' %}active{% endif %}">📰 News</a></li>
+                <li><a href="/search?q={{ query | urlencode }}&category=music" class="tab {% if category == 'music' %}active{% endif %}">🎵 Music</a></li>
+                <li><a href="/search?q={{ query | urlencode }}&category=science" class="tab {% if category == 'science' %}active{% endif %}">🔬 Science</a></li>
+                <li><a href="/search?q={{ query | urlencode }}&category=it" class="tab {% if category == 'it' %}active{% endif %}">💻 IT</a></li>
+                <li><a href="/search?q={{ query | urlencode }}&category=files" class="tab {% if category == 'files' %}active{% endif %}">📁 Files</a></li>
+                <li><a href="/search?q={{ query | urlencode }}&category=social" class="tab {% if category == 'social' %}active{% endif %}">👥 Social</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container-wide results-page">
+        <main class="results-main">
+            <!-- Results Info Bar -->
+            <div class="results-info">
+                <div class="results-info-left">
+                    <span class="results-count">{{ number_of_results }} result{% if number_of_results != 1 %}s{% endif %}</span>
+                    <span class="results-time">({{ search_time_ms }}ms{% if from_cache %}, cached{% endif %})</span>
+                </div>
+                {% if engines_used | length > 0 %}
+                <div class="engines-used">
+                    {% for engine in engines_used %}
+                    <span class="engine-badge">{{ engine }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+
+            {% if results | length == 0 %}
+            <!-- Empty State -->
+            <div class="empty-state">
+                <div class="empty-icon">🔍</div>
+                <h2 class="empty-title">No results found</h2>
+                <p class="empty-text">Try different keywords, another category, or check your spelling.</p>
+                {% if engines_failed is defined and engines_failed | length > 0 %}
+                <p class="empty-text" style="margin-top: 0.5rem; font-size: 0.8rem;">
+                    ⚠️ {{ engines_failed | length }} engine(s) failed or timed out
+                </p>
+                {% endif %}
+                <div style="margin-top: 1.5rem;">
+                    <a href="/search?q={{ query | urlencode }}&category=general" class="search-btn" style="display:inline-block;padding:0.6rem 1.5rem;">Try General Search</a>
+                </div>
+            </div>
+            {% else %}
+            
+            <!-- ═══════════════════════════════════════════════ -->
+            <!-- IMAGES category                                 -->
+            <!-- ═══════════════════════════════════════════════ -->
+            {% if category == "images" %}
+            <div class="image-grid">
+                {% for result in results %}
+                <a href="{{ result.url }}" class="image-result" target="_blank" rel="noopener" title="{{ result.title }} — {{ result.engine }}">
+                    {% if result.thumbnail %}
+                    <img src="{{ result.thumbnail }}" alt="{{ result.title }}" loading="lazy" onerror="this.parentElement.classList.add('img-broken')">
+                    {% else %}
+                    <div class="image-placeholder">🖼️</div>
+                    {% endif %}
+                    <div class="image-result-overlay">
+                        <span class="image-result-title">{{ result.title }}</span>
+                        <span class="image-result-engine">{{ result.engine }}</span>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+
+            <!-- ═══════════════════════════════════════════════ -->
+            <!-- VIDEOS category                                 -->
+            <!-- ═══════════════════════════════════════════════ -->
+            {% elif category == "videos" %}
+            {% for result in results %}
+            <article class="video-result">
+                <a href="{{ result.url }}" class="video-thumb" target="_blank" rel="noopener">
+                    {% if result.thumbnail %}
+                    <img src="{{ result.thumbnail }}" alt="{{ result.title }}" loading="lazy" onerror="this.style.display='none'">
+                    {% else %}
+                    <div class="video-placeholder">🎬</div>
+                    {% endif %}
+                </a>
+                <div class="video-info">
+                    <a href="{{ result.url }}" class="video-title" target="_blank" rel="noopener">{{ result.title }}</a>
+                    {% if result.content %}
+                    <p class="video-description">{{ result.content | truncate(length=200) }}</p>
+                    {% endif %}
+                    <div class="video-stats">
+                        <span class="result-engine">{{ result.engine }}</span>
+                        {% if result.published_date %}
+                        <span class="result-date">{{ result.published_date }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </article>
+            {% endfor %}
+
+            <!-- ═══════════════════════════════════════════════ -->
+            <!-- NEWS category                                   -->
+            <!-- ═══════════════════════════════════════════════ -->
+            {% elif category == "news" %}
+            {% for result in results %}
+            <article class="news-result">
+                {% if result.thumbnail %}
+                <a href="{{ result.url }}" class="news-thumb" target="_blank" rel="noopener">
+                    <img src="{{ result.thumbnail }}" alt="" loading="lazy" onerror="this.parentElement.style.display='none'">
+                </a>
+                {% endif %}
+                <div class="news-info">
+                    <div class="news-source">
+                        <img class="result-favicon" src="https://www.google.com/s2/favicons?domain={{ result.url }}&sz=16" alt="" loading="lazy" onerror="this.style.display='none'">
+                        <span>{{ result.engine }}</span>
+                        {% if result.published_date %}
+                        <span class="news-date"> · {{ result.published_date }}</span>
+                        {% endif %}
+                    </div>
+                    <a href="{{ result.url }}" class="news-title" target="_blank" rel="noopener">{{ result.title }}</a>
+                    {% if result.content %}
+                    <p class="news-snippet">{{ result.content | truncate(length=300) }}</p>
+                    {% endif %}
+                </div>
+            </article>
+            {% endfor %}
+
+            <!-- ═══════════════════════════════════════════════ -->
+            <!-- MUSIC category                                  -->
+            <!-- ═══════════════════════════════════════════════ -->
+            {% elif category == "music" %}
+            {% for result in results %}
+            <article class="music-result">
+                {% if result.thumbnail %}
+                <div class="music-art">
+                    <img src="{{ result.thumbnail }}" alt="" loading="lazy" onerror="this.parentElement.innerHTML='🎵'">
+                </div>
+                {% else %}
+                <div class="music-art">🎵</div>
+                {% endif %}
+                <div class="music-info">
+                    <a href="{{ result.url }}" class="result-title" target="_blank" rel="noopener">{{ result.title }}</a>
+                    {% if result.content %}
+                    <p class="result-snippet">{{ result.content | truncate(length=200) }}</p>
+                    {% endif %}
+                    <div class="result-meta">
+                        <span class="result-engine">{{ result.engine }}</span>
+                    </div>
+                </div>
+            </article>
+            {% endfor %}
+
+            <!-- ═══════════════════════════════════════════════ -->
+            <!-- GENERAL / SCIENCE / IT / FILES / SOCIAL default -->
+            <!-- ═══════════════════════════════════════════════ -->
+            {% else %}
+            {% for result in results %}
+            <article class="result">
+                <div class="result-header">
+                    <cite class="result-url">
+                        <img class="result-favicon" src="https://www.google.com/s2/favicons?domain={{ result.url }}&sz=32" alt="" loading="lazy" onerror="this.style.display='none'">
+                        <span>{{ result.url | truncate(length=80) }}</span>
+                    </cite>
+                </div>
+                <a href="{{ result.url }}" class="result-title" target="_blank" rel="noopener">{{ result.title }}</a>
+                {% if result.content %}
+                <p class="result-snippet">{{ result.content | truncate(length=300) }}</p>
+                {% endif %}
+                {% if result.thumbnail %}
+                <div class="result-thumb-inline">
+                    <img src="{{ result.thumbnail }}" alt="" loading="lazy" onerror="this.parentElement.style.display='none'">
+                </div>
+                {% endif %}
+                <div class="result-meta">
+                    <span class="result-engine">{{ result.engine }}</span>
+                    {% if result.published_date %}
+                    <span class="result-date">{{ result.published_date }}</span>
+                    {% endif %}
+                    {% if result.category and result.category != "general" %}
+                    <span class="result-category-badge">{{ result.category }}</span>
+                    {% endif %}
+                </div>
+            </article>
+            {% endfor %}
+            {% endif %}
+            
+            <!-- Pagination -->
+            {% if number_of_results > 10 %}
+            <nav class="pagination">
+                {% if page > 1 %}
+                <a href="/search?q={{ query | urlencode }}&category={{ category }}&page={{ page - 1 }}" class="page-btn">← Previous</a>
+                {% endif %}
+                
+                {% for p in range(start=1, end=total_pages + 1) %}
+                    {% if p <= 10 %}
+                    <a href="/search?q={{ query | urlencode }}&category={{ category }}&page={{ p }}" class="page-btn {% if p == page %}active{% endif %}">{{ p }}</a>
+                    {% endif %}
+                {% endfor %}
+                
+                {% if page < total_pages %}
+                <a href="/search?q={{ query | urlencode }}&category={{ category }}&page={{ page + 1 }}" class="page-btn">Next →</a>
+                {% endif %}
+            </nav>
+            {% endif %}
+            
+            {% endif %}
+        </main>
+
+        <!-- Sidebar -->
+        <aside class="results-sidebar">
+            <!-- Engine status -->
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">Engines</h3>
+                <div class="sidebar-card">
+                    {% if engines_used | length > 0 %}
+                    <p class="text-muted" style="margin-bottom: 0.5rem;">✅ {{ engines_used | length }} responded</p>
+                    {% endif %}
+                    {% if engines_failed is defined and engines_failed | length > 0 %}
+                    <p style="color: hsl(0, 60%, 60%); margin-bottom: 0.5rem;">⚠️ {{ engines_failed | length }} failed</p>
+                    <details style="margin-top: 0.25rem;">
+                        <summary class="text-muted" style="cursor:pointer; font-size:0.8rem;">Show failed</summary>
+                        <ul style="list-style:none; padding:0; margin-top:0.25rem;">
+                        {% for engine in engines_failed %}
+                            <li style="font-size:0.75rem; color:hsl(0,60%,60%); padding:0.125rem 0;">{{ engine }}</li>
+                        {% endfor %}
+                        </ul>
+                    </details>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Search Settings -->
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">Settings</h3>
+                <div class="sidebar-card">
+                    <p class="text-muted">Safe Search: {{ safe_search | default(value="Moderate") }}</p>
+                    <p class="text-muted">Language: {{ language | default(value="Auto") }}</p>
+                    <p class="text-muted">Page: {{ page }}</p>
+                </div>
+            </div>
+
+            <!-- About -->
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">About</h3>
+                <div class="sidebar-card">
+                    <p class="text-muted">Metasearch aggregates results from 200+ sources. No tracking. No profiling. No ads.</p>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container-wide">
+            <div class="footer-links">
+                <a href="/">Home</a>
+                <a href="/about">About</a>
+                <a href="/preferences">Preferences</a>
+                <a href="/api/v1/engines">Engines</a>
+            </div>
+            <p>Metasearch — No tracking. No profiling. No ads.</p>
+        </div>
+    </footer>
 </body>
 </html>

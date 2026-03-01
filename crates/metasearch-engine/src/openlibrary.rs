@@ -109,7 +109,7 @@ impl SearchEngine for OpenLibrary {
 
                 let mut result = SearchResult::new(&title, &page_url, &snippet, "openlibrary");
                 result.engine_rank = (i + 1) as u32;
-                result.category = Some(SearchCategory::General);
+                result.category = SearchCategory::General.to_string();
                 result.thumbnail = thumbnail;
                 Some(result)
             })

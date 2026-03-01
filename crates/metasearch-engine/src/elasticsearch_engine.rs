@@ -80,7 +80,7 @@ impl SearchEngine for ElasticsearchEngine {
             .header("Content-Type", "application/json")
             .body(body.to_string());
 
-        if let (Some(ref user), Some(ref pass)) = (&self.username, &self.password) {
+        if let (Some(user), Some(pass)) = (&self.username, &self.password) {
             req = req.basic_auth(user, Some(pass));
         }
 

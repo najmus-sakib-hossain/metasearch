@@ -31,11 +31,13 @@ impl DeepL {
 impl SearchEngine for DeepL {
     fn metadata(&self) -> EngineMetadata {
         EngineMetadata {
-            name: "DeepL".to_string(),
+            name: "deepl".to_string(),
             display_name: "DeepL".to_string(),
             homepage: "https://api-free.deepl.com".to_string(),
-            categories: vec![SearchCategory::General, SearchCategory::General],
+            categories: vec![SearchCategory::General],
             enabled: self.api_key.is_some(),
+            timeout_ms: 5000,
+            weight: 1.0,
         }
     }
 
@@ -71,13 +73,14 @@ impl SearchEngine for DeepL {
                         .get("detected_source_language")
                         .and_then(|v| v.as_str())
                         .unwrap_or("auto");
-                    results.push(SearchResult {
-                        title: format!("DeepL ({} → EN): {}", detected, text),
-                        url: "https://www.deepl.com/translator".to_string(),
-                        content: text.to_string(),
-                        engine: "deepl".to_string(),
-                        engine_rank: (i + 1) as u32,
-                    });
+                    let mut result = SearchResult::new(
+                        format!("DeepL ({} → EN): {}", detected, text),
+                        "https://www.deepl.com/translator",
+                        text,
+                        "deepl",
+                    );
+                    result.engine_rank = (i + 1) as u32;
+                    results.push(result);
                 }
             }
         }

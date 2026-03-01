@@ -135,19 +135,20 @@ impl SearchEngine for DuckDuckGoWeather {
 
             let condition = condition_label(condition_code);
 
-            results.push(SearchResult {
-                title: format!(
+            let mut result = SearchResult::new(
+                format!(
                     "Weather for {}: {:.1}°C — {}",
                     query.query, temp, condition
                 ),
-                url: format!("https://duckduckgo.com/?q=weather+{}", urlencoding::encode(&query.query)),
-                content: format!(
+                format!("https://duckduckgo.com/?q=weather+{}", urlencoding::encode(&query.query)),
+                format!(
                     "Temperature: {:.1}°C (feels like {:.1}°C) | Condition: {} | Humidity: {:.0}% | Wind: {:.1} km/h | Pressure: {:.0} hPa",
                     temp, feels_like, condition, humidity, wind_speed, pressure
                 ),
-                engine: "duckduckgo_weather".to_string(),
-                engine_rank: 1,
-            });
+                "duckduckgo_weather",
+            );
+            result.engine_rank = 1;
+            results.push(result);
         }
 
         // Daily forecast (from forecastDaily if available)
@@ -176,27 +177,28 @@ impl SearchEngine for DuckDuckGoWeather {
                     .and_then(|v| v.as_str())
                     .unwrap_or("Unknown");
 
-                results.push(SearchResult {
-                    title: format!(
+                let mut result = SearchResult::new(
+                    format!(
                         "{}: {:.0}°C / {:.0}°C — {}",
                         date_short,
                         temp_max,
                         temp_min,
                         condition_label(condition_code)
                     ),
-                    url: format!(
+                    format!(
                         "https://duckduckgo.com/?q=weather+{}",
                         urlencoding::encode(&query.query)
                     ),
-                    content: format!(
+                    format!(
                         "High: {:.1}°C | Low: {:.1}°C | {}",
                         temp_max,
                         temp_min,
                         condition_label(condition_code)
                     ),
-                    engine: "duckduckgo_weather".to_string(),
-                    engine_rank: (i + 2) as u32,
-                });
+                    "duckduckgo_weather",
+                );
+                result.engine_rank = (i + 2) as u32;
+                results.push(result);
             }
         }
 

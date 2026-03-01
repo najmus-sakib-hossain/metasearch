@@ -103,14 +103,14 @@ impl SearchEngine for Searchcode {
                     _ => format!("Code in {}", repo),
                 };
 
-                Some(SearchResult {
+                let mut result = SearchResult::new(
                     title,
-                    url: result_url,
+                    result_url,
                     content,
-                    engine: "Searchcode".to_string(),
-                    engine_rank: (i + 1) as u32,
-                    thumbnail: None,
-                })
+                    "searchcode",
+                );
+                result.engine_rank = (i + 1) as u32;
+                Some(result)
             })
             .collect();
 

@@ -71,11 +71,13 @@ struct DiscoursePost {
 impl SearchEngine for Discourse {
     fn metadata(&self) -> EngineMetadata {
         EngineMetadata {
-            name: "Discourse".to_string(),
+            name: "discourse".to_string(),
             display_name: "Discourse".to_string(),
-            homepage: "https://Discourse.com".to_string(),
-            categories: vec![metasearch_core::category::SearchCategory::General],
+            homepage: "https://www.discourse.org".to_string(),
+            categories: vec![SearchCategory::General],
             enabled: !self.base_url.is_empty(),
+            timeout_ms: 5000,
+            weight: 1.0,
         }
     }
 

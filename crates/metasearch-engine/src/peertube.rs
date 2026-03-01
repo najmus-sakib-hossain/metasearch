@@ -97,14 +97,15 @@ impl SearchEngine for PeerTube {
                         format!("https://{}{}", host, p)
                     }
                 });
-                Some(SearchResult {
+                let mut result = SearchResult::new(
                     title,
-                    url: result_url,
-                    content: item.description.unwrap_or_default(),
-                    engine: "peertube".to_string(),
-                    engine_rank: (i + 1) as u32,
-                    thumbnail,
-                })
+                    result_url,
+                    item.description.unwrap_or_default(),
+                    "peertube",
+                );
+                result.engine_rank = (i + 1) as u32;
+                result.thumbnail = thumbnail_url;
+                Some(result)
             })
             .collect();
 

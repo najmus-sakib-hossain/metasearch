@@ -151,9 +151,9 @@ impl Quark {
                     .unwrap_or_default();
 
                 let mut r = SearchResult::new(
-                    &html_escape::decode_html_entities(title),
+                    html_escape::decode_html_entities(title).into_owned(),
                     url,
-                    &html_escape::decode_html_entities(&content),
+                    html_escape::decode_html_entities(&content).into_owned(),
                     "quark",
                 );
                 r.category = SearchCategory::General.to_string();
@@ -191,9 +191,9 @@ impl Quark {
                     .unwrap_or_default();
 
                 let mut r = SearchResult::new(
-                    &html_escape::decode_html_entities(title),
+                    html_escape::decode_html_entities(title).into_owned(),
                     url,
-                    &html_escape::decode_html_entities(content),
+                    html_escape::decode_html_entities(content).into_owned(),
                     "quark",
                 );
                 r.category = SearchCategory::General.to_string();

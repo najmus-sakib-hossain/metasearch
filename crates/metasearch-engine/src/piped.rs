@@ -56,12 +56,13 @@ struct PipedItem {
 impl SearchEngine for Piped {
     fn metadata(&self) -> EngineMetadata {
         EngineMetadata {
-            name: "Piped".to_string(),
+            name: "piped".to_string(),
             display_name: "Piped".to_string(),
-            homepage: "https://Piped.com".to_string(),
-                .to_string(),
-            categories: vec![metasearch_core::category::SearchCategory::Videos],
+            homepage: "https://piped.video".to_string(),
+            categories: vec![SearchCategory::Videos],
             enabled: !self.backend_url.is_empty(),
+            timeout_ms: 5000,
+            weight: 1.0,
         }
     }
 

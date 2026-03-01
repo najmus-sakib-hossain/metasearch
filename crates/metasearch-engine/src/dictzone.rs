@@ -93,13 +93,14 @@ impl SearchEngine for DictZone {
                 continue;
             }
 
-            results.push(SearchResult {
-                title: format!("{} → {}", from_text, to_text),
-                url: url.clone(),
-                content: format!("{}: {}", from_text, to_text),
-                engine: "dictzone".to_string(),
-                engine_rank: (i + 1) as u32,
-            });
+            let mut result = SearchResult::new(
+                format!("{} → {}", from_text, to_text),
+                url.clone(),
+                format!("{}: {}", from_text, to_text),
+                "dictzone",
+            );
+            result.engine_rank = (i + 1) as u32;
+            results.push(result);
 
             if results.len() >= 10 {
                 break;

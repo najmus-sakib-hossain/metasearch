@@ -113,7 +113,7 @@ impl SearchEngine for RottenTomatoes {
 
             let mut result = SearchResult::new(&title, &result_url, &snippet, "rottentomatoes");
             result.engine_rank = (i + 1) as u32;
-            result.category = Some(SearchCategory::General);
+            result.category = SearchCategory::General.to_string();
             result.thumbnail = thumbnail;
             results.push(result);
         }

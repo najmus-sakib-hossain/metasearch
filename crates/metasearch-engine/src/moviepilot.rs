@@ -87,7 +87,7 @@ impl SearchEngine for Moviepilot {
 
                 let mut result = SearchResult::new(&title, &url, &snippet, "moviepilot");
                 result.engine_rank = (i + 1) as u32;
-                result.category = Some(SearchCategory::General);
+                result.category = SearchCategory::General.to_string();
                 result.thumbnail = item.image;
                 Some(result)
             })

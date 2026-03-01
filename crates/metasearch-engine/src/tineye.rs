@@ -94,13 +94,14 @@ impl SearchEngine for TinEye {
                 let width = m.get("width").and_then(|v| v.as_u64()).unwrap_or(0);
                 let height = m.get("height").and_then(|v| v.as_u64()).unwrap_or(0);
 
-                results.push(SearchResult {
-                    title: image_name.to_string(),
-                    url: page_url.to_string(),
-                    content: format!("Found on {} — {}×{}", domain, width, height),
-                    engine: "tineye".to_string(),
-                    engine_rank: (i + 1) as u32,
-                });
+                let mut result = SearchResult::new(
+                    image_name,
+                    page_url,
+                    format!("Found on {} — {}×{}", domain, width, height),
+                    "tineye",
+                );
+                result.engine_rank = (i + 1) as u32;
+                results.push(result);
 
                 if results.len() >= 20 {
                     break;

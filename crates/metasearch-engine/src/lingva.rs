@@ -34,15 +34,17 @@ impl Lingva {
 impl SearchEngine for Lingva {
     fn metadata(&self) -> EngineMetadata {
         EngineMetadata {
-            name: "Lingva".to_string(),
+            name: "lingva".to_string(),
             display_name: "Lingva".to_string(),
             homepage: if self.url.is_empty() {
                 "https://lingva.thedaviddelta.com".to_string()
             } else {
                 self.url.clone()
             },
-            categories: vec![SearchCategory::General, SearchCategory::General],
+            categories: vec![SearchCategory::General],
             enabled: !self.url.is_empty(),
+            timeout_ms: 5000,
+            weight: 1.0,
         }
     }
 
@@ -98,13 +100,14 @@ impl SearchEngine for Lingva {
                 }
             }
 
-            results.push(SearchResult {
-                title: format!("Lingva: {}", translation),
-                url: page_url,
+            let mut result = SearchResult::new(
+                format!("Lingva: {}", translation),
+                page_url,
                 content,
-                engine: "lingva".to_string(),
-                engine_rank: 1,
-            });
+                "lingva",
+            );
+            result.engine_rank = 1;
+            results.push(result);
         }
 
         Ok(results)

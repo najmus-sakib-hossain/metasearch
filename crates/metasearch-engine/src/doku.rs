@@ -34,11 +34,13 @@ impl Doku {
 impl SearchEngine for Doku {
     fn metadata(&self) -> EngineMetadata {
         EngineMetadata {
-            name: "DokuWiki".to_string(),
+            name: "dokuwiki".to_string(),
             display_name: "DokuWiki".to_string(),
-            homepage: "https://DokuWiki.com".to_string(),
-            categories: vec![metasearch_core::category::SearchCategory::General],
+            homepage: "https://www.dokuwiki.org".to_string(),
+            categories: vec![SearchCategory::General],
             enabled: !self.base_url.is_empty(),
+            timeout_ms: 5000,
+            weight: 1.0,
         }
     }
 

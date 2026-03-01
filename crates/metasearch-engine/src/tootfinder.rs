@@ -92,14 +92,14 @@ impl SearchEngine for Tootfinder {
                     truncated
                 });
 
-                Some(SearchResult {
+                let mut result = SearchResult::new(
                     title,
                     url,
                     content,
-                    engine: "Tootfinder".to_string(),
-                    engine_rank: (i + 1) as u32,
-                    thumbnail: None,
-                })
+                    "tootfinder",
+                );
+                result.engine_rank = (i + 1) as u32;
+                Some(result)
             })
             .collect();
 

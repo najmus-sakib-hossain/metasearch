@@ -99,14 +99,15 @@ impl SearchEngine for PodcastIndex {
                     }
                 }
                 let thumbnail_url = feed.image.filter(|u| !u.is_empty());
-                Some(SearchResult {
+                let mut result = SearchResult::new(
                     title,
-                    url: result_url,
-                    content,
-                    engine: "podcastindex".to_string(),
-                    engine_rank: (i + 1) as u32,
-                    thumbnail,
-                })
+                    result_url,
+                    snippet,
+                    "podcastindex",
+                );
+                result.engine_rank = (i + 1) as u32;
+                result.thumbnail = thumbnail_url;
+                Some(result)
             })
             .collect();
 

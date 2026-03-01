@@ -37,15 +37,17 @@ impl LibreTranslate {
 impl SearchEngine for LibreTranslate {
     fn metadata(&self) -> EngineMetadata {
         EngineMetadata {
-            name: "LibreTranslate".to_string(),
+            name: "libretranslate".to_string(),
             display_name: "LibreTranslate".to_string(),
             homepage: if self.base_url.is_empty() {
                 "https://libretranslate.com".to_string()
             } else {
                 self.base_url.clone()
             },
-            categories: vec![SearchCategory::General, SearchCategory::General],
+            categories: vec![SearchCategory::General],
             enabled: !self.base_url.is_empty(),
+            timeout_ms: 5000,
+            weight: 1.0,
         }
     }
 
@@ -91,13 +93,14 @@ impl SearchEngine for LibreTranslate {
                     content.push_str(&format!(" | Alternatives: {}", alt_strs.join(", ")));
                 }
             }
-            results.push(SearchResult {
-                title: format!("LibreTranslate: {}", text),
-                url: self.base_url.clone(),
+            let mut result = SearchResult::new(
+                format!("LibreTranslate: {}", text),
+                self.base_url.clone(),
                 content,
-                engine: "libretranslate".to_string(),
-                engine_rank: 1,
-            });
+                "libretranslate",
+            );
+            result.engine_rank = 1;
+            results.push(result);
         }
 
         Ok(results)

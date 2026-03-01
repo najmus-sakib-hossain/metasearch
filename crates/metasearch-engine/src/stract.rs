@@ -88,14 +88,14 @@ impl SearchEngine for Stract {
             .filter_map(|(i, page)| {
                 let title = page.title.filter(|t| !t.is_empty())?;
                 let url = page.url.filter(|u| !u.is_empty())?;
-                Some(SearchResult {
+                let mut result = SearchResult::new(
                     title,
                     url,
-                    content: page.snippet.unwrap_or_default(),
-                    engine: "stract".to_string(),
-                    engine_rank: (i + 1) as u32,
-                    thumbnail: None,
-                })
+                    page.snippet.unwrap_or_default(),
+                    "stract",
+                );
+                result.engine_rank = (i + 1) as u32;
+                Some(result)
             })
             .collect();
 

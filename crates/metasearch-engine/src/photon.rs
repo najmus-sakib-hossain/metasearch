@@ -155,14 +155,14 @@ impl SearchEngine for Photon {
                     name
                 };
 
-                Some(SearchResult {
+                let mut result = SearchResult::new(
                     title,
-                    url: result_url,
-                    content,
-                    engine: "photon".to_string(),
-                    engine_rank: (i + 1) as u32,
-                    thumbnail: None,
-                })
+                    result_url,
+                    snippet,
+                    "photon",
+                );
+                result.engine_rank = (i + 1) as u32;
+                Some(result)
             })
             .collect();
 

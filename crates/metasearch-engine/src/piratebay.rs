@@ -114,14 +114,14 @@ impl SearchEngine for PirateBay {
                     size_str, seeders, leechers, magnetlink
                 );
 
-                Some(SearchResult {
-                    title: name,
-                    url: link,
+                let mut result = SearchResult::new(
+                    name,
+                    link,
                     content,
-                    engine: "The Pirate Bay".to_string(),
-                    engine_rank: (i + 1) as u32,
-                    thumbnail: None,
-                })
+                    "piratebay",
+                );
+                result.engine_rank = (i + 1) as u32;
+                Some(result)
             })
             .collect();
 
