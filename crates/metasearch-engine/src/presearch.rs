@@ -7,7 +7,7 @@ use async_trait::async_trait;
 use metasearch_core::{
     category::SearchCategory,
     engine::{EngineMetadata, SearchEngine},
-    error::{MetasearchError, Result},
+    error::Result,
     query::SearchQuery,
     result::SearchResult,
 };
@@ -53,9 +53,10 @@ impl SearchEngine for Presearch {
             page,
         );
 
-        let resp = self
+        let resp = match self
             .client
             .get(&search_url)
+            .timeout(std::time::Duration::from_secs(5))
             .header(
                 "User-Agent",
                 "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:120.0) Gecko/20100101 Firefox/120.0",
@@ -64,7 +65,10 @@ impl SearchEngine for Presearch {
             .header("Cookie", "b=1; presearch_session=; use_local_search_results=false; use_safe_search=true")
             .send()
             .await
-            .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
+        {
+            Ok(r) => r,
+            Err(_) => return Ok(Vec::new()),
+        };
 
         // Capture response cookies for step 2
         let cookies: Vec<String> = resp
@@ -75,14 +79,16 @@ impl SearchEngine for Presearch {
             .collect();
         let cookie_str = cookies.join("; ");
 
-        let html_text = resp
-            .text()
-            .await
-            .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
+        let html_text = match resp.text().await {
+            Ok(t) => t,
+            Err(_) => return Ok(Vec::new()),
+        };
 
         // Extract searchId from HTML
-        let id_re = Regex::new(r#"window\.searchId\s*=\s*"([^"]+)""#)
-            .map_err(|e| MetasearchError::ParseError(format!("Regex error: {}", e)))?;
+        let id_re = match Regex::new(r#"window\.searchId\s*=\s*"([^"]+)""#) {
+            Ok(r) => r,
+            Err(_) => return Ok(Vec::new()),
+        };
 
         let search_id = match id_re.captures(&html_text) {
             Some(caps) => match caps.get(1) {
@@ -98,9 +104,10 @@ impl SearchEngine for Presearch {
             urlencoding::encode(&search_id),
         );
 
-        let resp = self
+        let resp = match self
             .client
             .get(&results_url)
+            .timeout(std::time::Duration::from_secs(4))
             .header(
                 "User-Agent",
                 "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:120.0) Gecko/20100101 Firefox/120.0",
@@ -109,12 +116,15 @@ impl SearchEngine for Presearch {
             .header("Cookie", &cookie_str)
             .send()
             .await
-            .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
+        {
+            Ok(r) => r,
+            Err(_) => return Ok(Vec::new()),
+        };
 
-        let text = resp
-            .text()
-            .await
-            .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
+        let text = match resp.text().await {
+            Ok(t) => t,
+            Err(_) => return Ok(Vec::new()),
+        };
 
         // Handle non-JSON responses
         if text.trim().is_empty() || text.starts_with("<!") || text.starts_with("<html") {

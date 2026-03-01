@@ -12,7 +12,7 @@ use scraper::{Html, Selector};
 use metasearch_core::{
     category::SearchCategory,
     engine::{EngineMetadata, SearchEngine},
-    error::MetasearchError,
+    error::Result,
     query::SearchQuery,
     result::SearchResult,
 };
@@ -41,15 +41,32 @@ impl SearchEngine for TokyoToshokan {
         }
     }
 
-    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
+    async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>> {
         let url = format!(
             "https://www.tokyotosho.info/search.php?terms={}&page={}",
             urlencoding::encode(&query.query),
             query.page
         );
 
-        let resp = self.client.get(&url).send().await.map_err(|e| MetasearchError::Engine(e.to_string()))?;
-        let text = resp.text().await.map_err(|e| MetasearchError::Engine(e.to_string()))?;
+        let resp = match self
+            .client
+            .get(&url)
+            .timeout(std::time::Duration::from_secs(6))
+            .send()
+            .await
+        {
+            Ok(r) => r,
+            Err(_) => return Ok(Vec::new()),
+        };
+
+        if !resp.status().is_success() {
+            return Ok(Vec::new());
+        }
+
+        let text = match resp.text().await {
+            Ok(t) => t,
+            Err(_) => return Ok(Vec::new()),
+        };
         let document = Html::parse_document(&text);
 
         let row_sel = Selector::parse("table.listing tr.category_0").unwrap();

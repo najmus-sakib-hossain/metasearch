@@ -8,7 +8,7 @@ use async_trait::async_trait;
 use metasearch_core::{
     category::SearchCategory,
     engine::{EngineMetadata, SearchEngine},
-    error::{MetasearchError, Result},
+    error::Result,
     query::SearchQuery,
     result::SearchResult,
 };
@@ -54,30 +54,36 @@ impl SearchEngine for Kickass {
             page,
         );
 
-        let resp = self
+        let resp = match self
             .client
             .get(&url)
-            .header("User-Agent", "Mozilla/5.0")
+            .timeout(std::time::Duration::from_secs(6))
+            .header(
+                "User-Agent",
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:120.0) Gecko/20100101 Firefox/120.0",
+            )
             .send()
             .await
-            .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
+        {
+            Ok(r) => r,
+            Err(_) => return Ok(Vec::new()),
+        };
 
-        let body = resp
-            .text()
-            .await
-            .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
+        if !resp.status().is_success() {
+            return Ok(Vec::new());
+        }
+
+        let body = match resp.text().await {
+            Ok(t) => t,
+            Err(_) => return Ok(Vec::new()),
+        };
 
         let document = Html::parse_document(&body);
-        let row_sel = Selector::parse("table.data tr")
-            .map_err(|e| MetasearchError::ParseError(format!("{e:?}")))?;
-        let link_sel = Selector::parse("a.cellMainLink")
-            .map_err(|e| MetasearchError::ParseError(format!("{e:?}")))?;
-        let seed_sel = Selector::parse("td.green")
-            .map_err(|e| MetasearchError::ParseError(format!("{e:?}")))?;
-        let leech_sel =
-            Selector::parse("td.red").map_err(|e| MetasearchError::ParseError(format!("{e:?}")))?;
-        let size_sel = Selector::parse("td.nobr")
-            .map_err(|e| MetasearchError::ParseError(format!("{e:?}")))?;
+        let row_sel = Selector::parse("table.data tr").unwrap();
+        let link_sel = Selector::parse("a.cellMainLink").unwrap();
+        let seed_sel = Selector::parse("td.green").unwrap();
+        let leech_sel = Selector::parse("td.red").unwrap();
+        let size_sel = Selector::parse("td.nobr").unwrap();
 
         let mut results = Vec::new();
 
