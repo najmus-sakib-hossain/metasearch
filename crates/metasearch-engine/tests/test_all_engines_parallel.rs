@@ -154,14 +154,20 @@ async fn test_all_engines_parallel() {
         println!();
         println!("  ⚠️  ENGINES RETURNING 0 RESULTS:");
         println!("    (These may have bot protection or need specific queries)");
-        for (i, name) in empty.iter().take(15).enumerate() {
+        for (i, name) in empty.iter().enumerate() {
             print!("    {:<25}", name);
             if (i + 1) % 3 == 0 {
                 println!();
             }
         }
-        if empty.len() > 15 {
-            println!("\n    ... and {} more", empty.len() - 15);
+        println!();
+    }
+
+    if !errors.is_empty() {
+        println!();
+        println!("  ❌ ENGINES WITH ERRORS:");
+        for (name, err) in errors.iter() {
+            println!("    {:<25}: {}", name, err);
         }
         println!();
     }

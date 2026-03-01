@@ -83,12 +83,13 @@ impl SearchEngine for ThreeSixtySearch {
             .await
             .ok();
 
-        // Extract cookie from response
         let cookie_str = cookie_resp
             .as_ref()
             .map(|r| {
-                r.cookies()
-                    .map(|c| format!("{}={}", c.name(), c.value()))
+                r.headers()
+                    .get_all(reqwest::header::SET_COOKIE)
+                    .iter()
+                    .filter_map(|c| c.to_str().ok().map(|s| s.to_owned()))
                     .collect::<Vec<_>>()
                     .join("; ")
             })

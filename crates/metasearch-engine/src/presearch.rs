@@ -68,8 +68,10 @@ impl SearchEngine for Presearch {
 
         // Capture response cookies for step 2
         let cookies: Vec<String> = resp
-            .cookies()
-            .map(|c| format!("{}={}", c.name(), c.value()))
+            .headers()
+            .get_all(reqwest::header::SET_COOKIE)
+            .iter()
+            .filter_map(|c| c.to_str().ok().map(|s| s.to_owned()))
             .collect();
         let cookie_str = cookies.join("; ");
 

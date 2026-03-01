@@ -1,0 +1,71 @@
+﻿cargo :     Checking metasearch-engine v0.1.0 
+(F:\metasearch\crates\metasearch-engine)
+At line:1 char:1
++ cargo check -p metasearch-engine 2>&1 | 
+Out-File -Encoding utf8 check ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (     
+   Checking me...asearch-engine):String) [], Rem  
+  oteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+error[E0599]: no method named `cookies` found for 
+struct `Response` in the current scope
+  --> 
+crates\metasearch-engine\src\presearch.rs:71:14
+   |
+70 |           let cookies: Vec<String> = resp
+   |  ____________________________________-
+71 | |             .cookies()
+   | |             -^^^^^^^ method not found in 
+`Response`
+   | |_____________|
+   |
+
+error[E0282]: type annotations needed
+  --> 
+crates\metasearch-engine\src\presearch.rs:72:19
+   |
+72 |             .map(|c| format!("{}={}", 
+c.name(), c.value()))
+   |                   ^                   - type 
+must be known at this point
+   |
+help: consider giving this closure parameter an 
+explicit type
+   |
+72 |             .map(|c: /* Type */| 
+format!("{}={}", c.name(), c.value()))
+   |                    ++++++++++++
+
+error[E0599]: no method named `cookies` found for 
+reference `&Response` in the current scope
+  --> crates\metasearch-engine\src\three_sixty_sea
+rch.rs:90:19
+   |
+90 |                 r.cookies()
+   |                   ^^^^^^^ method not found 
+in `&Response`
+
+error[E0282]: type annotations needed
+  --> crates\metasearch-engine\src\three_sixty_sea
+rch.rs:91:27
+   |
+91 |                     .map(|c| 
+format!("{}={}", c.name(), c.value()))
+   |                           ^                  
+ - type must be known at this point
+   |
+help: consider giving this closure parameter an 
+explicit type
+   |
+91 |                     .map(|c: /* Type */| 
+format!("{}={}", c.name(), c.value()))
+   |                            ++++++++++++
+
+Some errors have detailed explanations: E0282, 
+E0599.
+For more information about an error, try `rustc 
+--explain E0282`.
+error: could not compile `metasearch-engine` 
+(lib) due to 4 previous errors

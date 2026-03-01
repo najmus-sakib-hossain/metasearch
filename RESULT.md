@@ -36,7 +36,7 @@ $ cargo test -p metasearch-engine --test engine_probe -- --ignored --nocapture 2
    Compiling tower-http v0.6.8
    Compiling hyper-util v0.1.20
    Compiling hyper-rustls v0.27.7
-   Compiling reqwest v0.12.28
+   Compiling reqwest v0.12.28 
    Compiling metasearch-engine v0.1.0 (F:\metasearch\crates\metasearch-engine)
 warning: fields `port`, `username`, and `password` are never read
   --> crates\metasearch-engine\src\mariadb_engine.rs:40:5
