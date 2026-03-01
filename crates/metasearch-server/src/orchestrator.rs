@@ -142,6 +142,11 @@ impl SearchOrchestrator {
         let mut engines_used: Vec<String> = Vec::new();
         let mut engines_failed: Vec<String> = Vec::new();
 
+        // Early return thresholds for sub-second response
+        const MIN_ENGINES: usize = 5;  // Wait for at least 5 engines
+        const MIN_RESULTS: usize = 50; // Or 50 unique results
+        const MAX_WAIT_MS: u128 = 800; // But never wait more than 800ms
+
         while let Some(result) = futures.next().await {
             match result {
                 Some((engine_name, weight, results)) => {
@@ -165,6 +170,30 @@ impl SearchOrchestrator {
                     // (we can't get the name back here, so just count the failure)
                     engines_failed.push("unknown".to_string());
                 }
+            }
+
+            // Early return: stop waiting if we have enough results
+            let elapsed = start.elapsed().as_millis();
+            let have_enough = engines_used.len() >= MIN_ENGINES && url_map.len() >= MIN_RESULTS;
+            let timeout_reached = elapsed >= MAX_WAIT_MS;
+            
+            if have_enough || timeout_reached {
+                if have_enough {
+                    tracing::debug!(
+                        engines = engines_used.len(),
+                        results = url_map.len(),
+                        elapsed_ms = elapsed,
+                        "Early return: sufficient results"
+                    );
+                } else {
+                    tracing::debug!(
+                        engines = engines_used.len(),
+                        results = url_map.len(),
+                        elapsed_ms = elapsed,
+                        "Early return: timeout reached"
+                    );
+                }
+                break;
             }
         }
 

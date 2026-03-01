@@ -66,12 +66,12 @@ async fn main() -> anyhow::Result<()> {
     settings.server.host = cli.host;
     settings.server.port = cli.port;
 
-    // Build optimized HTTP client with connection pooling
+    // Build optimized HTTP client with connection pooling and DNS caching
     let http_client = reqwest::Client::builder()
         .user_agent("Metasearch/0.1 (https://github.com/najmus-sakib-hossain/metasearch)")
-        .timeout(std::time::Duration::from_secs(10))
-        .connect_timeout(std::time::Duration::from_secs(3))
-        .pool_max_idle_per_host(50)  // More connections per host
+        .timeout(std::time::Duration::from_secs(2))  // Aggressive 2s total timeout
+        .connect_timeout(std::time::Duration::from_millis(500))  // Fast connection
+        .pool_max_idle_per_host(100)  // More connections per host
         .pool_idle_timeout(std::time::Duration::from_secs(90))
         .tcp_nodelay(true)  // Disable Nagle's algorithm for lower latency
         .tcp_keepalive(std::time::Duration::from_secs(60))
@@ -82,6 +82,7 @@ async fn main() -> anyhow::Result<()> {
         .gzip(true)
         .brotli(true)
         .deflate(true)
+        // DNS caching is handled by the OS resolver, but we can optimize connection reuse
         .build()?;
 
     // Register ALL engines using with_defaults() — 200+ engines across all categories

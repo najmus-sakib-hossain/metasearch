@@ -53,12 +53,13 @@ impl EngineStats {
         self.last_failure = Some(Instant::now());
     }
 
-    /// Compute adaptive timeout: P95 latency × 1.5, clamped to [1 s, 10 s].
+    /// Compute adaptive timeout: P95 latency × 1.5, clamped to [500ms, 2s].
     /// Returns the configured static timeout when there is insufficient data.
     pub fn adaptive_timeout(&self, static_ms: u64) -> Duration {
         let count = self.cursor.min(100);
         if count < 5 {
-            return Duration::from_millis(static_ms);
+            // Use aggressive timeout for new engines
+            return Duration::from_millis(static_ms.min(1000));
         }
 
         let mut sorted = self.latencies[..count].to_vec();
@@ -67,7 +68,8 @@ impl EngineStats {
         let p95_ms = sorted[p95_idx] as u64;
         let timeout_ms = (p95_ms as f64 * 1.5) as u64;
 
-        Duration::from_millis(timeout_ms.clamp(1_000, 10_000))
+        // Aggressive clamping: 500ms to 2s (was 1s to 10s)
+        Duration::from_millis(timeout_ms.clamp(500, 2_000))
     }
 
     /// Recent failure rate over tracked requests.
