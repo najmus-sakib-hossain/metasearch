@@ -10,6 +10,7 @@ use metasearch_core::{
     result::SearchResult,
 };
 use reqwest::Client;
+use smallvec::smallvec;
 
 pub struct Reddit {
     metadata: EngineMetadata,
@@ -20,10 +21,10 @@ impl Reddit {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "reddit".to_string(),
-                display_name: "Reddit".to_string(),
-                homepage: "https://www.reddit.com".to_string(),
-                categories: vec![SearchCategory::SocialMedia],
+                name: "reddit".to_string().into(),
+                display_name: "Reddit".to_string().into(),
+                homepage: "https://www.reddit.com".to_string().into(),
+                categories: smallvec![SearchCategory::SocialMedia],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 1.0,

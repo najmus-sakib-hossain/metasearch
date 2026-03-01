@@ -17,6 +17,7 @@ use metasearch_core::{
 };
 use reqwest::Client;
 use tracing::info;
+use smallvec::smallvec;
 
 pub struct Arxiv {
     metadata: EngineMetadata,
@@ -27,10 +28,10 @@ impl Arxiv {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "arxiv".to_string(),
-                display_name: "arXiv".to_string(),
-                homepage: "https://arxiv.org".to_string(),
-                categories: vec![SearchCategory::Science],
+                name: "arxiv".to_string().into(),
+                display_name: "arXiv".to_string().into(),
+                homepage: "https://arxiv.org".to_string().into(),
+                categories: smallvec![SearchCategory::Science],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 1.1,

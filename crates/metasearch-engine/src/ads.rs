@@ -15,6 +15,7 @@ use metasearch_core::{
 use reqwest::Client;
 use serde::Deserialize;
 use tracing::info;
+use smallvec::smallvec;
 
 pub struct Ads {
     metadata: EngineMetadata,
@@ -26,10 +27,10 @@ impl Ads {
     pub fn new(client: Client, api_key: Option<String>) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "astrophysics_data_system".to_string(),
-                display_name: "NASA ADS".to_string(),
-                homepage: "https://ui.adsabs.harvard.edu/".to_string(),
-                categories: vec![SearchCategory::General],
+                name: "astrophysics_data_system".to_string().into(),
+                display_name: "NASA ADS".to_string().into(),
+                homepage: "https://ui.adsabs.harvard.edu/".to_string().into(),
+                categories: smallvec![SearchCategory::General],
                 enabled: true,
                 timeout_ms: 8000,
                 weight: 1.0,

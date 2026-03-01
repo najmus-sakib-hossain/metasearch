@@ -11,6 +11,7 @@ use metasearch_core::{
 };
 use reqwest::Client;
 use scraper::{Html, Selector};
+use smallvec::smallvec;
 
 const BASE_URL: &str = "https://www.ipernity.com";
 const PAGE_SIZE: u32 = 10;
@@ -24,10 +25,10 @@ impl Ipernity {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "ipernity".to_string(),
-                display_name: "Ipernity".to_string(),
-                homepage: "https://www.ipernity.com".to_string(),
-                categories: vec![SearchCategory::Images],
+                name: "ipernity".to_string().into(),
+                display_name: "Ipernity".to_string().into(),
+                homepage: "https://www.ipernity.com".to_string().into(),
+                categories: smallvec![SearchCategory::Images],
                 enabled: true,
                 timeout_ms: 6000,
                 weight: 1.0,

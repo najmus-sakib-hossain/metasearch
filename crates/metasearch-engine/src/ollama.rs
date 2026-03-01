@@ -14,6 +14,7 @@ use metasearch_core::{
 };
 use reqwest::Client;
 use tracing::info;
+use smallvec::smallvec;
 
 pub struct Ollama {
     metadata: EngineMetadata,
@@ -28,10 +29,10 @@ impl Ollama {
         let model = model.unwrap_or_else(|| "llama3".to_string());
         Self {
             metadata: EngineMetadata {
-                name: "ollama".to_string(),
-                display_name: "Ollama".to_string(),
-                homepage: "https://ollama.com".to_string(),
-                categories: vec![SearchCategory::General],
+                name: "ollama".to_string().into(),
+                display_name: "Ollama".to_string().into(),
+                homepage: "https://ollama.com".to_string().into(),
+                categories: smallvec![SearchCategory::General],
                 enabled: !base.is_empty(),
                 timeout_ms: 30000,
                 weight: 1.0,

@@ -15,6 +15,7 @@ use metasearch_core::{
 };
 use reqwest::Client;
 use scraper::{Html, Selector};
+use smallvec::smallvec;
 
 pub struct Sourcehut {
     metadata: EngineMetadata,
@@ -25,10 +26,10 @@ impl Sourcehut {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "sourcehut".to_string(),
-                display_name: "SourceHut".to_string(),
-                homepage: "https://sr.ht".to_string(),
-                categories: vec![SearchCategory::IT],
+                name: "sourcehut".to_string().into(),
+                display_name: "SourceHut".to_string().into(),
+                homepage: "https://sr.ht".to_string().into(),
+                categories: smallvec![SearchCategory::IT],
                 enabled: true,
                 timeout_ms: 8000,
                 weight: 0.6,

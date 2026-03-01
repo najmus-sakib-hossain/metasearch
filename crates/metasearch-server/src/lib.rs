@@ -4,7 +4,9 @@
 
 pub mod app;
 pub mod cache;
+pub mod health;
 pub mod middleware;
+pub mod orchestrator;
 pub mod routes;
 pub mod state;
 pub mod templates;

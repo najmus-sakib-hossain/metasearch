@@ -8,6 +8,7 @@
 use async_trait::async_trait;
 use reqwest::Client;
 use scraper::{Html, Selector};
+use smallvec::smallvec;
 
 use metasearch_core::{
     category::SearchCategory,
@@ -31,10 +32,10 @@ impl TokyoToshokan {
 impl SearchEngine for TokyoToshokan {
     fn metadata(&self) -> EngineMetadata {
         EngineMetadata {
-            name: "Tokyo Toshokan".to_string(),
-            display_name: "Tokyo Toshokan".to_string(),
-            homepage: "https://Tokyo Toshokan.com".to_string(),
-            categories: vec![SearchCategory::Files],
+            name: "Tokyo Toshokan".to_string().into(),
+            display_name: "Tokyo Toshokan".to_string().into(),
+            homepage: "https://Tokyo Toshokan.com".to_string().into(),
+            categories: smallvec![SearchCategory::Files],
             enabled: true,
             timeout_ms: 5000,
             weight: 1.0,

@@ -14,6 +14,7 @@ use metasearch_core::{
     result::SearchResult,
 };
 use reqwest::Client;
+use smallvec::smallvec;
 
 pub struct Reuters {
     metadata: EngineMetadata,
@@ -24,10 +25,10 @@ impl Reuters {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "reuters".to_string(),
-                display_name: "Reuters".to_string(),
-                homepage: "https://www.reuters.com".to_string(),
-                categories: vec![SearchCategory::News],
+                name: "reuters".to_string().into(),
+                display_name: "Reuters".to_string().into(),
+                homepage: "https://www.reuters.com".to_string().into(),
+                categories: smallvec![SearchCategory::News],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 1.0,

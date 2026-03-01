@@ -16,6 +16,7 @@ use metasearch_core::{
 use reqwest::Client;
 use scraper::{Html, Selector};
 use tracing::info;
+use smallvec::smallvec;
 
 pub struct AlpineLinux {
     metadata: EngineMetadata,
@@ -26,10 +27,10 @@ impl AlpineLinux {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "alpinelinux".to_string(),
-                display_name: "Alpine Linux Packages".to_string(),
-                homepage: "https://pkgs.alpinelinux.org".to_string(),
-                categories: vec![SearchCategory::IT],
+                name: "alpinelinux".to_string().into(),
+                display_name: "Alpine Linux Packages".to_string().into(),
+                homepage: "https://pkgs.alpinelinux.org".to_string().into(),
+                categories: smallvec![SearchCategory::IT],
                 enabled: true,
                 timeout_ms: 3000,
                 weight: 0.7,

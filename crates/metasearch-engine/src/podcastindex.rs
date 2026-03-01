@@ -10,6 +10,7 @@ use metasearch_core::{
 };
 use reqwest::Client;
 use serde::Deserialize;
+use smallvec::smallvec;
 
 pub struct PodcastIndex {
     metadata: EngineMetadata,
@@ -20,10 +21,10 @@ impl PodcastIndex {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "podcastindex".to_string(),
-                display_name: "Podcast Index".to_string(),
-                homepage: "https://podcastindex.org".to_string(),
-                categories: vec![SearchCategory::Music],
+                name: "podcastindex".to_string().into(),
+                display_name: "Podcast Index".to_string().into(),
+                homepage: "https://podcastindex.org".to_string().into(),
+                categories: smallvec![SearchCategory::Music],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 1.0,

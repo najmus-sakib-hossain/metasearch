@@ -12,6 +12,7 @@ use metasearch_core::{
 };
 use reqwest::Client;
 use scraper::{Html, Selector};
+use smallvec::smallvec;
 
 pub struct AnnasArchive {
     metadata: EngineMetadata,
@@ -22,10 +23,10 @@ impl AnnasArchive {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "annas_archive".to_string(),
-                display_name: "Anna's Archive".to_string(),
-                homepage: "https://annas-archive.li".to_string(),
-                categories: vec![SearchCategory::Files],
+                name: "annas_archive".to_string().into(),
+                display_name: "Anna's Archive".to_string().into(),
+                homepage: "https://annas-archive.li".to_string().into(),
+                categories: smallvec![SearchCategory::Files],
                 enabled: true,
                 timeout_ms: 6000,
                 weight: 1.0,

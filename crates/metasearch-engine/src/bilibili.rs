@@ -16,6 +16,7 @@ use metasearch_core::{
 use reqwest::Client;
 use serde::Deserialize;
 use tracing::info;
+use smallvec::smallvec;
 
 pub struct Bilibili {
     metadata: EngineMetadata,
@@ -26,10 +27,10 @@ impl Bilibili {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "bilibili".to_string(),
-                display_name: "Bilibili".to_string(),
-                homepage: "https://www.bilibili.com".to_string(),
-                categories: vec![SearchCategory::Videos],
+                name: "bilibili".to_string().into(),
+                display_name: "Bilibili".to_string().into(),
+                homepage: "https://www.bilibili.com".to_string().into(),
+                categories: smallvec![SearchCategory::Videos],
                 enabled: true,
                 timeout_ms: 4000,
                 weight: 0.9,

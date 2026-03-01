@@ -10,6 +10,7 @@ use metasearch_core::{
 };
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
+use smallvec::smallvec;
 
 pub struct Stract {
     metadata: EngineMetadata,
@@ -20,10 +21,10 @@ impl Stract {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "stract".to_string(),
-                display_name: "Stract".to_string(),
-                homepage: "https://stract.com".to_string(),
-                categories: vec![SearchCategory::General],
+                name: "stract".to_string().into(),
+                display_name: "Stract".to_string().into(),
+                homepage: "https://stract.com".to_string().into(),
+                categories: smallvec![SearchCategory::General],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 1.0,

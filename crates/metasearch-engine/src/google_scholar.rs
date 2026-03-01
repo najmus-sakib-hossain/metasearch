@@ -15,6 +15,7 @@ use metasearch_core::{
 use reqwest::Client;
 use scraper::{Html, Selector};
 use tracing::{info, warn};
+use smallvec::smallvec;
 
 pub struct GoogleScholar {
     metadata: EngineMetadata,
@@ -25,10 +26,10 @@ impl GoogleScholar {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "google_scholar".to_string(),
-                display_name: "Google Scholar".to_string(),
-                homepage: "https://scholar.google.com".to_string(),
-                categories: vec![SearchCategory::General],
+                name: "google_scholar".to_string().into(),
+                display_name: "Google Scholar".to_string().into(),
+                homepage: "https://scholar.google.com".to_string().into(),
+                categories: smallvec![SearchCategory::General],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 1.0,

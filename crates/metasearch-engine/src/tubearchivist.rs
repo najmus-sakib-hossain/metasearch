@@ -13,6 +13,7 @@ use metasearch_core::{
     result::SearchResult,
 };
 use reqwest::Client;
+use smallvec::smallvec;
 
 pub struct TubeArchivist {
     metadata: EngineMetadata,
@@ -27,10 +28,10 @@ impl TubeArchivist {
         let enabled = !base.is_empty() && token.is_some();
         Self {
             metadata: EngineMetadata {
-                name: "tubearchivist".to_string(),
-                display_name: "TubeArchivist".to_string(),
-                homepage: "https://www.tubearchivist.com".to_string(),
-                categories: vec![SearchCategory::Videos],
+                name: "tubearchivist".to_string().into(),
+                display_name: "TubeArchivist".to_string().into(),
+                homepage: "https://www.tubearchivist.com".to_string().into(),
+                categories: smallvec![SearchCategory::Videos],
                 enabled,
                 timeout_ms: 5000,
                 weight: 0.8,

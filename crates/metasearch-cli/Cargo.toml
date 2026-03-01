@@ -20,3 +20,6 @@ tracing-subscriber.workspace = true
 anyhow.workspace = true
 serde_json.workspace = true
 reqwest.workspace = true
+
+# Performance - mimalloc allocator (2-6x faster than system allocator, critical for musl)
+mimalloc.workspace = true

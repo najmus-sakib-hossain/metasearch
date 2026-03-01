@@ -10,6 +10,7 @@ use metasearch_core::{
 };
 use reqwest::Client;
 use serde_json::Value;
+use smallvec::smallvec;
 
 pub struct Pinterest {
     metadata: EngineMetadata,
@@ -20,10 +21,10 @@ impl Pinterest {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "pinterest".to_string(),
-                display_name: "Pinterest".to_string(),
-                homepage: "https://www.pinterest.com".to_string(),
-                categories: vec![SearchCategory::Images],
+                name: "pinterest".to_string().into(),
+                display_name: "Pinterest".to_string().into(),
+                homepage: "https://www.pinterest.com".to_string().into(),
+                categories: smallvec![SearchCategory::Images],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 1.0,

@@ -11,6 +11,7 @@ use metasearch_core::{
 };
 use reqwest::Client;
 use scraper::{Html, Selector};
+use smallvec::smallvec;
 
 const BASE_URL: &str = "https://www.ina.fr";
 const PAGE_SIZE: u32 = 12;
@@ -24,10 +25,10 @@ impl Ina {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "ina".to_string(),
-                display_name: "INA".to_string(),
-                homepage: "https://www.ina.fr".to_string(),
-                categories: vec![SearchCategory::Videos],
+                name: "ina".to_string().into(),
+                display_name: "INA".to_string().into(),
+                homepage: "https://www.ina.fr".to_string().into(),
+                categories: smallvec![SearchCategory::Videos],
                 enabled: true,
                 timeout_ms: 6000,
                 weight: 1.0,

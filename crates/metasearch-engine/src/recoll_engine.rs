@@ -8,6 +8,7 @@
 use async_trait::async_trait;
 use reqwest::Client;
 use serde::Deserialize;
+use smallvec::smallvec;
 
 use metasearch_core::{
     category::SearchCategory,
@@ -55,10 +56,10 @@ struct RecollResult {
 impl SearchEngine for RecollEngine {
     fn metadata(&self) -> EngineMetadata {
         EngineMetadata {
-            name: "recoll".to_string(),
-            display_name: "Recoll".to_string(),
-            homepage: "https://www.recoll.org".to_string(),
-            categories: vec![SearchCategory::General],
+            name: "recoll".to_string().into(),
+            display_name: "Recoll".to_string().into(),
+            homepage: "https://www.recoll.org".to_string().into(),
+            categories: smallvec![SearchCategory::General],
             enabled: !self.base_url.is_empty(),
             timeout_ms: 5000,
             weight: 0.8,

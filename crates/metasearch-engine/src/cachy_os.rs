@@ -12,6 +12,7 @@ use metasearch_core::{
 };
 use reqwest::Client;
 use serde::Deserialize;
+use smallvec::smallvec;
 
 pub struct CachyOs {
     metadata: EngineMetadata,
@@ -22,10 +23,10 @@ impl CachyOs {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "cachy_os".to_string(),
-                display_name: "CachyOS".to_string(),
-                homepage: "https://packages.cachyos.org".to_string(),
-                categories: vec![SearchCategory::IT],
+                name: "cachy_os".to_string().into(),
+                display_name: "CachyOS".to_string().into(),
+                homepage: "https://packages.cachyos.org".to_string().into(),
+                categories: smallvec![SearchCategory::IT],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 0.6,

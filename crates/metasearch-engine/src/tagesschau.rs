@@ -10,6 +10,7 @@ use metasearch_core::{
 };
 use reqwest::Client;
 use serde::Deserialize;
+use smallvec::smallvec;
 
 pub struct Tagesschau {
     metadata: EngineMetadata,
@@ -20,10 +21,10 @@ impl Tagesschau {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "tagesschau".to_string(),
-                display_name: "Tagesschau".to_string(),
-                homepage: "https://www.tagesschau.de".to_string(),
-                categories: vec![SearchCategory::News],
+                name: "tagesschau".to_string().into(),
+                display_name: "Tagesschau".to_string().into(),
+                homepage: "https://www.tagesschau.de".to_string().into(),
+                categories: smallvec![SearchCategory::News],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 1.0,

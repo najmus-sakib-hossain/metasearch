@@ -14,6 +14,7 @@ use metasearch_core::{
 };
 use reqwest::Client;
 use scraper::{Html, Selector};
+use smallvec::smallvec;
 
 pub struct DeviantArt {
     metadata: EngineMetadata,
@@ -24,10 +25,10 @@ impl DeviantArt {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "deviantart".to_string(),
-                display_name: "DeviantArt".to_string(),
-                homepage: "https://www.deviantart.com".to_string(),
-                categories: vec![SearchCategory::Images],
+                name: "deviantart".to_string().into(),
+                display_name: "DeviantArt".to_string().into(),
+                homepage: "https://www.deviantart.com".to_string().into(),
+                categories: smallvec![SearchCategory::Images],
                 enabled: true,
                 timeout_ms: 8000,
                 weight: 0.7,

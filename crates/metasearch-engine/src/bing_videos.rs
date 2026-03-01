@@ -10,6 +10,7 @@ use metasearch_core::{
     result::SearchResult,
 };
 use reqwest::Client;
+use smallvec::smallvec;
 
 pub struct BingVideos {
     metadata: EngineMetadata,
@@ -20,10 +21,10 @@ impl BingVideos {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "bing_videos".to_string(),
-                display_name: "Bing Videos".to_string(),
-                homepage: "https://www.bing.com/videos".to_string(),
-                categories: vec![SearchCategory::Videos],
+                name: "bing_videos".to_string().into(),
+                display_name: "Bing Videos".to_string().into(),
+                homepage: "https://www.bing.com/videos".to_string().into(),
+                categories: smallvec![SearchCategory::Videos],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 1.0,

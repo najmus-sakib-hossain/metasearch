@@ -9,6 +9,7 @@ use metasearch_core::{
     result::SearchResult,
 };
 use reqwest::Client;
+use smallvec::smallvec;
 
 pub struct SteamStore {
     metadata: EngineMetadata,
@@ -19,10 +20,10 @@ impl SteamStore {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "steam".to_string(),
-                display_name: "Steam".to_string(),
-                homepage: "https://store.steampowered.com".to_string(),
-                categories: vec![SearchCategory::General],
+                name: "steam".to_string().into(),
+                display_name: "Steam".to_string().into(),
+                homepage: "https://store.steampowered.com".to_string().into(),
+                categories: smallvec![SearchCategory::General],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 1.0,

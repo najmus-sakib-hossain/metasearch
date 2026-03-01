@@ -12,6 +12,7 @@ use metasearch_core::{
     result::SearchResult,
 };
 use reqwest::Client;
+use smallvec::smallvec;
 
 pub struct GitLab {
     metadata: EngineMetadata,
@@ -23,10 +24,10 @@ impl GitLab {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "gitlab".to_string(),
-                display_name: "GitLab".to_string(),
-                homepage: "https://gitlab.com".to_string(),
-                categories: vec![SearchCategory::IT],
+                name: "gitlab".to_string().into(),
+                display_name: "GitLab".to_string().into(),
+                homepage: "https://gitlab.com".to_string().into(),
+                categories: smallvec![SearchCategory::IT],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 0.8,
@@ -39,10 +40,10 @@ impl GitLab {
     pub fn with_base_url(client: Client, base_url: &str) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "gitlab".to_string(),
-                display_name: "GitLab".to_string(),
-                homepage: base_url.to_string(),
-                categories: vec![SearchCategory::IT],
+                name: "gitlab".to_string().into(),
+                display_name: "GitLab".to_string().into(),
+                homepage: base_url.to_string().into(),
+                categories: smallvec![SearchCategory::IT],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 0.8,

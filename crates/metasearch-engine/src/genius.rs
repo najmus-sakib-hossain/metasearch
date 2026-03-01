@@ -10,6 +10,7 @@ use metasearch_core::{
     result::SearchResult,
 };
 use reqwest::Client;
+use smallvec::smallvec;
 
 const PAGE_SIZE: u32 = 5;
 
@@ -22,10 +23,10 @@ impl Genius {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "genius".to_string(),
-                display_name: "Genius".to_string(),
-                homepage: "https://genius.com".to_string(),
-                categories: vec![SearchCategory::Music],
+                name: "genius".to_string().into(),
+                display_name: "Genius".to_string().into(),
+                homepage: "https://genius.com".to_string().into(),
+                categories: smallvec![SearchCategory::Music],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 1.0,

@@ -14,6 +14,7 @@ use metasearch_core::{
 };
 use reqwest::Client;
 use scraper::{Html, Selector};
+use smallvec::smallvec;
 
 pub struct LibRs {
     metadata: EngineMetadata,
@@ -24,10 +25,10 @@ impl LibRs {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "lib_rs".to_string(),
-                display_name: "lib.rs".to_string(),
-                homepage: "https://lib.rs".to_string(),
-                categories: vec![SearchCategory::IT],
+                name: "lib_rs".to_string().into(),
+                display_name: "lib.rs".to_string().into(),
+                homepage: "https://lib.rs".to_string().into(),
+                categories: smallvec![SearchCategory::IT],
                 enabled: true,
                 timeout_ms: 8000,
                 weight: 0.7,

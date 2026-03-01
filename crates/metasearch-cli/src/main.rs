@@ -1,5 +1,10 @@
 //! Metasearch CLI — entry point for the application.
 
+// mimalloc: 2-6x faster than system allocator, critical on musl targets.
+// Works on all platforms (Windows, Linux, macOS, Alpine/musl).
+#[global_allocator]
+static GLOBAL: mimalloc::MiMalloc = mimalloc::MiMalloc;
+
 use std::sync::Arc;
 
 use clap::{Parser, Subcommand};
@@ -7,7 +12,14 @@ use tracing_subscriber::EnvFilter;
 
 use metasearch_core::config::Settings;
 use metasearch_engine::EngineRegistry;
-use metasearch_server::{app, cache::SearchCache, state::AppState, templates::Templates};
+use metasearch_server::{
+    app,
+    cache::SearchCache,
+    health::EngineHealthTracker,
+    orchestrator::SearchOrchestrator,
+    state::AppState,
+    templates::Templates,
+};
 
 #[derive(Parser)]
 #[command(name = "metasearch")]
@@ -54,24 +66,49 @@ async fn main() -> anyhow::Result<()> {
     settings.server.host = cli.host;
     settings.server.port = cli.port;
 
-    // Build HTTP client shared across engines
+    // Build optimized HTTP client with connection pooling
     let http_client = reqwest::Client::builder()
         .user_agent("Metasearch/0.1 (https://github.com/najmus-sakib-hossain/metasearch)")
         .timeout(std::time::Duration::from_secs(10))
-        .connect_timeout(std::time::Duration::from_secs(5))
+        .connect_timeout(std::time::Duration::from_secs(3))
+        .pool_max_idle_per_host(50)  // More connections per host
+        .pool_idle_timeout(std::time::Duration::from_secs(90))
+        .tcp_nodelay(true)  // Disable Nagle's algorithm for lower latency
+        .tcp_keepalive(std::time::Duration::from_secs(60))
+        .http2_adaptive_window(true)  // Better HTTP/2 performance
+        .http2_keep_alive_interval(std::time::Duration::from_secs(30))
+        .http2_keep_alive_timeout(std::time::Duration::from_secs(10))
+        .http2_keep_alive_while_idle(true)
+        .gzip(true)
+        .brotli(true)
+        .deflate(true)
         .build()?;
 
     // Register ALL engines using with_defaults() — 200+ engines across all categories
     let registry = EngineRegistry::with_defaults(http_client);
     let engine_count = registry.count();
+    let registry = Arc::new(registry);
 
     // Load templates
     let templates = Templates::new(&cli.templates)?;
 
+    // Build the performance stack
+    let cache = SearchCache::new(settings.cache.max_entries, settings.cache.ttl_secs);
+    let health = Arc::new(EngineHealthTracker::new());
+    let max_engines = settings.search.max_concurrent_engines;
+    let orchestrator = Arc::new(SearchOrchestrator::new(
+        Arc::clone(&registry),
+        cache.clone(),
+        Arc::clone(&health),
+        max_engines,
+    ));
+
     let state = Arc::new(AppState {
-        cache: SearchCache::new(settings.cache.max_entries, settings.cache.ttl_secs),
-        engine_registry: Arc::new(registry),
+        cache,
+        engine_registry: registry,
         templates: Arc::new(templates),
+        orchestrator,
+        health,
         settings,
     });
 

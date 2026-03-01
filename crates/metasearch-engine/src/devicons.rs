@@ -10,6 +10,7 @@ use metasearch_core::{
     result::SearchResult,
 };
 use reqwest::Client;
+use smallvec::smallvec;
 
 const CDN_BASE: &str = "https://cdn.jsdelivr.net/gh/devicons/devicon@latest";
 
@@ -22,10 +23,10 @@ impl Devicons {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "devicons".to_string(),
-                display_name: "Devicons".to_string(),
-                homepage: "https://devicon.dev".to_string(),
-                categories: vec![SearchCategory::Images],
+                name: "devicons".to_string().into(),
+                display_name: "Devicons".to_string().into(),
+                homepage: "https://devicon.dev".to_string().into(),
+                categories: smallvec![SearchCategory::Images],
                 enabled: true,
                 timeout_ms: 8000,
                 weight: 1.0,

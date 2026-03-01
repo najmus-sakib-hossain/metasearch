@@ -6,6 +6,7 @@ use async_trait::async_trait;
 use regex::Regex;
 use reqwest::Client;
 use scraper::{Html, Selector};
+use smallvec::smallvec;
 
 use metasearch_core::{
     category::SearchCategory,
@@ -24,10 +25,10 @@ impl Www1x {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "www1x".to_string(),
-                display_name: "1x".to_string(),
-                homepage: "https://1x.com".to_string(),
-                categories: vec![SearchCategory::Images],
+                name: "www1x".to_string().into(),
+                display_name: "1x".to_string().into(),
+                homepage: "https://1x.com".to_string().into(),
+                categories: smallvec![SearchCategory::Images],
                 enabled: true,
                 timeout_ms: 8000,
                 weight: 0.7,

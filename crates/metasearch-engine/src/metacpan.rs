@@ -13,6 +13,7 @@ use metasearch_core::{
 use reqwest::Client;
 use serde::Deserialize;
 use serde_json::json;
+use smallvec::smallvec;
 
 pub struct MetaCpan {
     metadata: EngineMetadata,
@@ -23,10 +24,10 @@ impl MetaCpan {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "metacpan".to_string(),
-                display_name: "MetaCPAN".to_string(),
-                homepage: "https://metacpan.org".to_string(),
-                categories: vec![SearchCategory::IT],
+                name: "metacpan".to_string().into(),
+                display_name: "MetaCPAN".to_string().into(),
+                homepage: "https://metacpan.org".to_string().into(),
+                categories: smallvec![SearchCategory::IT],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 1.0,

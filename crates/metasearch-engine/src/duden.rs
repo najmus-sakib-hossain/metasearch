@@ -12,6 +12,7 @@ use metasearch_core::{
 };
 use reqwest::Client;
 use scraper::{Html, Selector};
+use smallvec::smallvec;
 
 pub struct Duden {
     metadata: EngineMetadata,
@@ -22,10 +23,10 @@ impl Duden {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "duden".to_string(),
-                display_name: "Duden".to_string(),
-                homepage: "https://www.duden.de".to_string(),
-                categories: vec![SearchCategory::General],
+                name: "duden".to_string().into(),
+                display_name: "Duden".to_string().into(),
+                homepage: "https://www.duden.de".to_string().into(),
+                categories: smallvec![SearchCategory::General],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 1.0,

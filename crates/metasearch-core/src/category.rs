@@ -3,7 +3,7 @@
 use serde::{Deserialize, Serialize};
 
 /// Categories of search supported by the metasearch engine.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum SearchCategory {
     General,

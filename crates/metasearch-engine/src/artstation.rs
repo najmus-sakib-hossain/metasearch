@@ -14,6 +14,7 @@ use metasearch_core::{
 };
 use regex::Regex;
 use reqwest::Client;
+use smallvec::smallvec;
 
 pub struct ArtStation {
     metadata: EngineMetadata,
@@ -24,10 +25,10 @@ impl ArtStation {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "artstation".to_string(),
-                display_name: "ArtStation".to_string(),
-                homepage: "https://www.artstation.com".to_string(),
-                categories: vec![SearchCategory::Images],
+                name: "artstation".to_string().into(),
+                display_name: "ArtStation".to_string().into(),
+                homepage: "https://www.artstation.com".to_string().into(),
+                categories: smallvec![SearchCategory::Images],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 0.8,

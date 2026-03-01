@@ -16,6 +16,7 @@ use metasearch_core::{
 use reqwest::Client;
 // Removed unused imports - using regex and JSON parsing instead
 use tracing::info;
+use smallvec::smallvec;
 
 pub struct Ask {
     metadata: EngineMetadata,
@@ -26,10 +27,10 @@ impl Ask {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "ask".to_string(),
-                display_name: "Ask.com".to_string(),
-                homepage: "https://www.ask.com".to_string(),
-                categories: vec![SearchCategory::General],
+                name: "ask".to_string().into(),
+                display_name: "Ask.com".to_string().into(),
+                homepage: "https://www.ask.com".to_string().into(),
+                categories: smallvec![SearchCategory::General],
                 enabled: true,
                 timeout_ms: 4000,
                 weight: 0.8,

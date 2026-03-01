@@ -14,6 +14,7 @@ use metasearch_core::{
 };
 use reqwest::Client;
 use tracing::info;
+use smallvec::smallvec;
 
 pub struct YandexMusic {
     metadata: EngineMetadata,
@@ -24,10 +25,10 @@ impl YandexMusic {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "yandex_music".to_string(),
-                display_name: "Yandex Music".to_string(),
-                homepage: "https://music.yandex.ru".to_string(),
-                categories: vec![SearchCategory::Music],
+                name: "yandex_music".to_string().into(),
+                display_name: "Yandex Music".to_string().into(),
+                homepage: "https://music.yandex.ru".to_string().into(),
+                categories: smallvec![SearchCategory::Music],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 1.0,

@@ -13,6 +13,7 @@ use metasearch_core::{
     result::SearchResult,
 };
 use reqwest::Client;
+use smallvec::smallvec;
 
 const SCANR_BASE: &str = "https://scanr.enseignementsup-recherche.gouv.fr";
 
@@ -25,10 +26,10 @@ impl ScanrStructures {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "scanr_structures".to_string(),
-                display_name: "ScanR Structures".to_string(),
-                homepage: SCANR_BASE.to_string(),
-                categories: vec![SearchCategory::Science],
+                name: "scanr_structures".to_string().into(),
+                display_name: "ScanR Structures".to_string().into(),
+                homepage: SCANR_BASE.to_string().into(),
+                categories: smallvec![SearchCategory::Science],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 0.8,

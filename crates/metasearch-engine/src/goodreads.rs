@@ -11,6 +11,7 @@ use metasearch_core::{
 };
 use reqwest::Client;
 use scraper::{Html, Selector};
+use smallvec::smallvec;
 
 pub struct Goodreads {
     metadata: EngineMetadata,
@@ -21,10 +22,10 @@ impl Goodreads {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "goodreads".to_string(),
-                display_name: "Goodreads".to_string(),
-                homepage: "https://www.goodreads.com".to_string(),
-                categories: vec![SearchCategory::General],
+                name: "goodreads".to_string().into(),
+                display_name: "Goodreads".to_string().into(),
+                homepage: "https://www.goodreads.com".to_string().into(),
+                categories: smallvec![SearchCategory::General],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 0.8,

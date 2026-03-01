@@ -9,6 +9,7 @@ use metasearch_core::{
     result::SearchResult,
 };
 use reqwest::Client;
+use smallvec::smallvec;
 
 pub struct Selfhst {
     metadata: EngineMetadata,
@@ -19,10 +20,10 @@ impl Selfhst {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "selfhst".to_string(),
-                display_name: "Selfh.st Icons".to_string(),
-                homepage: "https://selfh.st/icons/".to_string(),
-                categories: vec![SearchCategory::Images],
+                name: "selfhst".to_string().into(),
+                display_name: "Selfh.st Icons".to_string().into(),
+                homepage: "https://selfh.st/icons/".to_string().into(),
+                categories: smallvec![SearchCategory::Images],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 1.0,

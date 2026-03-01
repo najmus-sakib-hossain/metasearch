@@ -11,6 +11,7 @@ use metasearch_core::{
     result::SearchResult,
 };
 use reqwest::Client;
+use smallvec::smallvec;
 
 pub struct Gitea {
     metadata: EngineMetadata,
@@ -21,10 +22,10 @@ impl Gitea {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "gitea".to_string(),
-                display_name: "Gitea".to_string(),
-                homepage: "https://gitea.com".to_string(),
-                categories: vec![SearchCategory::IT],
+                name: "gitea".to_string().into(),
+                display_name: "Gitea".to_string().into(),
+                homepage: "https://gitea.com".to_string().into(),
+                categories: smallvec![SearchCategory::IT],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 1.0,

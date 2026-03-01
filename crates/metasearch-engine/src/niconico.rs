@@ -15,6 +15,7 @@ use metasearch_core::{
 };
 use reqwest::Client;
 use tracing::info;
+use smallvec::smallvec;
 
 pub struct Niconico {
     metadata: EngineMetadata,
@@ -25,10 +26,10 @@ impl Niconico {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "niconico".to_string(),
-                display_name: "Niconico".to_string(),
-                homepage: "https://www.nicovideo.jp".to_string(),
-                categories: vec![SearchCategory::Videos],
+                name: "niconico".to_string().into(),
+                display_name: "Niconico".to_string().into(),
+                homepage: "https://www.nicovideo.jp".to_string().into(),
+                categories: smallvec![SearchCategory::Videos],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 1.0,

@@ -4,6 +4,7 @@
 
 use async_trait::async_trait;
 use reqwest::Client;
+use smallvec::smallvec;
 
 use metasearch_core::{
     category::SearchCategory,
@@ -26,10 +27,10 @@ impl SensCritique {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "senscritique".to_string(),
-                display_name: "SensCritique".to_string(),
-                homepage: "https://www.senscritique.com".to_string(),
-                categories: vec![SearchCategory::General],
+                name: "senscritique".to_string().into(),
+                display_name: "SensCritique".to_string().into(),
+                homepage: "https://www.senscritique.com".to_string().into(),
+                categories: smallvec![SearchCategory::General],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 1.0,

@@ -11,6 +11,7 @@ use metasearch_core::{
 };
 use reqwest::Client;
 use scraper::{Html, Selector};
+use smallvec::smallvec;
 
 pub struct LeetX {
     metadata: EngineMetadata,
@@ -21,10 +22,10 @@ impl LeetX {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "1337x".to_string(),
-                display_name: "1337x".to_string(),
-                homepage: "https://1337x.to".to_string(),
-                categories: vec![SearchCategory::Files],
+                name: "1337x".to_string().into(),
+                display_name: "1337x".to_string().into(),
+                homepage: "https://1337x.to".to_string().into(),
+                categories: smallvec![SearchCategory::Files],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 0.7,

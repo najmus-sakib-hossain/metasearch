@@ -9,6 +9,7 @@ use metasearch_core::{
     result::SearchResult,
 };
 use reqwest::Client;
+use smallvec::smallvec;
 
 const PAGE_SIZE: u32 = 10;
 
@@ -21,10 +22,10 @@ impl MicrosoftLearn {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "microsoft_learn".to_string(),
-                display_name: "Microsoft Learn".to_string(),
-                homepage: "https://learn.microsoft.com".to_string(),
-                categories: vec![SearchCategory::IT],
+                name: "microsoft_learn".to_string().into(),
+                display_name: "Microsoft Learn".to_string().into(),
+                homepage: "https://learn.microsoft.com".to_string().into(),
+                categories: smallvec![SearchCategory::IT],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 1.0,

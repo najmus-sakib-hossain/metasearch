@@ -7,6 +7,7 @@
 
 use async_trait::async_trait;
 use reqwest::Client;
+use smallvec::smallvec;
 
 use metasearch_core::{
     category::SearchCategory,
@@ -52,10 +53,10 @@ fn condition_label(code: &str) -> &str {
 impl SearchEngine for DuckDuckGoWeather {
     fn metadata(&self) -> EngineMetadata {
         EngineMetadata {
-            name: "DuckDuckGoWeather".to_string(),
-            display_name: "DuckDuckGoWeather".to_string(),
-            homepage: "https://duckduckgo.com".to_string(),
-            categories: vec![SearchCategory::General],
+            name: "DuckDuckGoWeather".to_string().into(),
+            display_name: "DuckDuckGoWeather".to_string().into(),
+            homepage: "https://duckduckgo.com".to_string().into(),
+            categories: smallvec![SearchCategory::General],
             enabled: true,
             timeout_ms: 5000,
             weight: 1.0,

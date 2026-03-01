@@ -9,6 +9,7 @@ use metasearch_core::{
     result::SearchResult,
 };
 use reqwest::Client;
+use smallvec::smallvec;
 
 pub struct SearchcodeCode {
     metadata: EngineMetadata,
@@ -19,10 +20,10 @@ impl SearchcodeCode {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "searchcode_code".to_string(),
-                display_name: "Searchcode".to_string(),
-                homepage: "https://searchcode.com".to_string(),
-                categories: vec![SearchCategory::IT],
+                name: "searchcode_code".to_string().into(),
+                display_name: "Searchcode".to_string().into(),
+                homepage: "https://searchcode.com".to_string().into(),
+                categories: smallvec![SearchCategory::IT],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 1.0,

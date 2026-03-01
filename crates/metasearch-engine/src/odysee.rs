@@ -12,6 +12,7 @@ use metasearch_core::{
 };
 use reqwest::Client;
 use serde::Deserialize;
+use smallvec::smallvec;
 
 pub struct Odysee {
     metadata: EngineMetadata,
@@ -22,10 +23,10 @@ impl Odysee {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "odysee".to_string(),
-                display_name: "Odysee".to_string(),
-                homepage: "https://odysee.com".to_string(),
-                categories: vec![SearchCategory::Videos],
+                name: "odysee".to_string().into(),
+                display_name: "Odysee".to_string().into(),
+                homepage: "https://odysee.com".to_string().into(),
+                categories: smallvec![SearchCategory::Videos],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 1.0,

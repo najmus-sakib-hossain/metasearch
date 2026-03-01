@@ -9,6 +9,7 @@ use async_trait::async_trait;
 use reqwest::Client;
 use std::sync::Mutex;
 use std::time::{SystemTime, UNIX_EPOCH};
+use smallvec::smallvec;
 
 use metasearch_core::{
     category::SearchCategory,
@@ -108,10 +109,10 @@ impl AppleMaps {
 impl SearchEngine for AppleMaps {
     fn metadata(&self) -> EngineMetadata {
         EngineMetadata {
-            name: "AppleMaps".to_string(),
-            display_name: "AppleMaps".to_string(),
-            homepage: "https://www.apple.com/maps/".to_string(),
-            categories: vec![SearchCategory::Maps],
+            name: "AppleMaps".to_string().into(),
+            display_name: "AppleMaps".to_string().into(),
+            homepage: "https://www.apple.com/maps/".to_string().into(),
+            categories: smallvec![SearchCategory::Maps],
             enabled: true,
             timeout_ms: 5000,
             weight: 1.0,

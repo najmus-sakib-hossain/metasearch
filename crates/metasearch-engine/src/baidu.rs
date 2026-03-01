@@ -16,6 +16,7 @@ use metasearch_core::{
 use reqwest::Client;
 use serde::Deserialize;
 use tracing::{info, warn};
+use smallvec::smallvec;
 
 pub struct Baidu {
     metadata: EngineMetadata,
@@ -26,10 +27,10 @@ impl Baidu {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "baidu".to_string(),
-                display_name: "Baidu".to_string(),
-                homepage: "https://www.baidu.com".to_string(),
-                categories: vec![SearchCategory::General],
+                name: "baidu".to_string().into(),
+                display_name: "Baidu".to_string().into(),
+                homepage: "https://www.baidu.com".to_string().into(),
+                categories: smallvec![SearchCategory::General],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 1.0,

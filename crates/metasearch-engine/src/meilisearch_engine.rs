@@ -7,6 +7,7 @@
 use async_trait::async_trait;
 use reqwest::Client;
 use serde_json::Value;
+use smallvec::smallvec;
 
 use metasearch_core::{
     category::SearchCategory,
@@ -38,10 +39,10 @@ impl MeilisearchEngine {
 impl SearchEngine for MeilisearchEngine {
     fn metadata(&self) -> EngineMetadata {
         EngineMetadata {
-            name: "MeiliSearch".to_string(),
-            display_name: "MeiliSearch".to_string(),
-            homepage: "https://www.meilisearch.com".to_string(),
-            categories: vec![SearchCategory::General],
+            name: "MeiliSearch".to_string().into(),
+            display_name: "MeiliSearch".to_string().into(),
+            homepage: "https://www.meilisearch.com".to_string().into(),
+            categories: smallvec![SearchCategory::General],
             enabled: !self.base_url.is_empty() && !self.index.is_empty(),
             timeout_ms: 5000,
             weight: 1.0,

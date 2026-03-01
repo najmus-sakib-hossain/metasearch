@@ -17,6 +17,7 @@ use metasearch_core::{
 use reqwest::Client;
 use serde::Deserialize;
 use tracing::info;
+use smallvec::smallvec;
 
 pub struct AppleAppStore {
     metadata: EngineMetadata,
@@ -27,10 +28,10 @@ impl AppleAppStore {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "apple_app_store".to_string(),
-                display_name: "Apple App Store".to_string(),
-                homepage: "https://www.apple.com/app-store/".to_string(),
-                categories: vec![SearchCategory::Files, SearchCategory::IT],
+                name: "apple_app_store".to_string().into(),
+                display_name: "Apple App Store".to_string().into(),
+                homepage: "https://www.apple.com/app-store/".to_string().into(),
+                categories: smallvec![SearchCategory::Files, SearchCategory::IT],
                 enabled: true,
                 timeout_ms: 3000,
                 weight: 0.9,

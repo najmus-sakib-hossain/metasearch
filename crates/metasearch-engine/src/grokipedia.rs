@@ -12,6 +12,7 @@ use metasearch_core::{
 };
 use reqwest::Client;
 use serde::Deserialize;
+use smallvec::smallvec;
 
 pub struct Grokipedia {
     metadata: EngineMetadata,
@@ -22,10 +23,10 @@ impl Grokipedia {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "grokipedia".to_string(),
-                display_name: "Grokipedia".to_string(),
-                homepage: "https://grokipedia.com".to_string(),
-                categories: vec![SearchCategory::General],
+                name: "grokipedia".to_string().into(),
+                display_name: "Grokipedia".to_string().into(),
+                homepage: "https://grokipedia.com".to_string().into(),
+                categories: smallvec![SearchCategory::General],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 1.0,

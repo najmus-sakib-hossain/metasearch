@@ -14,6 +14,7 @@ use metasearch_core::{
 };
 use reqwest::Client;
 use tracing::info;
+use smallvec::smallvec;
 
 pub struct GithubCode {
     metadata: EngineMetadata,
@@ -25,10 +26,10 @@ impl GithubCode {
     pub fn new(client: Client, token: Option<String>) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "github_code".to_string(),
-                display_name: "GitHub Code".to_string(),
-                homepage: "https://github.com".to_string(),
-                categories: vec![SearchCategory::IT],
+                name: "github_code".to_string().into(),
+                display_name: "GitHub Code".to_string().into(),
+                homepage: "https://github.com".to_string().into(),
+                categories: smallvec![SearchCategory::IT],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 1.0,

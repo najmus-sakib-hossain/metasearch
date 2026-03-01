@@ -141,7 +141,7 @@ async fn test_all_engines_parallel() {
             } else {
                 "Other"
             };
-            error_types.entry(err_type.to_string()).or_insert_with(Vec::new).push(name.clone());
+            error_types.entry(err_type.to_string()).or_default().push(name.clone());
         }
         
         for (err_type, engines) in error_types.iter() {

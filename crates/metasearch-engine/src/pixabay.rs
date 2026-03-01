@@ -14,6 +14,7 @@ use metasearch_core::{
 };
 use reqwest::Client;
 use tracing::info;
+use smallvec::smallvec;
 
 pub struct Pixabay {
     metadata: EngineMetadata,
@@ -24,10 +25,10 @@ impl Pixabay {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "pixabay".to_string(),
-                display_name: "Pixabay".to_string(),
-                homepage: "https://pixabay.com".to_string(),
-                categories: vec![SearchCategory::Images],
+                name: "pixabay".to_string().into(),
+                display_name: "Pixabay".to_string().into(),
+                homepage: "https://pixabay.com".to_string().into(),
+                categories: smallvec![SearchCategory::Images],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 1.0,

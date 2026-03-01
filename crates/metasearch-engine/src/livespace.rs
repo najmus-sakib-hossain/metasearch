@@ -11,6 +11,7 @@ use metasearch_core::{
     result::SearchResult,
 };
 use reqwest::Client;
+use smallvec::smallvec;
 
 pub struct LiveSpace {
     metadata: EngineMetadata,
@@ -21,10 +22,10 @@ impl LiveSpace {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "livespace".to_string(),
-                display_name: "LiveSpace".to_string(),
-                homepage: "https://live.space".to_string(),
-                categories: vec![SearchCategory::Videos],
+                name: "livespace".to_string().into(),
+                display_name: "LiveSpace".to_string().into(),
+                homepage: "https://live.space".to_string().into(),
+                categories: smallvec![SearchCategory::Videos],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 1.0,

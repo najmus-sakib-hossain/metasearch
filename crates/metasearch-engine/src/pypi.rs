@@ -11,6 +11,7 @@ use metasearch_core::{
 };
 use reqwest::Client;
 use scraper::{Html, Selector};
+use smallvec::smallvec;
 
 pub struct PyPI {
     metadata: EngineMetadata,
@@ -21,10 +22,10 @@ impl PyPI {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "pypi".to_string(),
-                display_name: "PyPI".to_string(),
-                homepage: "https://pypi.org".to_string(),
-                categories: vec![SearchCategory::IT],
+                name: "pypi".to_string().into(),
+                display_name: "PyPI".to_string().into(),
+                homepage: "https://pypi.org".to_string().into(),
+                categories: smallvec![SearchCategory::IT],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 1.0,

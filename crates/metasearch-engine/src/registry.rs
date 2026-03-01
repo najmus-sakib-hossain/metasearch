@@ -1,8 +1,8 @@
 //! Engine registry — manages all available search engines.
 
-use std::collections::HashMap;
 use std::sync::Arc;
 
+use dashmap::DashMap;
 use metasearch_core::category::SearchCategory;
 use metasearch_core::engine::SearchEngine;
 use reqwest::Client;
@@ -79,19 +79,20 @@ use crate::{azure::Azure, cloudflareai::CloudflareAi, ollama::Ollama};
 
 /// Central registry of all search engines.
 pub struct EngineRegistry {
-    engines: HashMap<String, Arc<dyn SearchEngine>>,
+    engines: DashMap<String, Arc<dyn SearchEngine>>,
 }
 
 impl EngineRegistry {
     pub fn new() -> Self {
         Self {
-            engines: HashMap::new(),
+            engines: DashMap::new(),
         }
     }
 
     /// Create a registry pre-loaded with all built-in engines (209 total).
     pub fn with_defaults(client: Client) -> Self {
         let mut registry = Self::new();
+        // Note: reqwest::Client is already Arc-backed internally — no need to wrap
 
         // ── Original engines ──────────────────────────────
         registry.register(Arc::new(Google::new(client.clone())));
@@ -391,27 +392,27 @@ impl EngineRegistry {
 
     /// Register a new engine.
     pub fn register(&mut self, engine: Arc<dyn SearchEngine>) {
-        let name = engine.metadata().name.clone();
+        let name = engine.metadata().name.into_owned();
         self.engines.insert(name, engine);
     }
 
     /// Get an engine by name.
-    pub fn get(&self, name: &str) -> Option<&Arc<dyn SearchEngine>> {
-        self.engines.get(name)
+    pub fn get(&self, name: &str) -> Option<Arc<dyn SearchEngine>> {
+        self.engines.get(name).map(|r| Arc::clone(&r))
     }
 
     /// Get all enabled engines for a given category.
     pub fn engines_for_category(&self, category: &SearchCategory) -> Vec<Arc<dyn SearchEngine>> {
         self.engines
-            .values()
+            .iter()
             .filter(|e| e.metadata().enabled && e.metadata().categories.contains(category))
-            .cloned()
+            .map(|r| Arc::clone(&r))
             .collect()
     }
 
     /// List all registered engine names.
     pub fn engine_names(&self) -> Vec<String> {
-        self.engines.keys().cloned().collect()
+        self.engines.iter().map(|r| r.key().clone()).collect()
     }
 
     /// Number of registered engines.

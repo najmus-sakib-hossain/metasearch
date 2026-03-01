@@ -12,6 +12,7 @@ use metasearch_core::{
 };
 use reqwest::Client;
 use serde::Deserialize;
+use smallvec::smallvec;
 
 pub struct IlPost {
     metadata: EngineMetadata,
@@ -22,10 +23,10 @@ impl IlPost {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "il_post".to_string(),
-                display_name: "Il Post".to_string(),
-                homepage: "https://www.ilpost.it".to_string(),
-                categories: vec![SearchCategory::News],
+                name: "il_post".to_string().into(),
+                display_name: "Il Post".to_string().into(),
+                homepage: "https://www.ilpost.it".to_string().into(),
+                categories: smallvec![SearchCategory::News],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 1.0,

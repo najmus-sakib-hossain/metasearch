@@ -13,6 +13,7 @@ use metasearch_core::{
     result::SearchResult,
 };
 use reqwest::Client;
+use smallvec::smallvec;
 
 pub struct SearxEngine {
     metadata: EngineMetadata,
@@ -26,10 +27,10 @@ impl SearxEngine {
         let enabled = !base.is_empty();
         Self {
             metadata: EngineMetadata {
-                name: "searx_engine".to_string(),
-                display_name: "SearXNG".to_string(),
-                homepage: "https://docs.searxng.org".to_string(),
-                categories: vec![SearchCategory::General],
+                name: "searx_engine".to_string().into(),
+                display_name: "SearXNG".to_string().into(),
+                homepage: "https://docs.searxng.org".to_string().into(),
+                categories: smallvec![SearchCategory::General],
                 enabled,
                 timeout_ms: 10000,
                 weight: 1.0,

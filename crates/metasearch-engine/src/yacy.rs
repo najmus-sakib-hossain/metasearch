@@ -12,6 +12,7 @@ use metasearch_core::{
     result::SearchResult,
 };
 use reqwest::Client;
+use smallvec::smallvec;
 
 pub struct Yacy {
     metadata: EngineMetadata,
@@ -25,10 +26,10 @@ impl Yacy {
         let enabled = !base.is_empty();
         Self {
             metadata: EngineMetadata {
-                name: "yacy".to_string(),
-                display_name: "YaCy".to_string(),
-                homepage: "https://yacy.net".to_string(),
-                categories: vec![SearchCategory::General],
+                name: "yacy".to_string().into(),
+                display_name: "YaCy".to_string().into(),
+                homepage: "https://yacy.net".to_string().into(),
+                categories: smallvec![SearchCategory::General],
                 enabled,
                 timeout_ms: 6000,
                 weight: 0.7,

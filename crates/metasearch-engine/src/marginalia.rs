@@ -14,6 +14,7 @@ use metasearch_core::{
 use reqwest::Client;
 use serde::Deserialize;
 use tracing::info;
+use smallvec::smallvec;
 
 pub struct Marginalia {
     metadata: EngineMetadata,
@@ -25,10 +26,10 @@ impl Marginalia {
     pub fn new(client: Client, api_key: Option<String>) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "marginalia".to_string(),
-                display_name: "Marginalia".to_string(),
-                homepage: "https://marginalia.nu".to_string(),
-                categories: vec![SearchCategory::General],
+                name: "marginalia".to_string().into(),
+                display_name: "Marginalia".to_string().into(),
+                homepage: "https://marginalia.nu".to_string().into(),
+                categories: smallvec![SearchCategory::General],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 1.0,

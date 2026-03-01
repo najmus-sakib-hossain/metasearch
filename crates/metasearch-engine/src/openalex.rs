@@ -8,6 +8,7 @@
 use async_trait::async_trait;
 use reqwest::Client;
 use serde::Deserialize;
+use smallvec::smallvec;
 
 use metasearch_core::{
     category::SearchCategory,
@@ -95,10 +96,10 @@ fn reconstruct_abstract(inverted_index: &serde_json::Value) -> String {
 impl SearchEngine for OpenAlex {
     fn metadata(&self) -> EngineMetadata {
         EngineMetadata {
-            name: "OpenAlex".to_string(),
-            display_name: "OpenAlex".to_string(),
-            homepage: "https://OpenAlex.com".to_string(),
-            categories: vec![SearchCategory::Science],
+            name: "OpenAlex".to_string().into(),
+            display_name: "OpenAlex".to_string().into(),
+            homepage: "https://OpenAlex.com".to_string().into(),
+            categories: smallvec![SearchCategory::Science],
             enabled: true,
             timeout_ms: 5000,
             weight: 1.0,

@@ -10,6 +10,7 @@ use metasearch_core::{
 };
 use reqwest::Client;
 use serde::Deserialize;
+use smallvec::smallvec;
 
 pub struct VoidLinux {
     metadata: EngineMetadata,
@@ -20,10 +21,10 @@ impl VoidLinux {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "voidlinux".to_string(),
-                display_name: "Void Linux".to_string(),
-                homepage: "https://voidlinux.org".to_string(),
-                categories: vec![SearchCategory::IT],
+                name: "voidlinux".to_string().into(),
+                display_name: "Void Linux".to_string().into(),
+                homepage: "https://voidlinux.org".to_string().into(),
+                categories: smallvec![SearchCategory::IT],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 1.0,

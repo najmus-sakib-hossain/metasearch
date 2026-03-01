@@ -15,6 +15,7 @@ use metasearch_core::{
 use reqwest::Client;
 use serde::Deserialize;
 use tracing::{info, warn};
+use smallvec::smallvec;
 
 pub struct GoogleImages {
     metadata: EngineMetadata,
@@ -25,10 +26,10 @@ impl GoogleImages {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "google_images".to_string(),
-                display_name: "Google Images".to_string(),
-                homepage: "https://images.google.com".to_string(),
-                categories: vec![SearchCategory::General],
+                name: "google_images".to_string().into(),
+                display_name: "Google Images".to_string().into(),
+                homepage: "https://images.google.com".to_string().into(),
+                categories: smallvec![SearchCategory::General],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 1.0,
@@ -163,10 +164,33 @@ impl SearchEngine for GoogleImages {
                         format!("{} ({})", content, resolution)
                     };
 
+                    // Get the actual image URL
+                    let img_url = item
+                        .original_image
+                        .as_ref()
+                        .and_then(|o| o.url.as_deref())
+                        .unwrap_or("");
+
                     let mut r =
                         SearchResult::new(title, result_url, &full_content, "google_images");
                     r.engine_rank = (i + 1) as u32;
                     r.category = SearchCategory::General.to_string();
+                    
+                    // Set thumbnail to the actual image URL for display
+                    if !img_url.is_empty() {
+                        r.thumbnail = Some(img_url.to_string());
+                        
+                        // Store image metadata
+                        if let Some(orig) = &item.original_image {
+                            r.metadata = serde_json::json!({
+                                "img_src": img_url,
+                                "width": orig.width,
+                                "height": orig.height,
+                                "resolution": resolution,
+                            });
+                        }
+                    }
+                    
                     results.push(r);
                 }
             }

@@ -16,6 +16,7 @@ use metasearch_core::{
 use reqwest::Client;
 use scraper::{Html, Selector};
 use tracing::info;
+use smallvec::smallvec;
 
 pub struct Bing {
     metadata: EngineMetadata,
@@ -26,10 +27,10 @@ impl Bing {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "bing".to_string(),
-                display_name: "Bing".to_string(),
-                homepage: "https://www.bing.com".to_string(),
-                categories: vec![
+                name: "bing".to_string().into(),
+                display_name: "Bing".to_string().into(),
+                homepage: "https://www.bing.com".to_string().into(),
+                categories: smallvec![
                     SearchCategory::General,
                     SearchCategory::News,
                     SearchCategory::Images,

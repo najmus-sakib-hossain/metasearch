@@ -14,6 +14,7 @@ use metasearch_core::{
 use regex::Regex;
 use reqwest::Client;
 use tracing::info;
+use smallvec::smallvec;
 
 pub struct YoutubeNoapi {
     metadata: EngineMetadata,
@@ -24,10 +25,10 @@ impl YoutubeNoapi {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "youtube_noapi".to_string(),
-                display_name: "YouTube".to_string(),
-                homepage: "https://www.youtube.com".to_string(),
-                categories: vec![SearchCategory::Videos, SearchCategory::Music],
+                name: "youtube_noapi".to_string().into(),
+                display_name: "YouTube".to_string().into(),
+                homepage: "https://www.youtube.com".to_string().into(),
+                categories: smallvec![SearchCategory::Videos, SearchCategory::Music],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 1.5,

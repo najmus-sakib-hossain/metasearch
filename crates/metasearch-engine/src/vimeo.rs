@@ -14,6 +14,7 @@ use metasearch_core::{
     result::SearchResult,
 };
 use reqwest::Client;
+use smallvec::smallvec;
 
 pub struct Vimeo {
     metadata: EngineMetadata,
@@ -24,10 +25,10 @@ impl Vimeo {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "vimeo".to_string(),
-                display_name: "Vimeo".to_string(),
-                homepage: "https://vimeo.com".to_string(),
-                categories: vec![SearchCategory::Videos],
+                name: "vimeo".to_string().into(),
+                display_name: "Vimeo".to_string().into(),
+                homepage: "https://vimeo.com".to_string().into(),
+                categories: smallvec![SearchCategory::Videos],
                 enabled: true,
                 timeout_ms: 8000,
                 weight: 1.0,

@@ -7,6 +7,7 @@
 
 use async_trait::async_trait;
 use reqwest::Client;
+use smallvec::smallvec;
 
 use metasearch_core::{
     category::SearchCategory,
@@ -34,14 +35,14 @@ impl Lingva {
 impl SearchEngine for Lingva {
     fn metadata(&self) -> EngineMetadata {
         EngineMetadata {
-            name: "lingva".to_string(),
-            display_name: "Lingva".to_string(),
+            name: "lingva".to_string().into(),
+            display_name: "Lingva".to_string().into(),
             homepage: if self.url.is_empty() {
                 "https://lingva.thedaviddelta.com".to_string()
             } else {
                 self.url.clone()
-            },
-            categories: vec![SearchCategory::General],
+            }.into(),
+            categories: smallvec![SearchCategory::General],
             enabled: !self.url.is_empty(),
             timeout_ms: 5000,
             weight: 1.0,

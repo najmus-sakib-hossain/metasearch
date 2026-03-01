@@ -14,6 +14,7 @@ use metasearch_core::engine::{EngineMetadata, SearchEngine};
 use metasearch_core::error::MetasearchError;
 use metasearch_core::query::SearchQuery;
 use metasearch_core::result::SearchResult;
+use smallvec::smallvec;
 
 const API_URL: &str = "https://de1.api.radio-browser.info";
 const RESULTS_PER_PAGE: u32 = 10;
@@ -27,10 +28,10 @@ impl RadioBrowser {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "radio_browser".to_string(),
-                display_name: "Radio Browser".to_string(),
-                homepage: "https://www.radio-browser.info".to_string(),
-                categories: vec![SearchCategory::Music],
+                name: "radio_browser".to_string().into(),
+                display_name: "Radio Browser".to_string().into(),
+                homepage: "https://www.radio-browser.info".to_string().into(),
+                categories: smallvec![SearchCategory::Music],
                 enabled: true,
                 timeout_ms: 8000,
                 weight: 0.7,

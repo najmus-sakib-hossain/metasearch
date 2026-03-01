@@ -20,6 +20,7 @@
 //! ```
 
 use async_trait::async_trait;
+use smallvec::smallvec;
 
 use metasearch_core::{
     category::SearchCategory,
@@ -68,10 +69,10 @@ impl MongoDbEngine {
 
         Self {
             metadata: EngineMetadata {
-                name: "mongodb".to_string(),
-                display_name: "MongoDB".to_string(),
-                homepage: "https://www.mongodb.com".to_string(),
-                categories: vec![SearchCategory::General],
+                name: "mongodb".to_string().into(),
+                display_name: "MongoDB".to_string().into(),
+                homepage: "https://www.mongodb.com".to_string().into(),
+                categories: smallvec![SearchCategory::General],
                 enabled,
                 timeout_ms: 5000,
                 weight: 0.8,

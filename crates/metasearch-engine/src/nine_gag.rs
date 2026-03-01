@@ -16,6 +16,7 @@ use metasearch_core::{
 use reqwest::Client;
 use serde::Deserialize;
 use tracing::info;
+use smallvec::smallvec;
 
 pub struct NineGag {
     metadata: EngineMetadata,
@@ -26,10 +27,10 @@ impl NineGag {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "9gag".to_string(),
-                display_name: "9GAG".to_string(),
-                homepage: "https://9gag.com".to_string(),
-                categories: vec![SearchCategory::SocialMedia],
+                name: "9gag".to_string().into(),
+                display_name: "9GAG".to_string().into(),
+                homepage: "https://9gag.com".to_string().into(),
+                categories: smallvec![SearchCategory::SocialMedia],
                 enabled: true,
                 timeout_ms: 3000,
                 weight: 0.7,

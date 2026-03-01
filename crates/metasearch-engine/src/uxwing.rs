@@ -5,6 +5,7 @@
 use async_trait::async_trait;
 use reqwest::Client;
 use scraper::{Html, Selector};
+use smallvec::smallvec;
 
 use metasearch_core::{
     category::SearchCategory,
@@ -23,10 +24,10 @@ impl Uxwing {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "uxwing".to_string(),
-                display_name: "UXWing".to_string(),
-                homepage: "https://uxwing.com".to_string(),
-                categories: vec![SearchCategory::Images],
+                name: "uxwing".to_string().into(),
+                display_name: "UXWing".to_string().into(),
+                homepage: "https://uxwing.com".to_string().into(),
+                categories: smallvec![SearchCategory::Images],
                 enabled: true,
                 timeout_ms: 8000,
                 weight: 0.7,

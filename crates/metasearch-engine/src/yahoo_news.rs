@@ -5,6 +5,7 @@
 use async_trait::async_trait;
 use reqwest::Client;
 use scraper::{Html, Selector};
+use smallvec::smallvec;
 
 use metasearch_core::{
     category::SearchCategory,
@@ -23,10 +24,10 @@ impl YahooNews {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "yahoo_news".to_string(),
-                display_name: "Yahoo News".to_string(),
-                homepage: "https://news.yahoo.com".to_string(),
-                categories: vec![SearchCategory::News],
+                name: "yahoo_news".to_string().into(),
+                display_name: "Yahoo News".to_string().into(),
+                homepage: "https://news.yahoo.com".to_string().into(),
+                categories: smallvec![SearchCategory::News],
                 enabled: true,
                 timeout_ms: 8000,
                 weight: 1.0,

@@ -7,6 +7,7 @@
 
 use async_trait::async_trait;
 use reqwest::Client;
+use smallvec::smallvec;
 
 use metasearch_core::{
     category::SearchCategory,
@@ -31,10 +32,10 @@ impl DeepL {
 impl SearchEngine for DeepL {
     fn metadata(&self) -> EngineMetadata {
         EngineMetadata {
-            name: "deepl".to_string(),
-            display_name: "DeepL".to_string(),
-            homepage: "https://api-free.deepl.com".to_string(),
-            categories: vec![SearchCategory::General],
+            name: "deepl".to_string().into(),
+            display_name: "DeepL".to_string().into(),
+            homepage: "https://api-free.deepl.com".to_string().into(),
+            categories: smallvec![SearchCategory::General],
             enabled: self.api_key.is_some(),
             timeout_ms: 5000,
             weight: 1.0,

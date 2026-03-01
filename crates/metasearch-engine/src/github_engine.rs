@@ -10,6 +10,7 @@ use metasearch_core::{
     result::SearchResult,
 };
 use reqwest::Client;
+use smallvec::smallvec;
 
 pub struct GitHub {
     metadata: EngineMetadata,
@@ -20,10 +21,10 @@ impl GitHub {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "github".to_string(),
-                display_name: "GitHub".to_string(),
-                homepage: "https://github.com".to_string(),
-                categories: vec![SearchCategory::IT],
+                name: "github".to_string().into(),
+                display_name: "GitHub".to_string().into(),
+                homepage: "https://github.com".to_string().into(),
+                categories: smallvec![SearchCategory::IT],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 1.0,

@@ -14,6 +14,7 @@ use metasearch_core::{
     result::SearchResult,
 };
 use reqwest::Client;
+use smallvec::smallvec;
 
 pub struct StackExchange {
     metadata: EngineMetadata,
@@ -25,10 +26,10 @@ impl StackExchange {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "stackexchange".to_string(),
-                display_name: "StackExchange".to_string(),
-                homepage: "https://stackoverflow.com".to_string(),
-                categories: vec![SearchCategory::IT],
+                name: "stackexchange".to_string().into(),
+                display_name: "StackExchange".to_string().into(),
+                homepage: "https://stackoverflow.com".to_string().into(),
+                categories: smallvec![SearchCategory::IT],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 1.2,
@@ -41,10 +42,10 @@ impl StackExchange {
     pub fn with_site(client: Client, site: &str) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "stackexchange".to_string(),
-                display_name: "StackExchange".to_string(),
-                homepage: format!("https://{}.com", site),
-                categories: vec![SearchCategory::IT],
+                name: "stackexchange".to_string().into(),
+                display_name: "StackExchange".to_string().into(),
+                homepage: format!("https://{}.com", site).into(),
+                categories: smallvec![SearchCategory::IT],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 1.2,

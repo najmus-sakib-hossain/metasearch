@@ -11,6 +11,7 @@ use metasearch_core::{
     result::SearchResult,
 };
 use reqwest::Client;
+use smallvec::smallvec;
 
 pub struct AdobeStock {
     metadata: EngineMetadata,
@@ -21,10 +22,10 @@ impl AdobeStock {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "adobe_stock".to_string(),
-                display_name: "Adobe Stock".to_string(),
-                homepage: "https://stock.adobe.com".to_string(),
-                categories: vec![SearchCategory::Images],
+                name: "adobe_stock".to_string().into(),
+                display_name: "Adobe Stock".to_string().into(),
+                homepage: "https://stock.adobe.com".to_string().into(),
+                categories: smallvec![SearchCategory::Images],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 1.0,

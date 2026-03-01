@@ -14,6 +14,7 @@ use metasearch_core::{
     result::SearchResult,
 };
 use reqwest::Client;
+use smallvec::smallvec;
 
 const RESULTS_PER_PAGE: u32 = 10;
 
@@ -27,10 +28,10 @@ impl SoundCloud {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "soundcloud".to_string(),
-                display_name: "SoundCloud".to_string(),
-                homepage: "https://soundcloud.com".to_string(),
-                categories: vec![SearchCategory::Music],
+                name: "soundcloud".to_string().into(),
+                display_name: "SoundCloud".to_string().into(),
+                homepage: "https://soundcloud.com".to_string().into(),
+                categories: smallvec![SearchCategory::Music],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 1.0,
@@ -43,10 +44,10 @@ impl SoundCloud {
     pub fn with_client_id(client: Client, client_id: String) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "soundcloud".to_string(),
-                display_name: "SoundCloud".to_string(),
-                homepage: "https://soundcloud.com".to_string(),
-                categories: vec![SearchCategory::Music],
+                name: "soundcloud".to_string().into(),
+                display_name: "SoundCloud".to_string().into(),
+                homepage: "https://soundcloud.com".to_string().into(),
+                categories: smallvec![SearchCategory::Music],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 1.0,

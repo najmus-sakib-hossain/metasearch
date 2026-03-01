@@ -8,6 +8,7 @@
 use async_trait::async_trait;
 use reqwest::Client;
 use serde::Deserialize;
+use smallvec::smallvec;
 
 use metasearch_core::{
     category::SearchCategory,
@@ -44,10 +45,10 @@ struct ApiResult {
 impl SearchEngine for Openverse {
     fn metadata(&self) -> EngineMetadata {
         EngineMetadata {
-            name: "Openverse".to_string(),
-            display_name: "Openverse".to_string(),
-            homepage: "https://Openverse.com".to_string(),
-            categories: vec![SearchCategory::Images],
+            name: "Openverse".to_string().into(),
+            display_name: "Openverse".to_string().into(),
+            homepage: "https://Openverse.com".to_string().into(),
+            categories: smallvec![SearchCategory::Images],
             enabled: true,
             timeout_ms: 5000,
             weight: 1.0,

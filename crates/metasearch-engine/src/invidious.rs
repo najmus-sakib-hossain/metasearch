@@ -8,6 +8,7 @@
 use async_trait::async_trait;
 use reqwest::Client;
 use serde::Deserialize;
+use smallvec::smallvec;
 
 use metasearch_core::{
     category::SearchCategory,
@@ -52,10 +53,10 @@ struct InvidiousResult {
 impl SearchEngine for Invidious {
     fn metadata(&self) -> EngineMetadata {
         EngineMetadata {
-            name: "Invidious".to_string(),
-            display_name: "Invidious".to_string(),
-            homepage: "https://invidious.io".to_string(),
-            categories: vec![SearchCategory::Videos],
+            name: "Invidious".to_string().into(),
+            display_name: "Invidious".to_string().into(),
+            homepage: "https://invidious.io".to_string().into(),
+            categories: smallvec![SearchCategory::Videos],
             enabled: !self.base_url.is_empty(),
             timeout_ms: 5000,
             weight: 1.0,

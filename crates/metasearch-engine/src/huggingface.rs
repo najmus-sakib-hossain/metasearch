@@ -10,6 +10,7 @@ use metasearch_core::{
     result::SearchResult,
 };
 use reqwest::Client;
+use smallvec::smallvec;
 
 pub struct HuggingFace {
     metadata: EngineMetadata,
@@ -21,10 +22,10 @@ impl HuggingFace {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "huggingface".to_string(),
-                display_name: "Hugging Face".to_string(),
-                homepage: "https://huggingface.co".to_string(),
-                categories: vec![SearchCategory::IT],
+                name: "huggingface".to_string().into(),
+                display_name: "Hugging Face".to_string().into(),
+                homepage: "https://huggingface.co".to_string().into(),
+                categories: smallvec![SearchCategory::IT],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 1.0,
@@ -37,10 +38,10 @@ impl HuggingFace {
     pub fn with_endpoint(client: Client, endpoint: &str) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "huggingface".to_string(),
-                display_name: "Hugging Face".to_string(),
-                homepage: "https://huggingface.co".to_string(),
-                categories: vec![SearchCategory::IT],
+                name: "huggingface".to_string().into(),
+                display_name: "Hugging Face".to_string().into(),
+                homepage: "https://huggingface.co".to_string().into(),
+                categories: smallvec![SearchCategory::IT],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 1.0,

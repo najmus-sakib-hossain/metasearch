@@ -10,6 +10,7 @@ use metasearch_core::{
     result::SearchResult,
 };
 use reqwest::Client;
+use smallvec::smallvec;
 
 const PAGE_SIZE: u32 = 10;
 
@@ -22,10 +23,10 @@ impl Nvd {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "nvd".to_string(),
-                display_name: "NVD".to_string(),
-                homepage: "https://nvd.nist.gov".to_string(),
-                categories: vec![SearchCategory::IT],
+                name: "nvd".to_string().into(),
+                display_name: "NVD".to_string().into(),
+                homepage: "https://nvd.nist.gov".to_string().into(),
+                categories: smallvec![SearchCategory::IT],
                 enabled: true,
                 timeout_ms: 8000,
                 weight: 1.0,

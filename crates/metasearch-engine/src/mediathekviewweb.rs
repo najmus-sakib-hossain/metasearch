@@ -12,6 +12,7 @@ use metasearch_core::{
 };
 use reqwest::Client;
 use serde_json::json;
+use smallvec::smallvec;
 
 pub struct MediathekViewWeb {
     metadata: EngineMetadata,
@@ -22,10 +23,10 @@ impl MediathekViewWeb {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "mediathekviewweb".to_string(),
-                display_name: "MediathekViewWeb".to_string(),
-                homepage: "https://mediathekviewweb.de".to_string(),
-                categories: vec![SearchCategory::Videos],
+                name: "mediathekviewweb".to_string().into(),
+                display_name: "MediathekViewWeb".to_string().into(),
+                homepage: "https://mediathekviewweb.de".to_string().into(),
+                categories: smallvec![SearchCategory::Videos],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 1.0,

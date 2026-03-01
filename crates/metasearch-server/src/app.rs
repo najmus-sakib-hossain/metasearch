@@ -4,8 +4,13 @@ use std::net::SocketAddr;
 use std::sync::Arc;
 
 use axum::Router;
-use tower_http::compression::CompressionLayer;
-use tower_http::trace::TraceLayer;
+use tower::ServiceBuilder;
+use tower_http::{
+    compression::CompressionLayer,
+    cors::CorsLayer,
+    request_id::{MakeRequestUuid, PropagateRequestIdLayer, SetRequestIdLayer},
+    trace::TraceLayer,
+};
 use tracing::info;
 
 use crate::routes;
@@ -18,8 +23,19 @@ pub fn build_router(state: Arc<AppState>) -> Router {
         .merge(routes::api_routes())
         .merge(routes::static_routes())
         .merge(routes::health_routes())
-        .layer(CompressionLayer::new())
-        .layer(TraceLayer::new_for_http())
+        .layer(
+            ServiceBuilder::new()
+                // Inbound: stamp a UUID request-id on every request
+                .layer(SetRequestIdLayer::x_request_id(MakeRequestUuid))
+                // Structured trace spans per request
+                .layer(TraceLayer::new_for_http())
+                // Outbound: propagate the request-id to the response headers
+                .layer(PropagateRequestIdLayer::x_request_id())
+                // Response body gzip compression
+                .layer(CompressionLayer::new())
+                // Permissive CORS (lock down in production via config)
+                .layer(CorsLayer::permissive()),
+        )
         .with_state(state)
 }
 

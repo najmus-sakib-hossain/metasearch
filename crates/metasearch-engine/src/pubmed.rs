@@ -18,6 +18,7 @@ use metasearch_core::{
 use regex::Regex;
 use reqwest::Client;
 use tracing::info;
+use smallvec::smallvec;
 
 pub struct Pubmed {
     metadata: EngineMetadata,
@@ -28,10 +29,10 @@ impl Pubmed {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "pubmed".to_string(),
-                display_name: "PubMed".to_string(),
-                homepage: "https://www.ncbi.nlm.nih.gov/pubmed".to_string(),
-                categories: vec![SearchCategory::Science],
+                name: "pubmed".to_string().into(),
+                display_name: "PubMed".to_string().into(),
+                homepage: "https://www.ncbi.nlm.nih.gov/pubmed".to_string().into(),
+                categories: smallvec![SearchCategory::Science],
                 enabled: true,
                 timeout_ms: 8000,
                 weight: 1.0,

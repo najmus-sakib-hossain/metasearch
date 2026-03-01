@@ -10,6 +10,7 @@ use metasearch_core::{
 };
 use reqwest::Client;
 use scraper::{Html, Selector};
+use smallvec::smallvec;
 
 pub struct PkgGoDev {
     metadata: EngineMetadata,
@@ -20,10 +21,10 @@ impl PkgGoDev {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "pkg_go_dev".to_string(),
-                display_name: "pkg.go.dev".to_string(),
-                homepage: "https://pkg.go.dev".to_string(),
-                categories: vec![SearchCategory::IT],
+                name: "pkg_go_dev".to_string().into(),
+                display_name: "pkg.go.dev".to_string().into(),
+                homepage: "https://pkg.go.dev".to_string().into(),
+                categories: smallvec![SearchCategory::IT],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 1.0,

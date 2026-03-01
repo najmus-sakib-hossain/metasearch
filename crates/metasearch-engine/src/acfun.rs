@@ -14,6 +14,7 @@ use metasearch_core::engine::{EngineMetadata, SearchEngine};
 use metasearch_core::error::MetasearchError;
 use metasearch_core::query::SearchQuery;
 use metasearch_core::result::SearchResult;
+use smallvec::smallvec;
 
 pub struct AcFun {
     metadata: EngineMetadata,
@@ -24,10 +25,10 @@ impl AcFun {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "acfun".to_string(),
-                display_name: "AcFun".to_string(),
-                homepage: "https://www.acfun.cn".to_string(),
-                categories: vec![SearchCategory::Videos],
+                name: "acfun".to_string().into(),
+                display_name: "AcFun".to_string().into(),
+                homepage: "https://www.acfun.cn".to_string().into(),
+                categories: smallvec![SearchCategory::Videos],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 0.8,

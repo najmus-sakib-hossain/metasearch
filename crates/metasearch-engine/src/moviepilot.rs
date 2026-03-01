@@ -5,6 +5,7 @@
 use async_trait::async_trait;
 use reqwest::Client;
 use serde::Deserialize;
+use smallvec::smallvec;
 
 use metasearch_core::{
     category::SearchCategory,
@@ -40,10 +41,10 @@ struct MoviepilotResult {
 impl SearchEngine for Moviepilot {
     fn metadata(&self) -> EngineMetadata {
         EngineMetadata {
-            name: "moviepilot".to_string(),
-            display_name: "moviepilot".to_string(),
-            homepage: "https://moviepilot.com".to_string(),
-            categories: vec![SearchCategory::General],
+            name: "moviepilot".to_string().into(),
+            display_name: "moviepilot".to_string().into(),
+            homepage: "https://moviepilot.com".to_string().into(),
+            categories: smallvec![SearchCategory::General],
             enabled: true,
             timeout_ms: 5000,
             weight: 1.0,

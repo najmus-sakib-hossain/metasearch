@@ -13,6 +13,7 @@ use metasearch_core::engine::{EngineMetadata, SearchEngine};
 use metasearch_core::error::MetasearchError;
 use metasearch_core::query::SearchQuery;
 use metasearch_core::result::SearchResult;
+use smallvec::smallvec;
 
 const BASE_URL: &str = "https://www.ansa.it";
 const SEARCH_URL: &str = "https://www.ansa.it/ricerca/ansait/search.shtml";
@@ -27,10 +28,10 @@ impl Ansa {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "ansa".to_string(),
-                display_name: "ANSA".to_string(),
-                homepage: BASE_URL.to_string(),
-                categories: vec![SearchCategory::News],
+                name: "ansa".to_string().into(),
+                display_name: "ANSA".to_string().into(),
+                homepage: BASE_URL.to_string().into(),
+                categories: smallvec![SearchCategory::News],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 0.7,

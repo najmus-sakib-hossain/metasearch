@@ -10,6 +10,7 @@ use metasearch_core::{
     result::SearchResult,
 };
 use reqwest::Client;
+use smallvec::smallvec;
 
 pub struct Lemmy {
     metadata: EngineMetadata,
@@ -21,10 +22,10 @@ impl Lemmy {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "lemmy".to_string(),
-                display_name: "Lemmy".to_string(),
-                homepage: "https://lemmy.ml".to_string(),
-                categories: vec![SearchCategory::SocialMedia],
+                name: "lemmy".to_string().into(),
+                display_name: "Lemmy".to_string().into(),
+                homepage: "https://lemmy.ml".to_string().into(),
+                categories: smallvec![SearchCategory::SocialMedia],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 0.8,
@@ -37,10 +38,10 @@ impl Lemmy {
     pub fn with_base_url(client: Client, base_url: &str) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "lemmy".to_string(),
-                display_name: "Lemmy".to_string(),
-                homepage: base_url.to_string(),
-                categories: vec![SearchCategory::SocialMedia],
+                name: "lemmy".to_string().into(),
+                display_name: "Lemmy".to_string().into(),
+                homepage: base_url.to_string().into(),
+                categories: smallvec![SearchCategory::SocialMedia],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 0.8,

@@ -14,6 +14,7 @@ use metasearch_core::{
 };
 use reqwest::Client;
 use tracing::info;
+use smallvec::smallvec;
 
 pub struct Azure {
     metadata: EngineMetadata,
@@ -36,11 +37,11 @@ impl Azure {
         let enabled = !base.is_empty() && !key.is_empty() && !index.is_empty();
         Self {
             metadata: EngineMetadata {
-                name: "azure".to_string(),
-                display_name: "Azure Search".to_string(),
+                name: "azure".to_string().into(),
+                display_name: "Azure Search".to_string().into(),
                 homepage: "https://azure.microsoft.com/products/ai-services/cognitive-search"
-                    .to_string(),
-                categories: vec![SearchCategory::General],
+                    .to_string().into(),
+                categories: smallvec![SearchCategory::General],
                 enabled,
                 timeout_ms: 5000,
                 weight: 1.0,

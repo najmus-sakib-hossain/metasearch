@@ -13,6 +13,7 @@ use metasearch_core::engine::{EngineMetadata, SearchEngine};
 use metasearch_core::error::MetasearchError;
 use metasearch_core::query::SearchQuery;
 use metasearch_core::result::SearchResult;
+use smallvec::smallvec;
 
 const API_URL: &str = "https://findthatmeme.com/api/v1/search";
 const RESULTS_PER_PAGE: u32 = 50;
@@ -26,10 +27,10 @@ impl FindThatMeme {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "findthatmeme".to_string(),
-                display_name: "FindThatMeme".to_string(),
-                homepage: "https://findthatmeme.com".to_string(),
-                categories: vec![SearchCategory::Images],
+                name: "findthatmeme".to_string().into(),
+                display_name: "FindThatMeme".to_string().into(),
+                homepage: "https://findthatmeme.com".to_string().into(),
+                categories: smallvec![SearchCategory::Images],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 0.6,

@@ -12,6 +12,7 @@ use metasearch_core::{
 };
 use reqwest::Client;
 use scraper::{Html, Selector};
+use smallvec::smallvec;
 
 pub struct Nyaa {
     metadata: EngineMetadata,
@@ -22,10 +23,10 @@ impl Nyaa {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "nyaa".to_string(),
-                display_name: "Nyaa".to_string(),
-                homepage: "https://nyaa.si".to_string(),
-                categories: vec![SearchCategory::Files],
+                name: "nyaa".to_string().into(),
+                display_name: "Nyaa".to_string().into(),
+                homepage: "https://nyaa.si".to_string().into(),
+                categories: smallvec![SearchCategory::Files],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 1.0,

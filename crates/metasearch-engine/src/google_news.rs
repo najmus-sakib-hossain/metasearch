@@ -5,6 +5,7 @@ use async_trait::async_trait;
 use base64::Engine as _;
 use base64::engine::general_purpose;
 use reqwest::Client;
+use smallvec::smallvec;
 
 use metasearch_core::{
     category::SearchCategory,
@@ -76,10 +77,10 @@ fn extract_xml_attr<'a>(item_xml: &'a str, tag: &str, attr: &str) -> Option<&'a 
 impl SearchEngine for GoogleNews {
     fn metadata(&self) -> EngineMetadata {
         EngineMetadata {
-            name: "Google News".to_string(),
-            display_name: "Google News".to_string(),
-            homepage: "https://news.google.com".to_string(),
-            categories: vec![SearchCategory::News],
+            name: "Google News".to_string().into(),
+            display_name: "Google News".to_string().into(),
+            homepage: "https://news.google.com".to_string().into(),
+            categories: smallvec![SearchCategory::News],
             enabled: true,
             timeout_ms: 8000,
             weight: 1.0,

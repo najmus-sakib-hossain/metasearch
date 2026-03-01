@@ -14,6 +14,7 @@ use metasearch_core::engine::{EngineMetadata, SearchEngine};
 use metasearch_core::error::Result;
 use metasearch_core::query::SearchQuery;
 use metasearch_core::result::SearchResult;
+use smallvec::smallvec;
 
 const BASE_URL: &str = "https://ahmia.fi";
 
@@ -26,10 +27,10 @@ impl Ahmia {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "ahmia".to_string(),
-                display_name: "Ahmia".to_string(),
-                homepage: BASE_URL.to_string(),
-                categories: vec![SearchCategory::General],
+                name: "ahmia".to_string().into(),
+                display_name: "Ahmia".to_string().into(),
+                homepage: BASE_URL.to_string().into(),
+                categories: smallvec![SearchCategory::General],
                 enabled: true,
                 timeout_ms: 10000,
                 weight: 0.5,

@@ -13,6 +13,7 @@ use metasearch_core::{
     result::SearchResult,
 };
 use reqwest::Client;
+use smallvec::smallvec;
 
 pub struct Freesound {
     metadata: EngineMetadata,
@@ -24,10 +25,10 @@ impl Freesound {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "freesound".to_string(),
-                display_name: "Freesound".to_string(),
-                homepage: "https://freesound.org".to_string(),
-                categories: vec![SearchCategory::Music],
+                name: "freesound".to_string().into(),
+                display_name: "Freesound".to_string().into(),
+                homepage: "https://freesound.org".to_string().into(),
+                categories: smallvec![SearchCategory::Music],
                 enabled: false, // Disabled by default — needs API key
                 timeout_ms: 5000,
                 weight: 0.8,
@@ -40,10 +41,10 @@ impl Freesound {
     pub fn with_api_key(client: Client, api_key: String) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "freesound".to_string(),
-                display_name: "Freesound".to_string(),
-                homepage: "https://freesound.org".to_string(),
-                categories: vec![SearchCategory::Music],
+                name: "freesound".to_string().into(),
+                display_name: "Freesound".to_string().into(),
+                homepage: "https://freesound.org".to_string().into(),
+                categories: smallvec![SearchCategory::Music],
                 enabled: false, // Disabled by default — needs API key
                 timeout_ms: 5000,
                 weight: 0.8,

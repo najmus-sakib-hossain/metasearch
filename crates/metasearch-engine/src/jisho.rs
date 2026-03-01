@@ -12,6 +12,7 @@ use metasearch_core::{
 };
 use reqwest::Client;
 use serde::Deserialize;
+use smallvec::smallvec;
 
 pub struct Jisho {
     metadata: EngineMetadata,
@@ -22,10 +23,10 @@ impl Jisho {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "jisho".to_string(),
-                display_name: "Jisho".to_string(),
-                homepage: "https://jisho.org".to_string(),
-                categories: vec![SearchCategory::General],
+                name: "jisho".to_string().into(),
+                display_name: "Jisho".to_string().into(),
+                homepage: "https://jisho.org".to_string().into(),
+                categories: smallvec![SearchCategory::General],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 1.0,

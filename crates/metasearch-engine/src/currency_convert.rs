@@ -10,6 +10,7 @@
 use async_trait::async_trait;
 use regex::Regex;
 use reqwest::Client;
+use smallvec::smallvec;
 
 use metasearch_core::{
     category::SearchCategory,
@@ -33,10 +34,10 @@ impl CurrencyConvert {
 impl SearchEngine for CurrencyConvert {
     fn metadata(&self) -> EngineMetadata {
         EngineMetadata {
-            name: "CurrencyConvert".to_string(),
-            display_name: "CurrencyConvert".to_string(),
-            homepage: "https://duckduckgo.com".to_string(),
-            categories: vec![SearchCategory::General, SearchCategory::General],
+            name: "CurrencyConvert".to_string().into(),
+            display_name: "CurrencyConvert".to_string().into(),
+            homepage: "https://duckduckgo.com".to_string().into(),
+            categories: smallvec![SearchCategory::General, SearchCategory::General],
             enabled: true,
             timeout_ms: 5000,
             weight: 1.0,

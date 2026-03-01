@@ -12,6 +12,7 @@ use metasearch_core::{
 };
 use reqwest::Client;
 use serde::Deserialize;
+use smallvec::smallvec;
 
 pub struct Wallhaven {
     metadata: EngineMetadata,
@@ -22,10 +23,10 @@ impl Wallhaven {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "wallhaven".to_string(),
-                display_name: "Wallhaven".to_string(),
-                homepage: "https://wallhaven.cc".to_string(),
-                categories: vec![SearchCategory::Images],
+                name: "wallhaven".to_string().into(),
+                display_name: "Wallhaven".to_string().into(),
+                homepage: "https://wallhaven.cc".to_string().into(),
+                categories: smallvec![SearchCategory::Images],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 1.0,

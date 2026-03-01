@@ -1,7 +1,10 @@
 //! Search engine trait definition.
 
+use std::borrow::Cow;
+
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
+use smallvec::SmallVec;
 
 use crate::category::SearchCategory;
 use crate::error::Result;
@@ -12,16 +15,16 @@ use crate::result::SearchResult;
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct EngineMetadata {
     /// Unique identifier (e.g., "google", "duckduckgo").
-    pub name: String,
+    pub name: Cow<'static, str>,
 
     /// Human-readable display name.
-    pub display_name: String,
+    pub display_name: Cow<'static, str>,
 
     /// URL of the engine's homepage.
-    pub homepage: String,
+    pub homepage: Cow<'static, str>,
 
-    /// Categories this engine supports.
-    pub categories: Vec<SearchCategory>,
+    /// Categories this engine supports (stack-allocated for ≤4 categories).
+    pub categories: SmallVec<[SearchCategory; 4]>,
 
     /// Whether this engine is enabled by default.
     pub enabled: bool,

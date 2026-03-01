@@ -13,6 +13,7 @@ use metasearch_core::{
     result::SearchResult,
 };
 use reqwest::Client;
+use smallvec::smallvec;
 
 pub struct Wttr {
     metadata: EngineMetadata,
@@ -23,10 +24,10 @@ impl Wttr {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "wttr".to_string(),
-                display_name: "wttr.in".to_string(),
-                homepage: "https://wttr.in".to_string(),
-                categories: vec![SearchCategory::General],
+                name: "wttr".to_string().into(),
+                display_name: "wttr.in".to_string().into(),
+                homepage: "https://wttr.in".to_string().into(),
+                categories: smallvec![SearchCategory::General],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 1.0,

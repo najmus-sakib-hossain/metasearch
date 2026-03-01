@@ -14,6 +14,7 @@ use metasearch_core::{
     result::SearchResult,
 };
 use reqwest::Client;
+use smallvec::smallvec;
 
 static HTML_TAG_RE: std::sync::LazyLock<regex::Regex> =
     std::sync::LazyLock::new(|| regex::Regex::new(r"<[^>]+>").unwrap());
@@ -29,10 +30,10 @@ impl SemanticScholar {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "semantic_scholar".to_string(),
-                display_name: "Semantic Scholar".to_string(),
-                homepage: "https://www.semanticscholar.org".to_string(),
-                categories: vec![SearchCategory::Science],
+                name: "semantic_scholar".to_string().into(),
+                display_name: "Semantic Scholar".to_string().into(),
+                homepage: "https://www.semanticscholar.org".to_string().into(),
+                categories: smallvec![SearchCategory::Science],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 1.2,

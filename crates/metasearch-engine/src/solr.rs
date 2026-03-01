@@ -13,6 +13,7 @@ use metasearch_core::{
     result::SearchResult,
 };
 use reqwest::Client;
+use smallvec::smallvec;
 
 pub struct Solr {
     metadata: EngineMetadata,
@@ -26,10 +27,10 @@ impl Solr {
         let enabled = !base.is_empty();
         Self {
             metadata: EngineMetadata {
-                name: "solr".to_string(),
-                display_name: "Solr".to_string(),
-                homepage: "https://solr.apache.org".to_string(),
-                categories: vec![SearchCategory::General],
+                name: "solr".to_string().into(),
+                display_name: "Solr".to_string().into(),
+                homepage: "https://solr.apache.org".to_string().into(),
+                categories: smallvec![SearchCategory::General],
                 enabled,
                 timeout_ms: 5000,
                 weight: 0.8,

@@ -12,6 +12,7 @@ use metasearch_core::{
     result::SearchResult,
 };
 use reqwest::Client;
+use smallvec::smallvec;
 
 pub struct DuckDuckGoExtra {
     metadata: EngineMetadata,
@@ -22,10 +23,10 @@ impl DuckDuckGoExtra {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "duckduckgo_extra".to_string(),
-                display_name: "DuckDuckGo Images".to_string(),
-                homepage: "https://duckduckgo.com".to_string(),
-                categories: vec![SearchCategory::Images],
+                name: "duckduckgo_extra".to_string().into(),
+                display_name: "DuckDuckGo Images".to_string().into(),
+                homepage: "https://duckduckgo.com".to_string().into(),
+                categories: smallvec![SearchCategory::Images],
                 enabled: true,
                 timeout_ms: 8000,
                 weight: 1.0,

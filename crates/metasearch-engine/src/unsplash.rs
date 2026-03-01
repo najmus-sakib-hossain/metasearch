@@ -14,6 +14,7 @@ use metasearch_core::{
 };
 use reqwest::Client;
 use url::Url;
+use smallvec::smallvec;
 
 pub struct Unsplash {
     metadata: EngineMetadata,
@@ -24,10 +25,10 @@ impl Unsplash {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "unsplash".to_string(),
-                display_name: "Unsplash".to_string(),
-                homepage: "https://unsplash.com".to_string(),
-                categories: vec![SearchCategory::Images],
+                name: "unsplash".to_string().into(),
+                display_name: "Unsplash".to_string().into(),
+                homepage: "https://unsplash.com".to_string().into(),
+                categories: smallvec![SearchCategory::Images],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 1.0,

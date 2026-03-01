@@ -8,6 +8,7 @@
 use async_trait::async_trait;
 use reqwest::Client;
 use serde::Deserialize;
+use smallvec::smallvec;
 
 use metasearch_core::{
     category::SearchCategory,
@@ -51,10 +52,10 @@ const TRACKERS: &[&str] = &[
 impl SearchEngine for PirateBay {
     fn metadata(&self) -> EngineMetadata {
         EngineMetadata {
-            name: "The Pirate Bay".to_string(),
-            display_name: "The Pirate Bay".to_string(),
-            homepage: "https://The Pirate Bay.com".to_string(),
-            categories: vec![SearchCategory::Files],
+            name: "The Pirate Bay".to_string().into(),
+            display_name: "The Pirate Bay".to_string().into(),
+            homepage: "https://The Pirate Bay.com".to_string().into(),
+            categories: smallvec![SearchCategory::Files],
             enabled: true,
             timeout_ms: 5000,
             weight: 1.0,

@@ -12,6 +12,7 @@ use metasearch_core::{
     result::SearchResult,
 };
 use reqwest::Client;
+use smallvec::smallvec;
 
 pub struct Pixiv {
     metadata: EngineMetadata,
@@ -22,10 +23,10 @@ impl Pixiv {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "pixiv".to_string(),
-                display_name: "Pixiv".to_string(),
-                homepage: "https://www.pixiv.net".to_string(),
-                categories: vec![SearchCategory::Images],
+                name: "pixiv".to_string().into(),
+                display_name: "Pixiv".to_string().into(),
+                homepage: "https://www.pixiv.net".to_string().into(),
+                categories: smallvec![SearchCategory::Images],
                 enabled: true,
                 timeout_ms: 6000,
                 weight: 0.8,

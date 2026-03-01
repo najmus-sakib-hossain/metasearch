@@ -8,6 +8,7 @@
 use async_trait::async_trait;
 use reqwest::Client;
 use serde_json::json;
+use smallvec::smallvec;
 
 use metasearch_core::{
     category::SearchCategory,
@@ -37,14 +38,14 @@ impl LibreTranslate {
 impl SearchEngine for LibreTranslate {
     fn metadata(&self) -> EngineMetadata {
         EngineMetadata {
-            name: "libretranslate".to_string(),
-            display_name: "LibreTranslate".to_string(),
+            name: "libretranslate".to_string().into(),
+            display_name: "LibreTranslate".to_string().into(),
             homepage: if self.base_url.is_empty() {
                 "https://libretranslate.com".to_string()
             } else {
                 self.base_url.clone()
-            },
-            categories: vec![SearchCategory::General],
+            }.into(),
+            categories: smallvec![SearchCategory::General],
             enabled: !self.base_url.is_empty(),
             timeout_ms: 5000,
             weight: 1.0,

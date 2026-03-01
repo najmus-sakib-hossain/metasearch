@@ -9,6 +9,7 @@ use async_trait::async_trait;
 use reqwest::Client;
 use serde::Deserialize;
 use std::collections::HashMap;
+use smallvec::smallvec;
 
 use metasearch_core::{
     category::SearchCategory,
@@ -74,10 +75,10 @@ struct DiscoursePost {
 impl SearchEngine for Discourse {
     fn metadata(&self) -> EngineMetadata {
         EngineMetadata {
-            name: "discourse".to_string(),
-            display_name: "Discourse".to_string(),
-            homepage: "https://www.discourse.org".to_string(),
-            categories: vec![SearchCategory::General],
+            name: "discourse".to_string().into(),
+            display_name: "Discourse".to_string().into(),
+            homepage: "https://www.discourse.org".to_string().into(),
+            categories: smallvec![SearchCategory::General],
             enabled: !self.base_url.is_empty(),
             timeout_ms: 5000,
             weight: 1.0,

@@ -14,6 +14,7 @@ use metasearch_core::{
 };
 use reqwest::Client;
 use tracing::info;
+use smallvec::smallvec;
 
 pub struct CloudflareAi {
     metadata: EngineMetadata,
@@ -36,10 +37,10 @@ impl CloudflareAi {
         let enabled = !acct.is_empty() && !token.is_empty();
         Self {
             metadata: EngineMetadata {
-                name: "cloudflareai".to_string(),
-                display_name: "Cloudflare AI".to_string(),
-                homepage: "https://ai.cloudflare.com".to_string(),
-                categories: vec![SearchCategory::General],
+                name: "cloudflareai".to_string().into(),
+                display_name: "Cloudflare AI".to_string().into(),
+                homepage: "https://ai.cloudflare.com".to_string().into(),
+                categories: smallvec![SearchCategory::General],
                 enabled,
                 timeout_ms: 30000,
                 weight: 1.0,

@@ -12,6 +12,7 @@ use metasearch_core::engine::{EngineMetadata, SearchEngine};
 use metasearch_core::error::MetasearchError;
 use metasearch_core::query::SearchQuery;
 use metasearch_core::result::SearchResult;
+use smallvec::smallvec;
 
 const BASE_URL: &str = "https://www.flickr.com";
 
@@ -24,10 +25,10 @@ impl FlickrNoapi {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "flickr_noapi".to_string(),
-                display_name: "Flickr (no API)".to_string(),
-                homepage: BASE_URL.to_string(),
-                categories: vec![SearchCategory::Images],
+                name: "flickr_noapi".to_string().into(),
+                display_name: "Flickr (no API)".to_string().into(),
+                homepage: BASE_URL.to_string().into(),
+                categories: smallvec![SearchCategory::Images],
                 enabled: true,
                 timeout_ms: 8000,
                 weight: 0.7,

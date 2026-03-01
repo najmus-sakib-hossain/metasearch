@@ -7,6 +7,7 @@
 
 use async_trait::async_trait;
 use reqwest::Client;
+use smallvec::smallvec;
 
 use metasearch_core::{
     category::SearchCategory,
@@ -30,10 +31,10 @@ impl TinEye {
 impl SearchEngine for TinEye {
     fn metadata(&self) -> EngineMetadata {
         EngineMetadata {
-            name: "TinEye".to_string(),
-            display_name: "TinEye".to_string(),
-            homepage: "https://tineye.com".to_string(),
-            categories: vec![SearchCategory::Images, SearchCategory::General],
+            name: "TinEye".to_string().into(),
+            display_name: "TinEye".to_string().into(),
+            homepage: "https://tineye.com".to_string().into(),
+            categories: smallvec![SearchCategory::Images, SearchCategory::General],
             enabled: true,
             timeout_ms: 5000,
             weight: 1.0,

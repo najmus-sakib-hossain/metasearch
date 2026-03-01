@@ -10,6 +10,7 @@ use metasearch_core::{
     result::SearchResult,
 };
 use reqwest::Client;
+use smallvec::smallvec;
 
 pub struct YouTube {
     metadata: EngineMetadata,
@@ -20,10 +21,10 @@ impl YouTube {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "youtube".to_string(),
-                display_name: "YouTube".to_string(),
-                homepage: "https://www.youtube.com".to_string(),
-                categories: vec![SearchCategory::Videos],
+                name: "youtube".to_string().into(),
+                display_name: "YouTube".to_string().into(),
+                homepage: "https://www.youtube.com".to_string().into(),
+                categories: smallvec![SearchCategory::Videos],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 1.5,

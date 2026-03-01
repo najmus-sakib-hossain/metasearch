@@ -9,6 +9,7 @@ use metasearch_core::{
     result::SearchResult,
 };
 use reqwest::Client;
+use smallvec::smallvec;
 
 pub struct Repology {
     metadata: EngineMetadata,
@@ -19,10 +20,10 @@ impl Repology {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "repology".to_string(),
-                display_name: "Repology".to_string(),
-                homepage: "https://repology.org".to_string(),
-                categories: vec![SearchCategory::IT],
+                name: "repology".to_string().into(),
+                display_name: "Repology".to_string().into(),
+                homepage: "https://repology.org".to_string().into(),
+                categories: smallvec![SearchCategory::IT],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 1.0,

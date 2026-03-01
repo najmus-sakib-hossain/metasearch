@@ -12,6 +12,7 @@ use metasearch_core::{
 };
 use reqwest::Client;
 use serde::Deserialize;
+use smallvec::smallvec;
 
 pub struct CccMedia {
     metadata: EngineMetadata,
@@ -22,10 +23,10 @@ impl CccMedia {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "ccc_media".to_string(),
-                display_name: "CCC Media".to_string(),
-                homepage: "https://media.ccc.de".to_string(),
-                categories: vec![SearchCategory::Videos],
+                name: "ccc_media".to_string().into(),
+                display_name: "CCC Media".to_string().into(),
+                homepage: "https://media.ccc.de".to_string().into(),
+                categories: smallvec![SearchCategory::Videos],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 0.6,

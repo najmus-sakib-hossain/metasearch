@@ -8,6 +8,7 @@
 use async_trait::async_trait;
 use reqwest::Client;
 use serde::Deserialize;
+use smallvec::smallvec;
 
 use metasearch_core::{
     category::SearchCategory,
@@ -45,10 +46,10 @@ struct CodeResult {
 impl SearchEngine for Searchcode {
     fn metadata(&self) -> EngineMetadata {
         EngineMetadata {
-            name: "Searchcode".to_string(),
-            display_name: "Searchcode".to_string(),
-            homepage: "https://Searchcode.com".to_string(),
-            categories: vec![SearchCategory::IT],
+            name: "Searchcode".to_string().into(),
+            display_name: "Searchcode".to_string().into(),
+            homepage: "https://Searchcode.com".to_string().into(),
+            categories: smallvec![SearchCategory::IT],
             enabled: true,
             timeout_ms: 5000,
             weight: 1.0,

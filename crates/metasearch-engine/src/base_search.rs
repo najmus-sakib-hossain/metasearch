@@ -13,6 +13,7 @@ use metasearch_core::{
 };
 use regex::Regex;
 use reqwest::Client;
+use smallvec::smallvec;
 
 pub struct BaseSearch {
     metadata: EngineMetadata,
@@ -23,10 +24,10 @@ impl BaseSearch {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "base_search".to_string(),
-                display_name: "BASE".to_string(),
-                homepage: "https://base-search.net".to_string(),
-                categories: vec![SearchCategory::General],
+                name: "base_search".to_string().into(),
+                display_name: "BASE".to_string().into(),
+                homepage: "https://base-search.net".to_string().into(),
+                categories: smallvec![SearchCategory::General],
                 enabled: true,
                 timeout_ms: 6000,
                 weight: 1.0,

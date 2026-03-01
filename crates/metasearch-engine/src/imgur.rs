@@ -14,6 +14,7 @@ use metasearch_core::{
 };
 use reqwest::Client;
 use scraper::{Html, Selector};
+use smallvec::smallvec;
 
 pub struct Imgur {
     metadata: EngineMetadata,
@@ -24,10 +25,10 @@ impl Imgur {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "imgur".to_string(),
-                display_name: "Imgur".to_string(),
-                homepage: "https://imgur.com".to_string(),
-                categories: vec![SearchCategory::Images],
+                name: "imgur".to_string().into(),
+                display_name: "Imgur".to_string().into(),
+                homepage: "https://imgur.com".to_string().into(),
+                categories: smallvec![SearchCategory::Images],
                 enabled: true,
                 timeout_ms: 8000,
                 weight: 0.7,

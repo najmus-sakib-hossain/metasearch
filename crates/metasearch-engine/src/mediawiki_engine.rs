@@ -7,6 +7,7 @@
 use async_trait::async_trait;
 use reqwest::Client;
 use serde::Deserialize;
+use smallvec::smallvec;
 
 use metasearch_core::{
     category::SearchCategory,
@@ -58,10 +59,10 @@ fn strip_search_highlight(s: &str) -> String {
 impl SearchEngine for MediaWikiEngine {
     fn metadata(&self) -> EngineMetadata {
         EngineMetadata {
-            name: "mediawiki".to_string(),
-            display_name: "MediaWiki".to_string(),
-            homepage: "https://www.mediawiki.org".to_string(),
-            categories: vec![SearchCategory::General],
+            name: "mediawiki".to_string().into(),
+            display_name: "MediaWiki".to_string().into(),
+            homepage: "https://www.mediawiki.org".to_string().into(),
+            categories: smallvec![SearchCategory::General],
             enabled: !self.base_url.is_empty(),
             timeout_ms: 5000,
             weight: 1.0,

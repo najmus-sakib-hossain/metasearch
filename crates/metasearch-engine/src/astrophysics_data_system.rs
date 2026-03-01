@@ -14,6 +14,7 @@ use metasearch_core::{
 };
 use reqwest::Client;
 use tracing::info;
+use smallvec::smallvec;
 
 pub struct AstrophysicsDataSystem {
     metadata: EngineMetadata,
@@ -25,10 +26,10 @@ impl AstrophysicsDataSystem {
     pub fn new(client: Client, api_key: Option<String>) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "astrophysics_data_system".to_string(),
-                display_name: "ADS".to_string(),
-                homepage: "https://ui.adsabs.harvard.edu".to_string(),
-                categories: vec![SearchCategory::Science],
+                name: "astrophysics_data_system".to_string().into(),
+                display_name: "ADS".to_string().into(),
+                homepage: "https://ui.adsabs.harvard.edu".to_string().into(),
+                categories: smallvec![SearchCategory::Science],
                 enabled: api_key.is_some(),
                 timeout_ms: 8000,
                 weight: 1.0,

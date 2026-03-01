@@ -14,3 +14,10 @@ uuid.workspace = true
 thiserror.workspace = true
 async-trait.workspace = true
 tracing.workspace = true
+
+# Performance optimizations
+dashmap.workspace = true
+rayon.workspace = true
+smallvec = { workspace = true, features = ["serde"] }
+compact_str = { workspace = true }
+ahash.workspace = true

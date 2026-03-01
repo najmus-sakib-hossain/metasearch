@@ -10,6 +10,7 @@ use metasearch_core::{
 };
 use reqwest::Client;
 use serde::Deserialize;
+use smallvec::smallvec;
 
 pub struct Photon {
     metadata: EngineMetadata,
@@ -20,10 +21,10 @@ impl Photon {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "photon".to_string(),
-                display_name: "Photon".to_string(),
-                homepage: "https://photon.komoot.io".to_string(),
-                categories: vec![SearchCategory::Maps],
+                name: "photon".to_string().into(),
+                display_name: "Photon".to_string().into(),
+                homepage: "https://photon.komoot.io".to_string().into(),
+                categories: smallvec![SearchCategory::Maps],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 1.0,

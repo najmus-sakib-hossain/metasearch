@@ -11,6 +11,7 @@ use metasearch_core::{
     result::SearchResult,
 };
 use reqwest::Client;
+use smallvec::smallvec;
 
 pub struct Iqiyi {
     metadata: EngineMetadata,
@@ -21,10 +22,10 @@ impl Iqiyi {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "iqiyi".to_string(),
-                display_name: "iQiyi".to_string(),
-                homepage: "https://www.iqiyi.com".to_string(),
-                categories: vec![SearchCategory::Videos],
+                name: "iqiyi".to_string().into(),
+                display_name: "iQiyi".to_string().into(),
+                homepage: "https://www.iqiyi.com".to_string().into(),
+                categories: smallvec![SearchCategory::Videos],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 1.0,

@@ -10,6 +10,7 @@ use metasearch_core::{
     result::SearchResult,
 };
 use reqwest::Client;
+use smallvec::smallvec;
 
 pub struct Chefkoch {
     metadata: EngineMetadata,
@@ -20,10 +21,10 @@ impl Chefkoch {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "chefkoch".to_string(),
-                display_name: "Chefkoch".to_string(),
-                homepage: "https://www.chefkoch.de".to_string(),
-                categories: vec![SearchCategory::General],
+                name: "chefkoch".to_string().into(),
+                display_name: "Chefkoch".to_string().into(),
+                homepage: "https://www.chefkoch.de".to_string().into(),
+                categories: smallvec![SearchCategory::General],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 0.5,

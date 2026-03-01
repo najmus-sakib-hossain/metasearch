@@ -13,6 +13,7 @@ use metasearch_core::{
 };
 use regex::Regex;
 use reqwest::Client;
+use smallvec::smallvec;
 
 pub struct Torznab {
     metadata: EngineMetadata,
@@ -32,10 +33,10 @@ impl Torznab {
         };
         Self {
             metadata: EngineMetadata {
-                name: "torznab".to_string(),
-                display_name: "Torznab".to_string(),
-                homepage,
-                categories: vec![SearchCategory::Files],
+                name: "torznab".to_string().into(),
+                display_name: "Torznab".to_string().into(),
+                homepage: homepage.into(),
+                categories: smallvec![SearchCategory::Files],
                 enabled,
                 timeout_ms: 8000,
                 weight: 0.6,

@@ -15,6 +15,7 @@ use metasearch_core::{
 use reqwest::Client;
 use serde::Deserialize;
 use tracing::info;
+use smallvec::smallvec;
 
 pub struct CoreEngine {
     metadata: EngineMetadata,
@@ -26,10 +27,10 @@ impl CoreEngine {
     pub fn new(client: Client, api_key: Option<String>) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "core".to_string(),
-                display_name: "CORE".to_string(),
-                homepage: "https://core.ac.uk".to_string(),
-                categories: vec![SearchCategory::General],
+                name: "core".to_string().into(),
+                display_name: "CORE".to_string().into(),
+                homepage: "https://core.ac.uk".to_string().into(),
+                categories: smallvec![SearchCategory::General],
                 enabled: true,
                 timeout_ms: 8000,
                 weight: 1.0,

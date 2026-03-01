@@ -14,6 +14,7 @@ use metasearch_core::{
 };
 use reqwest::Client;
 use serde::Deserialize;
+use smallvec::smallvec;
 
 pub struct ThreeSixtySearchVideos {
     metadata: EngineMetadata,
@@ -24,10 +25,10 @@ impl ThreeSixtySearchVideos {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "360search_videos".to_string(),
-                display_name: "360 Search Videos".to_string(),
-                homepage: "https://tv.360kan.com".to_string(),
-                categories: vec![SearchCategory::Videos],
+                name: "360search_videos".to_string().into(),
+                display_name: "360 Search Videos".to_string().into(),
+                homepage: "https://tv.360kan.com".to_string().into(),
+                categories: smallvec![SearchCategory::Videos],
                 enabled: true,
                 timeout_ms: 8000,
                 weight: 0.5,

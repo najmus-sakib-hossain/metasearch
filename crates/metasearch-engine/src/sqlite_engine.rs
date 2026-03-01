@@ -17,6 +17,7 @@
 //! ```
 
 use async_trait::async_trait;
+use smallvec::smallvec;
 
 use metasearch_core::{
     category::SearchCategory,
@@ -64,10 +65,10 @@ impl SqliteEngine {
 
         Self {
             metadata: EngineMetadata {
-                name: "sqlite".to_string(),
-                display_name: "SQLite".to_string(),
-                homepage: "https://www.sqlite.org".to_string(),
-                categories: vec![SearchCategory::General],
+                name: "sqlite".to_string().into(),
+                display_name: "SQLite".to_string().into(),
+                homepage: "https://www.sqlite.org".to_string().into(),
+                categories: smallvec![SearchCategory::General],
                 enabled,
                 timeout_ms: 5000,
                 weight: 0.8,

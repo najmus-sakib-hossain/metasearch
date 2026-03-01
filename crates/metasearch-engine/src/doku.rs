@@ -7,6 +7,7 @@
 use async_trait::async_trait;
 use reqwest::Client;
 use scraper::{Html, Selector};
+use smallvec::smallvec;
 
 use metasearch_core::{
     category::SearchCategory,
@@ -34,10 +35,10 @@ impl Doku {
 impl SearchEngine for Doku {
     fn metadata(&self) -> EngineMetadata {
         EngineMetadata {
-            name: "dokuwiki".to_string(),
-            display_name: "DokuWiki".to_string(),
-            homepage: "https://www.dokuwiki.org".to_string(),
-            categories: vec![SearchCategory::General],
+            name: "dokuwiki".to_string().into(),
+            display_name: "DokuWiki".to_string().into(),
+            homepage: "https://www.dokuwiki.org".to_string().into(),
+            categories: smallvec![SearchCategory::General],
             enabled: !self.base_url.is_empty(),
             timeout_ms: 5000,
             weight: 1.0,

@@ -13,6 +13,7 @@ use metasearch_core::{
     result::SearchResult,
 };
 use reqwest::Client;
+use smallvec::smallvec;
 
 const PDBE_BASE: &str = "https://www.ebi.ac.uk/pdbe";
 
@@ -25,10 +26,10 @@ impl Pdbe {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "pdbe".to_string(),
-                display_name: "PDBe".to_string(),
-                homepage: PDBE_BASE.to_string(),
-                categories: vec![SearchCategory::Science],
+                name: "pdbe".to_string().into(),
+                display_name: "PDBe".to_string().into(),
+                homepage: PDBE_BASE.to_string().into(),
+                categories: smallvec![SearchCategory::Science],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 0.8,

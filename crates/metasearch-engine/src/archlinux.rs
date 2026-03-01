@@ -13,6 +13,7 @@ use metasearch_core::{
     result::SearchResult,
 };
 use reqwest::Client;
+use smallvec::smallvec;
 
 pub struct ArchLinux {
     metadata: EngineMetadata,
@@ -23,10 +24,10 @@ impl ArchLinux {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "archlinux".to_string(),
-                display_name: "Arch Linux".to_string(),
-                homepage: "https://archlinux.org".to_string(),
-                categories: vec![SearchCategory::IT],
+                name: "archlinux".to_string().into(),
+                display_name: "Arch Linux".to_string().into(),
+                homepage: "https://archlinux.org".to_string().into(),
+                categories: smallvec![SearchCategory::IT],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 0.8,

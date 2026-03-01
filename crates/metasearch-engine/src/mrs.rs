@@ -4,6 +4,7 @@
 
 use async_trait::async_trait;
 use reqwest::Client;
+use smallvec::smallvec;
 
 use metasearch_core::{
     category::SearchCategory,
@@ -24,10 +25,10 @@ impl Mrs {
         let trimmed = base_url.trim_end_matches('/').to_string();
         Self {
             metadata: EngineMetadata {
-                name: "mrs".to_string(),
-                display_name: "Matrix Rooms Search".to_string(),
-                homepage: "https://matrixrooms.info".to_string(),
-                categories: vec![SearchCategory::SocialMedia],
+                name: "mrs".to_string().into(),
+                display_name: "Matrix Rooms Search".to_string().into(),
+                homepage: "https://matrixrooms.info".to_string().into(),
+                categories: smallvec![SearchCategory::SocialMedia],
                 enabled: !trimmed.is_empty(),
                 timeout_ms: 5000,
                 weight: 1.0,

@@ -12,6 +12,7 @@ use metasearch_core::{
 };
 use reqwest::Client;
 use scraper::{Html, Selector};
+use smallvec::smallvec;
 
 pub struct Digbt {
     metadata: EngineMetadata,
@@ -22,10 +23,10 @@ impl Digbt {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "digbt".to_string(),
-                display_name: "DigBT".to_string(),
-                homepage: "https://digbt.org".to_string(),
-                categories: vec![SearchCategory::Files],
+                name: "digbt".to_string().into(),
+                display_name: "DigBT".to_string().into(),
+                homepage: "https://digbt.org".to_string().into(),
+                categories: smallvec![SearchCategory::Files],
                 enabled: true,
                 timeout_ms: 6000,
                 weight: 1.0,

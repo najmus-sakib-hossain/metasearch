@@ -11,6 +11,7 @@ use metasearch_core::{
     result::SearchResult,
 };
 use reqwest::Client;
+use smallvec::smallvec;
 
 pub struct Yep {
     metadata: EngineMetadata,
@@ -21,10 +22,10 @@ impl Yep {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "yep".to_string(),
-                display_name: "Yep".to_string(),
-                homepage: "https://yep.com".to_string(),
-                categories: vec![SearchCategory::General],
+                name: "yep".to_string().into(),
+                display_name: "Yep".to_string().into(),
+                homepage: "https://yep.com".to_string().into(),
+                categories: smallvec![SearchCategory::General],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 1.0,

@@ -11,6 +11,7 @@ use metasearch_core::{
 };
 use reqwest::Client;
 use scraper::{Html, Selector};
+use smallvec::smallvec;
 
 pub struct DuckDuckGo {
     metadata: EngineMetadata,
@@ -21,10 +22,10 @@ impl DuckDuckGo {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "duckduckgo".to_string(),
-                display_name: "DuckDuckGo".to_string(),
-                homepage: "https://duckduckgo.com".to_string(),
-                categories: vec![
+                name: "duckduckgo".to_string().into(),
+                display_name: "DuckDuckGo".to_string().into(),
+                homepage: "https://duckduckgo.com".to_string().into(),
+                categories: smallvec![
                     SearchCategory::General,
                     SearchCategory::Images,
                     SearchCategory::News,

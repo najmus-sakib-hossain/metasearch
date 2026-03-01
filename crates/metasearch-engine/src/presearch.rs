@@ -14,6 +14,7 @@ use metasearch_core::{
 use regex::Regex;
 use reqwest::Client;
 use tracing::info;
+use smallvec::smallvec;
 
 pub struct Presearch {
     metadata: EngineMetadata,
@@ -24,10 +25,10 @@ impl Presearch {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "presearch".to_string(),
-                display_name: "Presearch".to_string(),
-                homepage: "https://presearch.io".to_string(),
-                categories: vec![SearchCategory::General],
+                name: "presearch".to_string().into(),
+                display_name: "Presearch".to_string().into(),
+                homepage: "https://presearch.io".to_string().into(),
+                categories: smallvec![SearchCategory::General],
                 enabled: true,
                 timeout_ms: 8000,
                 weight: 1.0,

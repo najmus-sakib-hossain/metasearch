@@ -11,6 +11,7 @@ use metasearch_core::{
     result::SearchResult,
 };
 use reqwest::Client;
+use smallvec::smallvec;
 
 pub struct Bt4g {
     metadata: EngineMetadata,
@@ -21,10 +22,10 @@ impl Bt4g {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "bt4g".to_string(),
-                display_name: "BT4G".to_string(),
-                homepage: "https://bt4gprx.com".to_string(),
-                categories: vec![SearchCategory::Files],
+                name: "bt4g".to_string().into(),
+                display_name: "BT4G".to_string().into(),
+                homepage: "https://bt4gprx.com".to_string().into(),
+                categories: smallvec![SearchCategory::Files],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 0.6,

@@ -13,6 +13,7 @@ use metasearch_core::{
     result::SearchResult,
 };
 use reqwest::Client;
+use smallvec::smallvec;
 
 pub struct SogouVideos {
     metadata: EngineMetadata,
@@ -23,10 +24,10 @@ impl SogouVideos {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "sogou_videos".to_string(),
-                display_name: "Sogou Videos".to_string(),
-                homepage: "https://v.sogou.com".to_string(),
-                categories: vec![SearchCategory::Videos],
+                name: "sogou_videos".to_string().into(),
+                display_name: "Sogou Videos".to_string().into(),
+                homepage: "https://v.sogou.com".to_string().into(),
+                categories: smallvec![SearchCategory::Videos],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 0.8,

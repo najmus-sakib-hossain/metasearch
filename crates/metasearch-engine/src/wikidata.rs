@@ -13,6 +13,7 @@ use metasearch_core::{
     result::SearchResult,
 };
 use reqwest::Client;
+use smallvec::smallvec;
 
 pub struct Wikidata {
     metadata: EngineMetadata,
@@ -23,10 +24,10 @@ impl Wikidata {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "wikidata".to_string(),
-                display_name: "Wikidata".to_string(),
-                homepage: "https://www.wikidata.org".to_string(),
-                categories: vec![SearchCategory::General],
+                name: "wikidata".to_string().into(),
+                display_name: "Wikidata".to_string().into(),
+                homepage: "https://www.wikidata.org".to_string().into(),
+                categories: smallvec![SearchCategory::General],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 0.8,

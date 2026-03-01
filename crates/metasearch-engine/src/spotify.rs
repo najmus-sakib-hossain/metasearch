@@ -14,6 +14,7 @@ use metasearch_core::{
     result::SearchResult,
 };
 use reqwest::Client;
+use smallvec::smallvec;
 
 pub struct Spotify {
     metadata: EngineMetadata,
@@ -26,10 +27,10 @@ impl Spotify {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "spotify".to_string(),
-                display_name: "Spotify".to_string(),
-                homepage: "https://www.spotify.com".to_string(),
-                categories: vec![SearchCategory::Music],
+                name: "spotify".to_string().into(),
+                display_name: "Spotify".to_string().into(),
+                homepage: "https://www.spotify.com".to_string().into(),
+                categories: smallvec![SearchCategory::Music],
                 enabled: false, // Disabled by default — needs API credentials
                 timeout_ms: 5000,
                 weight: 1.0,
@@ -43,10 +44,10 @@ impl Spotify {
     pub fn with_credentials(client: Client, client_id: String, client_secret: String) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "spotify".to_string(),
-                display_name: "Spotify".to_string(),
-                homepage: "https://www.spotify.com".to_string(),
-                categories: vec![SearchCategory::Music],
+                name: "spotify".to_string().into(),
+                display_name: "Spotify".to_string().into(),
+                homepage: "https://www.spotify.com".to_string().into(),
+                categories: smallvec![SearchCategory::Music],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 1.0,

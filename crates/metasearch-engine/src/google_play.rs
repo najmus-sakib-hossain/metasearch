@@ -5,6 +5,7 @@
 use async_trait::async_trait;
 use reqwest::Client;
 use scraper::{Html, Selector};
+use smallvec::smallvec;
 
 use metasearch_core::{
     category::SearchCategory,
@@ -23,10 +24,10 @@ impl GooglePlay {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "google_play".to_string(),
-                display_name: "Google Play".to_string(),
-                homepage: "https://play.google.com".to_string(),
-                categories: vec![SearchCategory::General],
+                name: "google_play".to_string().into(),
+                display_name: "Google Play".to_string().into(),
+                homepage: "https://play.google.com".to_string().into(),
+                categories: smallvec![SearchCategory::General],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 0.6,

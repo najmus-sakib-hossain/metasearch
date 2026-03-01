@@ -10,6 +10,7 @@ use metasearch_core::{
     result::SearchResult,
 };
 use reqwest::Client;
+use smallvec::smallvec;
 
 pub struct Flickr {
     metadata: EngineMetadata,
@@ -20,10 +21,10 @@ impl Flickr {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "flickr".to_string(),
-                display_name: "Flickr".to_string(),
-                homepage: "https://www.flickr.com".to_string(),
-                categories: vec![SearchCategory::Images],
+                name: "flickr".to_string().into(),
+                display_name: "Flickr".to_string().into(),
+                homepage: "https://www.flickr.com".to_string().into(),
+                categories: smallvec![SearchCategory::Images],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 1.0,
@@ -130,6 +131,13 @@ impl SearchEngine for Flickr {
                     if img_src.is_empty() {
                         continue;
                     }
+
+                    // Fix protocol-relative URLs
+                    let img_src = if img_src.starts_with("//") {
+                        format!("https:{}", img_src)
+                    } else {
+                        img_src
+                    };
 
                     let snippet = format!("{} @ Flickr", username);
 

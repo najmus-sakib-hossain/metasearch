@@ -24,3 +24,11 @@ chrono.workspace = true
 uuid.workspace = true
 anyhow.workspace = true
 futures.workspace = true
+
+# Performance
+dashmap.workspace = true
+parking_lot.workspace = true
+rustc-hash.workspace = true
+ahash.workspace = true
+compact_str = { workspace = true }
+smallvec = { workspace = true }

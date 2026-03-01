@@ -10,6 +10,7 @@ use metasearch_core::{
     result::SearchResult,
 };
 use reqwest::Client;
+use smallvec::smallvec;
 
 static HTML_TAG_RE: std::sync::LazyLock<regex::Regex> =
     std::sync::LazyLock::new(|| regex::Regex::new(r"<[^>]+>").unwrap());
@@ -24,10 +25,10 @@ impl Mastodon {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "mastodon".to_string(),
-                display_name: "Mastodon".to_string(),
-                homepage: "https://mastodon.social".to_string(),
-                categories: vec![SearchCategory::SocialMedia],
+                name: "mastodon".to_string().into(),
+                display_name: "Mastodon".to_string().into(),
+                homepage: "https://mastodon.social".to_string().into(),
+                categories: smallvec![SearchCategory::SocialMedia],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 0.8,
@@ -40,10 +41,10 @@ impl Mastodon {
     pub fn with_base_url(client: Client, base_url: &str) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "mastodon".to_string(),
-                display_name: "Mastodon".to_string(),
-                homepage: base_url.to_string(),
-                categories: vec![SearchCategory::SocialMedia],
+                name: "mastodon".to_string().into(),
+                display_name: "Mastodon".to_string().into(),
+                homepage: base_url.to_string().into(),
+                categories: smallvec![SearchCategory::SocialMedia],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 0.8,

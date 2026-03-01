@@ -10,6 +10,7 @@ use metasearch_core::{
     result::SearchResult,
 };
 use reqwest::Client;
+use smallvec::smallvec;
 
 pub struct Mixcloud {
     metadata: EngineMetadata,
@@ -20,10 +21,10 @@ impl Mixcloud {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "mixcloud".to_string(),
-                display_name: "Mixcloud".to_string(),
-                homepage: "https://www.mixcloud.com".to_string(),
-                categories: vec![SearchCategory::Music],
+                name: "mixcloud".to_string().into(),
+                display_name: "Mixcloud".to_string().into(),
+                homepage: "https://www.mixcloud.com".to_string().into(),
+                categories: smallvec![SearchCategory::Music],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 0.7,

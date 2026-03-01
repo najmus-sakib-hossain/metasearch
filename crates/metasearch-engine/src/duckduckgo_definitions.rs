@@ -14,6 +14,7 @@ use metasearch_core::{
 use reqwest::Client;
 use serde::Deserialize;
 use tracing::info;
+use smallvec::smallvec;
 
 pub struct DuckDuckGoDefinitions {
     metadata: EngineMetadata,
@@ -24,10 +25,10 @@ impl DuckDuckGoDefinitions {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "duckduckgo_definitions".to_string(),
-                display_name: "DuckDuckGo Definitions".to_string(),
-                homepage: "https://duckduckgo.com/".to_string(),
-                categories: vec![SearchCategory::General],
+                name: "duckduckgo_definitions".to_string().into(),
+                display_name: "DuckDuckGo Definitions".to_string().into(),
+                homepage: "https://duckduckgo.com/".to_string().into(),
+                categories: smallvec![SearchCategory::General],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 1.0,

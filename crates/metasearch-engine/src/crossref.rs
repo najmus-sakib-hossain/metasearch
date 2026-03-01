@@ -10,6 +10,7 @@ use metasearch_core::{
     result::SearchResult,
 };
 use reqwest::Client;
+use smallvec::smallvec;
 
 pub struct Crossref {
     metadata: EngineMetadata,
@@ -20,10 +21,10 @@ impl Crossref {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "crossref".to_string(),
-                display_name: "Crossref".to_string(),
-                homepage: "https://www.crossref.org".to_string(),
-                categories: vec![SearchCategory::Science],
+                name: "crossref".to_string().into(),
+                display_name: "Crossref".to_string().into(),
+                homepage: "https://www.crossref.org".to_string().into(),
+                categories: smallvec![SearchCategory::Science],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 1.0,

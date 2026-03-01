@@ -8,6 +8,7 @@
 use async_trait::async_trait;
 use reqwest::Client;
 use serde::Deserialize;
+use smallvec::smallvec;
 
 use metasearch_core::{
     category::SearchCategory,
@@ -45,10 +46,10 @@ struct TootCard {
 impl SearchEngine for Tootfinder {
     fn metadata(&self) -> EngineMetadata {
         EngineMetadata {
-            name: "Tootfinder".to_string(),
-            display_name: "Tootfinder".to_string(),
-            homepage: "https://Tootfinder.com".to_string(),
-            categories: vec![SearchCategory::SocialMedia],
+            name: "Tootfinder".to_string().into(),
+            display_name: "Tootfinder".to_string().into(),
+            homepage: "https://Tootfinder.com".to_string().into(),
+            categories: smallvec![SearchCategory::SocialMedia],
             enabled: true,
             timeout_ms: 5000,
             weight: 1.0,

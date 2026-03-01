@@ -14,6 +14,7 @@ use metasearch_core::{
 };
 use reqwest::Client;
 use scraper::{Html, Selector};
+use smallvec::smallvec;
 
 pub struct Kickass {
     metadata: EngineMetadata,
@@ -24,10 +25,10 @@ impl Kickass {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "kickass".to_string(),
-                display_name: "Kickass Torrents".to_string(),
-                homepage: "https://kickasstorrents.to".to_string(),
-                categories: vec![SearchCategory::Files],
+                name: "kickass".to_string().into(),
+                display_name: "Kickass Torrents".to_string().into(),
+                homepage: "https://kickasstorrents.to".to_string().into(),
+                categories: smallvec![SearchCategory::Files],
                 enabled: true,
                 timeout_ms: 8000,
                 weight: 0.6,

@@ -5,6 +5,7 @@
 use async_trait::async_trait;
 use reqwest::Client;
 use serde::Deserialize;
+use smallvec::smallvec;
 
 use metasearch_core::{
     category::SearchCategory,
@@ -68,10 +69,10 @@ struct SepiaAccount {
 impl SearchEngine for SepiaSearch {
     fn metadata(&self) -> EngineMetadata {
         EngineMetadata {
-            name: "sepiasearch".to_string(),
-            display_name: "sepiasearch".to_string(),
-            homepage: "https://sepiasearch.com".to_string(),
-            categories: vec![SearchCategory::Videos],
+            name: "sepiasearch".to_string().into(),
+            display_name: "sepiasearch".to_string().into(),
+            homepage: "https://sepiasearch.com".to_string().into(),
+            categories: smallvec![SearchCategory::Videos],
             enabled: true,
             timeout_ms: 5000,
             weight: 1.0,

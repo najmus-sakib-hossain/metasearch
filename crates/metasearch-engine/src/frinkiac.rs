@@ -10,6 +10,7 @@ use metasearch_core::{
     result::SearchResult,
 };
 use reqwest::Client;
+use smallvec::smallvec;
 
 const BASE: &str = "https://frinkiac.com/";
 
@@ -22,10 +23,10 @@ impl Frinkiac {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "frinkiac".to_string(),
-                display_name: "Frinkiac".to_string(),
-                homepage: "https://frinkiac.com".to_string(),
-                categories: vec![SearchCategory::Images],
+                name: "frinkiac".to_string().into(),
+                display_name: "Frinkiac".to_string().into(),
+                homepage: "https://frinkiac.com".to_string().into(),
+                categories: smallvec![SearchCategory::Images],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 1.0,

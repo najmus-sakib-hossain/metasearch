@@ -5,6 +5,7 @@
 use async_trait::async_trait;
 use reqwest::Client;
 use serde::Deserialize;
+use smallvec::smallvec;
 
 use metasearch_core::{
     category::SearchCategory,
@@ -49,10 +50,10 @@ struct OpenLibraryDoc {
 impl SearchEngine for OpenLibrary {
     fn metadata(&self) -> EngineMetadata {
         EngineMetadata {
-            name: "openlibrary".to_string(),
-            display_name: "openlibrary".to_string(),
-            homepage: "https://openlibrary.com".to_string(),
-            categories: vec![SearchCategory::General],
+            name: "openlibrary".to_string().into(),
+            display_name: "openlibrary".to_string().into(),
+            homepage: "https://openlibrary.com".to_string().into(),
+            categories: smallvec![SearchCategory::General],
             enabled: true,
             timeout_ms: 5000,
             weight: 1.0,

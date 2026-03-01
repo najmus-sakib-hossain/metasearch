@@ -12,6 +12,7 @@ use metasearch_core::{
 };
 use reqwest::Client;
 use tracing::info;
+use smallvec::smallvec;
 
 pub struct WolframAlphaNoapi {
     metadata: EngineMetadata,
@@ -22,10 +23,10 @@ impl WolframAlphaNoapi {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "wolframalpha_noapi".to_string(),
-                display_name: "Wolfram|Alpha".to_string(),
-                homepage: "https://www.wolframalpha.com".to_string(),
-                categories: vec![SearchCategory::Science],
+                name: "wolframalpha_noapi".to_string().into(),
+                display_name: "Wolfram|Alpha".to_string().into(),
+                homepage: "https://www.wolframalpha.com".to_string().into(),
+                categories: smallvec![SearchCategory::Science],
                 enabled: true,
                 timeout_ms: 10000,
                 weight: 1.0,

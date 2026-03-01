@@ -13,7 +13,9 @@ use metasearch_core::{
 };
 use reqwest::Client;
 use scraper::{Html, Selector};
+use std::borrow::Cow;
 use tracing::info;
+use smallvec::smallvec;
 
 #[allow(dead_code)]
 pub struct Brave {
@@ -26,10 +28,10 @@ impl Brave {
     pub fn new(client: Client, api_key: Option<String>) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "brave".to_string(),
-                display_name: "Brave Search".to_string(),
-                homepage: "https://search.brave.com".to_string(),
-                categories: vec![SearchCategory::General, SearchCategory::News],
+                name: Cow::Borrowed("brave"),
+                display_name: Cow::Borrowed("Brave Search"),
+                homepage: Cow::Borrowed("https://search.brave.com"),
+                categories: smallvec![SearchCategory::General, SearchCategory::News],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 1.3,

@@ -17,6 +17,7 @@ use regex::Regex;
 use reqwest::Client;
 use scraper::{Html, Selector};
 use tracing::{info, warn};
+use smallvec::smallvec;
 
 pub struct Sogou {
     metadata: EngineMetadata,
@@ -27,10 +28,10 @@ impl Sogou {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "sogou".to_string(),
-                display_name: "Sogou".to_string(),
-                homepage: "https://www.sogou.com".to_string(),
-                categories: vec![SearchCategory::General],
+                name: "sogou".to_string().into(),
+                display_name: "Sogou".to_string().into(),
+                homepage: "https://www.sogou.com".to_string().into(),
+                categories: smallvec![SearchCategory::General],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 1.0,

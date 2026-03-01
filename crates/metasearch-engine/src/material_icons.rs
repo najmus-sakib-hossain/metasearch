@@ -11,6 +11,7 @@ use metasearch_core::{
     result::SearchResult,
 };
 use reqwest::Client;
+use smallvec::smallvec;
 
 pub struct MaterialIcons {
     metadata: EngineMetadata,
@@ -21,10 +22,10 @@ impl MaterialIcons {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "material_icons".to_string(),
-                display_name: "Material Icons".to_string(),
-                homepage: "https://fonts.google.com/icons".to_string(),
-                categories: vec![SearchCategory::Images],
+                name: "material_icons".to_string().into(),
+                display_name: "Material Icons".to_string().into(),
+                homepage: "https://fonts.google.com/icons".to_string().into(),
+                categories: smallvec![SearchCategory::Images],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 1.0,

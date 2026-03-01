@@ -13,6 +13,7 @@ use metasearch_core::{
     result::SearchResult,
 };
 use reqwest::Client;
+use smallvec::smallvec;
 
 pub struct Qwant {
     metadata: EngineMetadata,
@@ -23,10 +24,10 @@ impl Qwant {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "qwant".to_string(),
-                display_name: "Qwant".to_string(),
-                homepage: "https://www.qwant.com".to_string(),
-                categories: vec![SearchCategory::General],
+                name: "qwant".to_string().into(),
+                display_name: "Qwant".to_string().into(),
+                homepage: "https://www.qwant.com".to_string().into(),
+                categories: smallvec![SearchCategory::General],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 1.0,

@@ -10,6 +10,7 @@ use metasearch_core::{
     result::SearchResult,
 };
 use reqwest::Client;
+use smallvec::smallvec;
 
 const PAGE_SIZE: u32 = 25;
 
@@ -22,10 +23,10 @@ impl Npm {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "npm".to_string(),
-                display_name: "npm".to_string(),
-                homepage: "https://www.npmjs.com".to_string(),
-                categories: vec![SearchCategory::IT],
+                name: "npm".to_string().into(),
+                display_name: "npm".to_string().into(),
+                homepage: "https://www.npmjs.com".to_string().into(),
+                categories: smallvec![SearchCategory::IT],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 1.0,

@@ -15,6 +15,7 @@ use metasearch_core::{
 use reqwest::Client;
 use scraper::{Html, Selector};
 use tracing::info;
+use smallvec::smallvec;
 
 const BASE_URL: &str = "https://z-lib.fm";
 
@@ -27,10 +28,10 @@ impl Zlibrary {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "zlibrary".to_string(),
-                display_name: "Z-Library".to_string(),
-                homepage: BASE_URL.to_string(),
-                categories: vec![SearchCategory::Files],
+                name: "zlibrary".to_string().into(),
+                display_name: "Z-Library".to_string().into(),
+                homepage: BASE_URL.to_string().into(),
+                categories: smallvec![SearchCategory::Files],
                 enabled: true,
                 timeout_ms: 6000,
                 weight: 1.0,

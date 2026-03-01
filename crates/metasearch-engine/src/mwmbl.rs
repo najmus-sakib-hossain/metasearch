@@ -12,6 +12,7 @@ use metasearch_core::{
 };
 use reqwest::Client;
 use serde::Deserialize;
+use smallvec::smallvec;
 
 pub struct Mwmbl {
     metadata: EngineMetadata,
@@ -22,10 +23,10 @@ impl Mwmbl {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "mwmbl".to_string(),
-                display_name: "Mwmbl".to_string(),
-                homepage: "https://mwmbl.org".to_string(),
-                categories: vec![SearchCategory::General],
+                name: "mwmbl".to_string().into(),
+                display_name: "Mwmbl".to_string().into(),
+                homepage: "https://mwmbl.org".to_string().into(),
+                categories: smallvec![SearchCategory::General],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 1.0,

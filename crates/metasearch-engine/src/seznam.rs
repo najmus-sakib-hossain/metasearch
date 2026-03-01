@@ -14,6 +14,7 @@ use metasearch_core::{
 };
 use reqwest::Client;
 use scraper::{Html, Selector};
+use smallvec::smallvec;
 
 pub struct Seznam {
     metadata: EngineMetadata,
@@ -24,10 +25,10 @@ impl Seznam {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "seznam".to_string(),
-                display_name: "Seznam".to_string(),
-                homepage: "https://www.seznam.cz".to_string(),
-                categories: vec![SearchCategory::General],
+                name: "seznam".to_string().into(),
+                display_name: "Seznam".to_string().into(),
+                homepage: "https://www.seznam.cz".to_string().into(),
+                categories: smallvec![SearchCategory::General],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 1.0,

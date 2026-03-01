@@ -14,6 +14,7 @@ use metasearch_core::{
 };
 use reqwest::Client;
 use scraper::{Html, Selector};
+use smallvec::smallvec;
 
 pub struct Yahoo {
     metadata: EngineMetadata,
@@ -24,10 +25,10 @@ impl Yahoo {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "yahoo".to_string(),
-                display_name: "Yahoo".to_string(),
-                homepage: "https://search.yahoo.com".to_string(),
-                categories: vec![SearchCategory::General],
+                name: "yahoo".to_string().into(),
+                display_name: "Yahoo".to_string().into(),
+                homepage: "https://search.yahoo.com".to_string().into(),
+                categories: smallvec![SearchCategory::General],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 1.0,

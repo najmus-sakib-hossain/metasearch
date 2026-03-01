@@ -10,6 +10,7 @@ use metasearch_core::{
     result::SearchResult,
 };
 use reqwest::Client;
+use smallvec::smallvec;
 
 pub struct Hex {
     metadata: EngineMetadata,
@@ -20,10 +21,10 @@ impl Hex {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "hex".to_string(),
-                display_name: "Hex.pm".to_string(),
-                homepage: "https://hex.pm".to_string(),
-                categories: vec![SearchCategory::IT],
+                name: "hex".to_string().into(),
+                display_name: "Hex.pm".to_string().into(),
+                homepage: "https://hex.pm".to_string().into(),
+                categories: smallvec![SearchCategory::IT],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 1.0,

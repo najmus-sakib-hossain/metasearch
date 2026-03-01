@@ -7,6 +7,7 @@
 
 use async_trait::async_trait;
 use reqwest::Client;
+use smallvec::smallvec;
 
 use metasearch_core::{
     category::SearchCategory,
@@ -30,10 +31,10 @@ impl OpenStreetMap {
 impl SearchEngine for OpenStreetMap {
     fn metadata(&self) -> EngineMetadata {
         EngineMetadata {
-            name: "OpenStreetMap".to_string(),
-            display_name: "OpenStreetMap".to_string(),
-            homepage: "https://nominatim.openstreetmap.org".to_string(),
-            categories: vec![SearchCategory::Maps],
+            name: "OpenStreetMap".to_string().into(),
+            display_name: "OpenStreetMap".to_string().into(),
+            homepage: "https://nominatim.openstreetmap.org".to_string().into(),
+            categories: smallvec![SearchCategory::Maps],
             enabled: true,
             timeout_ms: 5000,
             weight: 1.0,

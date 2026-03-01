@@ -10,6 +10,7 @@ use metasearch_core::{
     result::SearchResult,
 };
 use reqwest::Client;
+use smallvec::smallvec;
 
 const PAGE_SIZE: u32 = 10;
 
@@ -22,10 +23,10 @@ impl CratesIo {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "crates_io".to_string(),
-                display_name: "crates.io".to_string(),
-                homepage: "https://crates.io".to_string(),
-                categories: vec![SearchCategory::IT],
+                name: "crates_io".to_string().into(),
+                display_name: "crates.io".to_string().into(),
+                homepage: "https://crates.io".to_string().into(),
+                categories: smallvec![SearchCategory::IT],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 1.0,

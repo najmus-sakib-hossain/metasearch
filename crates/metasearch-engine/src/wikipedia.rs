@@ -11,6 +11,7 @@ use metasearch_core::{
 use reqwest::Client;
 use serde::Deserialize;
 use tracing::info;
+use smallvec::smallvec;
 
 pub struct Wikipedia {
     metadata: EngineMetadata,
@@ -21,10 +22,10 @@ impl Wikipedia {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "wikipedia".to_string(),
-                display_name: "Wikipedia".to_string(),
-                homepage: "https://www.wikipedia.org".to_string(),
-                categories: vec![SearchCategory::General, SearchCategory::Science],
+                name: "wikipedia".to_string().into(),
+                display_name: "Wikipedia".to_string().into(),
+                homepage: "https://www.wikipedia.org".to_string().into(),
+                categories: smallvec![SearchCategory::General, SearchCategory::Science],
                 enabled: true,
                 timeout_ms: 3000,
                 weight: 1.0,

@@ -8,6 +8,7 @@
 use async_trait::async_trait;
 use reqwest::Client;
 use serde::Deserialize;
+use smallvec::smallvec;
 
 use metasearch_core::{
     category::SearchCategory,
@@ -58,10 +59,10 @@ struct PipedItem {
 impl SearchEngine for Piped {
     fn metadata(&self) -> EngineMetadata {
         EngineMetadata {
-            name: "piped".to_string(),
-            display_name: "Piped".to_string(),
-            homepage: "https://piped.video".to_string(),
-            categories: vec![SearchCategory::Videos],
+            name: "piped".to_string().into(),
+            display_name: "Piped".to_string().into(),
+            homepage: "https://piped.video".to_string().into(),
+            categories: smallvec![SearchCategory::Videos],
             enabled: !self.backend_url.is_empty(),
             timeout_ms: 5000,
             weight: 1.0,

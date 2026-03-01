@@ -12,6 +12,7 @@ use metasearch_core::{
 };
 use reqwest::Client;
 use std::collections::HashMap;
+use smallvec::smallvec;
 
 pub struct Lucide {
     metadata: EngineMetadata,
@@ -22,10 +23,10 @@ impl Lucide {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "lucide".to_string(),
-                display_name: "Lucide".to_string(),
-                homepage: "https://lucide.dev".to_string(),
-                categories: vec![SearchCategory::Images],
+                name: "lucide".to_string().into(),
+                display_name: "Lucide".to_string().into(),
+                homepage: "https://lucide.dev".to_string().into(),
+                categories: smallvec![SearchCategory::Images],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 1.0,

@@ -14,6 +14,7 @@ use metasearch_core::{
 };
 use reqwest::Client;
 use scraper::{Html, Selector};
+use smallvec::smallvec;
 
 pub struct SogouWechat {
     metadata: EngineMetadata,
@@ -24,10 +25,10 @@ impl SogouWechat {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "sogou_wechat".to_string(),
-                display_name: "Sogou WeChat".to_string(),
-                homepage: "https://weixin.sogou.com".to_string(),
-                categories: vec![SearchCategory::News],
+                name: "sogou_wechat".to_string().into(),
+                display_name: "Sogou WeChat".to_string().into(),
+                homepage: "https://weixin.sogou.com".to_string().into(),
+                categories: smallvec![SearchCategory::News],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 0.8,

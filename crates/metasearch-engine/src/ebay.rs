@@ -11,6 +11,7 @@ use metasearch_core::{
 };
 use reqwest::Client;
 use scraper::{Html, Selector};
+use smallvec::smallvec;
 
 pub struct Ebay {
     metadata: EngineMetadata,
@@ -22,10 +23,10 @@ impl Ebay {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "ebay".to_string(),
-                display_name: "eBay".to_string(),
-                homepage: "https://www.ebay.com".to_string(),
-                categories: vec![SearchCategory::General],
+                name: "ebay".to_string().into(),
+                display_name: "eBay".to_string().into(),
+                homepage: "https://www.ebay.com".to_string().into(),
+                categories: smallvec![SearchCategory::General],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 0.8,
@@ -38,10 +39,10 @@ impl Ebay {
     pub fn with_base_url(client: Client, base_url: &str) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "ebay".to_string(),
-                display_name: "eBay".to_string(),
-                homepage: base_url.to_string(),
-                categories: vec![SearchCategory::General],
+                name: "ebay".to_string().into(),
+                display_name: "eBay".to_string().into(),
+                homepage: base_url.to_string().into(),
+                categories: smallvec![SearchCategory::General],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 0.8,

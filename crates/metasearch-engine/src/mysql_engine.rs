@@ -20,6 +20,7 @@
 //! ```
 
 use async_trait::async_trait;
+use smallvec::smallvec;
 
 use metasearch_core::{
     category::SearchCategory,
@@ -70,10 +71,10 @@ impl MysqlEngine {
 
         Self {
             metadata: EngineMetadata {
-                name: "mysql".to_string(),
-                display_name: "MySQL".to_string(),
-                homepage: "https://www.mysql.com".to_string(),
-                categories: vec![SearchCategory::General],
+                name: "mysql".to_string().into(),
+                display_name: "MySQL".to_string().into(),
+                homepage: "https://www.mysql.com".to_string().into(),
+                categories: smallvec![SearchCategory::General],
                 enabled,
                 timeout_ms: 5000,
                 weight: 0.8,

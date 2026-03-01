@@ -11,6 +11,7 @@ use metasearch_core::{
     result::SearchResult,
 };
 use reqwest::Client;
+use smallvec::smallvec;
 
 pub struct Pexels {
     metadata: EngineMetadata,
@@ -23,10 +24,10 @@ impl Pexels {
         let enabled = api_key.as_ref().is_some_and(|k| !k.is_empty());
         Self {
             metadata: EngineMetadata {
-                name: "pexels".to_string(),
-                display_name: "Pexels".to_string(),
-                homepage: "https://www.pexels.com".to_string(),
-                categories: vec![SearchCategory::Images],
+                name: "pexels".to_string().into(),
+                display_name: "Pexels".to_string().into(),
+                homepage: "https://www.pexels.com".to_string().into(),
+                categories: smallvec![SearchCategory::Images],
                 enabled,
                 timeout_ms: 5000,
                 weight: 1.0,

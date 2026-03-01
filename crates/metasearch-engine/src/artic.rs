@@ -17,6 +17,7 @@ use metasearch_core::{
 use reqwest::Client;
 use serde::Deserialize;
 use tracing::info;
+use smallvec::smallvec;
 
 pub struct Artic {
     metadata: EngineMetadata,
@@ -27,10 +28,10 @@ impl Artic {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "artic".to_string(),
-                display_name: "Art Institute of Chicago".to_string(),
-                homepage: "https://www.artic.edu".to_string(),
-                categories: vec![SearchCategory::Images],
+                name: "artic".to_string().into(),
+                display_name: "Art Institute of Chicago".to_string().into(),
+                homepage: "https://www.artic.edu".to_string().into(),
+                categories: smallvec![SearchCategory::Images],
                 enabled: true,
                 timeout_ms: 3000,
                 weight: 0.8,

@@ -14,6 +14,7 @@ use metasearch_core::{
 use reqwest::Client;
 use serde::Deserialize;
 use tracing::info;
+use smallvec::smallvec;
 
 pub struct BraveApi {
     metadata: EngineMetadata,
@@ -25,10 +26,10 @@ impl BraveApi {
     pub fn new(client: Client, api_key: Option<String>) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "braveapi".to_string(),
-                display_name: "Brave API".to_string(),
-                homepage: "https://api.search.brave.com/".to_string(),
-                categories: vec![SearchCategory::General],
+                name: "braveapi".to_string().into(),
+                display_name: "Brave API".to_string().into(),
+                homepage: "https://api.search.brave.com/".to_string().into(),
+                categories: smallvec![SearchCategory::General],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 1.0,

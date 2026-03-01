@@ -5,6 +5,7 @@
 use async_trait::async_trait;
 use reqwest::Client;
 use scraper::{Html, Selector};
+use smallvec::smallvec;
 
 use metasearch_core::{
     category::SearchCategory,
@@ -23,10 +24,10 @@ impl Mojeek {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "mojeek".to_string(),
-                display_name: "Mojeek".to_string(),
-                homepage: "https://mojeek.com".to_string(),
-                categories: vec![SearchCategory::General],
+                name: "mojeek".to_string().into(),
+                display_name: "Mojeek".to_string().into(),
+                homepage: "https://mojeek.com".to_string().into(),
+                categories: smallvec![SearchCategory::General],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 0.6,

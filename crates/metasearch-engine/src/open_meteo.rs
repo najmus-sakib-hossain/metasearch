@@ -16,6 +16,7 @@ use metasearch_core::{
     result::SearchResult,
 };
 use reqwest::Client;
+use smallvec::smallvec;
 
 pub struct OpenMeteo {
     metadata: EngineMetadata,
@@ -26,10 +27,10 @@ impl OpenMeteo {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "open_meteo".to_string(),
-                display_name: "Open-Meteo".to_string(),
-                homepage: "https://open-meteo.com".to_string(),
-                categories: vec![SearchCategory::General],
+                name: "open_meteo".to_string().into(),
+                display_name: "Open-Meteo".to_string().into(),
+                homepage: "https://open-meteo.com".to_string().into(),
+                categories: smallvec![SearchCategory::General],
                 enabled: true,
                 timeout_ms: 6000,
                 weight: 1.0,

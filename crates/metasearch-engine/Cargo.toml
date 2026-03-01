@@ -35,6 +35,13 @@ urlencoding = "2.1"
 html-escape = "0.2"
 base64 = "0.22"
 
+# Performance optimizations
+dashmap.workspace = true
+smallvec = { workspace = true, features = ["serde"] }
+
+# Zero-copy strings
+# (std::borrow::Cow is in stdlib — no extra dep needed)
+
 # Optional database dependencies
 rusqlite = { version = "0.32", optional = true }
 tokio-postgres = { version = "0.7", optional = true }

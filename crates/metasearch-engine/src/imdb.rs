@@ -11,6 +11,7 @@ use metasearch_core::{
 };
 use reqwest::Client;
 use std::collections::HashMap;
+use smallvec::smallvec;
 
 pub struct Imdb {
     metadata: EngineMetadata,
@@ -21,10 +22,10 @@ impl Imdb {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "imdb".to_string(),
-                display_name: "IMDb".to_string(),
-                homepage: "https://www.imdb.com".to_string(),
-                categories: vec![SearchCategory::General],
+                name: "imdb".to_string().into(),
+                display_name: "IMDb".to_string().into(),
+                homepage: "https://www.imdb.com".to_string().into(),
+                categories: smallvec![SearchCategory::General],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 0.8,

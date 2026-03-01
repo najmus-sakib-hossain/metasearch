@@ -16,6 +16,7 @@ use metasearch_core::{
 use reqwest::Client;
 use scraper::{Html, Selector};
 use tracing::info;
+use smallvec::smallvec;
 
 pub struct Bandcamp {
     metadata: EngineMetadata,
@@ -26,10 +27,10 @@ impl Bandcamp {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "bandcamp".to_string(),
-                display_name: "Bandcamp".to_string(),
-                homepage: "https://bandcamp.com".to_string(),
-                categories: vec![SearchCategory::Music],
+                name: "bandcamp".to_string().into(),
+                display_name: "Bandcamp".to_string().into(),
+                homepage: "https://bandcamp.com".to_string().into(),
+                categories: smallvec![SearchCategory::Music],
                 enabled: true,
                 timeout_ms: 4000,
                 weight: 1.0,

@@ -10,6 +10,7 @@ use metasearch_core::{
     result::SearchResult,
 };
 use reqwest::Client;
+use smallvec::smallvec;
 
 pub struct Fyyd {
     metadata: EngineMetadata,
@@ -20,10 +21,10 @@ impl Fyyd {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "fyyd".to_string(),
-                display_name: "Fyyd".to_string(),
-                homepage: "https://fyyd.de".to_string(),
-                categories: vec![SearchCategory::Music],
+                name: "fyyd".to_string().into(),
+                display_name: "Fyyd".to_string().into(),
+                homepage: "https://fyyd.de".to_string().into(),
+                categories: smallvec![SearchCategory::Music],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 0.6,

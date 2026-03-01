@@ -17,6 +17,7 @@ use regex::Regex;
 use reqwest::Client;
 use serde_json::Value;
 use tracing::{info, warn};
+use smallvec::smallvec;
 
 pub struct Quark {
     metadata: EngineMetadata,
@@ -27,10 +28,10 @@ impl Quark {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "quark".to_string(),
-                display_name: "Quark".to_string(),
-                homepage: "https://quark.sm.cn".to_string(),
-                categories: vec![SearchCategory::General],
+                name: "quark".to_string().into(),
+                display_name: "Quark".to_string().into(),
+                homepage: "https://quark.sm.cn".to_string().into(),
+                categories: smallvec![SearchCategory::General],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 1.0,

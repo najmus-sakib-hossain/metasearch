@@ -11,6 +11,7 @@ use metasearch_core::{
 };
 use reqwest::Client;
 use scraper::{Html, Selector};
+use smallvec::smallvec;
 
 pub struct BingNews {
     metadata: EngineMetadata,
@@ -21,10 +22,10 @@ impl BingNews {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "bing_news".to_string(),
-                display_name: "Bing News".to_string(),
-                homepage: "https://www.bing.com/news".to_string(),
-                categories: vec![SearchCategory::News],
+                name: "bing_news".to_string().into(),
+                display_name: "Bing News".to_string().into(),
+                homepage: "https://www.bing.com/news".to_string().into(),
+                categories: smallvec![SearchCategory::News],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 1.0,

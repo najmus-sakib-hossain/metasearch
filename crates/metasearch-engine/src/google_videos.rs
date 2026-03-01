@@ -4,6 +4,7 @@
 use async_trait::async_trait;
 use reqwest::Client;
 use scraper::{Html, Selector};
+use smallvec::smallvec;
 
 use metasearch_core::{
     engine::{EngineMetadata, SearchEngine},
@@ -26,10 +27,10 @@ impl GoogleVideos {
 impl SearchEngine for GoogleVideos {
     fn metadata(&self) -> EngineMetadata {
         EngineMetadata {
-            name: "Google Videos".to_string(),
-            display_name: "Google Videos".to_string(),
-            homepage: "https://Google Videos.com".to_string(),
-            categories: vec![metasearch_core::category::SearchCategory::Videos],
+            name: "Google Videos".to_string().into(),
+            display_name: "Google Videos".to_string().into(),
+            homepage: "https://Google Videos.com".to_string().into(),
+            categories: smallvec![metasearch_core::category::SearchCategory::Videos],
             enabled: true,
             timeout_ms: 5000,
             weight: 1.0,

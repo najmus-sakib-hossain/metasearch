@@ -14,6 +14,7 @@ use metasearch_core::{
 };
 use reqwest::Client;
 use tracing::info;
+use smallvec::smallvec;
 
 pub struct YoutubeApi {
     metadata: EngineMetadata,
@@ -25,10 +26,10 @@ impl YoutubeApi {
     pub fn new(client: Client, api_key: Option<String>) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "youtube_api".to_string(),
-                display_name: "YouTube API".to_string(),
-                homepage: "https://www.youtube.com".to_string(),
-                categories: vec![SearchCategory::Videos, SearchCategory::Music],
+                name: "youtube_api".to_string().into(),
+                display_name: "YouTube API".to_string().into(),
+                homepage: "https://www.youtube.com".to_string().into(),
+                categories: smallvec![SearchCategory::Videos, SearchCategory::Music],
                 enabled: api_key.is_some(),
                 timeout_ms: 5000,
                 weight: 1.5,

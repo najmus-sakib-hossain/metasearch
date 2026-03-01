@@ -11,6 +11,7 @@ use metasearch_core::{
 };
 use reqwest::Client;
 use scraper::{Html, Selector};
+use smallvec::smallvec;
 
 pub struct Fdroid {
     metadata: EngineMetadata,
@@ -21,10 +22,10 @@ impl Fdroid {
     pub fn new(client: Client) -> Self {
         Self {
             metadata: EngineMetadata {
-                name: "fdroid".to_string(),
-                display_name: "F-Droid".to_string(),
-                homepage: "https://search.f-droid.org".to_string(),
-                categories: vec![SearchCategory::Files],
+                name: "fdroid".to_string().into(),
+                display_name: "F-Droid".to_string().into(),
+                homepage: "https://search.f-droid.org".to_string().into(),
+                categories: smallvec![SearchCategory::Files],
                 enabled: true,
                 timeout_ms: 5000,
                 weight: 0.7,
