@@ -8,7 +8,7 @@ use async_trait::async_trait;
 use metasearch_core::{
     category::SearchCategory,
     engine::{EngineMetadata, SearchEngine},
-    error::{MetasearchError, Result},
+    error::Result,
     query::SearchQuery,
     result::SearchResult,
 };
@@ -53,34 +53,52 @@ impl SearchEngine for Niconico {
             encoded, page
         );
 
-        let resp = self
+        let resp = match self
             .client
             .get(&url)
+            .timeout(std::time::Duration::from_secs(6))
             .header(
                 "User-Agent",
                 "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
             )
             .send()
             .await
-            .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
+        {
+            Ok(r) => r,
+            Err(_) => return Ok(Vec::new()),
+        };
 
-        let body = resp
-            .text()
-            .await
-            .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
+        if !resp.status().is_success() {
+            return Ok(Vec::new());
+        }
+
+        let body = match resp.text().await {
+            Ok(t) => t,
+            Err(_) => return Ok(Vec::new()),
+        };
 
         let document = Html::parse_document(&body);
 
-        let item_selector = Selector::parse("li[data-video-item]")
-            .map_err(|e| MetasearchError::ParseError(format!("selector: {:?}", e)))?;
-        let thumb_link_selector = Selector::parse("a.itemThumbWrap")
-            .map_err(|e| MetasearchError::ParseError(format!("selector: {:?}", e)))?;
-        let title_selector = Selector::parse("p.itemTitle a")
-            .map_err(|e| MetasearchError::ParseError(format!("selector: {:?}", e)))?;
-        let desc_selector = Selector::parse("p.itemDescription")
-            .map_err(|e| MetasearchError::ParseError(format!("selector: {:?}", e)))?;
-        let img_selector = Selector::parse("img.thumb")
-            .map_err(|e| MetasearchError::ParseError(format!("selector: {:?}", e)))?;
+        let item_selector = match Selector::parse("li[data-video-item]") {
+            Ok(s) => s,
+            Err(_) => return Ok(Vec::new()),
+        };
+        let thumb_link_selector = match Selector::parse("a.itemThumbWrap") {
+            Ok(s) => s,
+            Err(_) => return Ok(Vec::new()),
+        };
+        let title_selector = match Selector::parse("p.itemTitle a") {
+            Ok(s) => s,
+            Err(_) => return Ok(Vec::new()),
+        };
+        let desc_selector = match Selector::parse("p.itemDescription") {
+            Ok(s) => s,
+            Err(_) => return Ok(Vec::new()),
+        };
+        let img_selector = match Selector::parse("img.thumb") {
+            Ok(s) => s,
+            Err(_) => return Ok(Vec::new()),
+        };
 
         let mut results = Vec::new();
 

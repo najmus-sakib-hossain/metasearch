@@ -6,7 +6,7 @@ use async_trait::async_trait;
 use metasearch_core::{
     category::SearchCategory,
     engine::{EngineMetadata, SearchEngine},
-    error::{MetasearchError, Result},
+    error::{Result},
     query::SearchQuery,
     result::SearchResult,
 };
@@ -49,7 +49,7 @@ impl SearchEngine for WolframAlphaNoapi {
         let token_resp = self
             .client
             .get(token_url)
-            .timeout(std::time::Duration::from_secs(5))
+            .timeout(std::time::Duration::from_secs(3))
             .header(
                 "User-Agent",
                 "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
@@ -91,7 +91,7 @@ impl SearchEngine for WolframAlphaNoapi {
         let resp = match self
             .client
             .get(&query_url)
-            .timeout(std::time::Duration::from_secs(5))
+            .timeout(std::time::Duration::from_secs(3))
             .header("Referer", &referer)
             .header(
                 "User-Agent",

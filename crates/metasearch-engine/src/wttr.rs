@@ -8,7 +8,7 @@ use async_trait::async_trait;
 use metasearch_core::{
     category::SearchCategory,
     engine::{EngineMetadata, SearchEngine},
-    error::{MetasearchError, Result},
+    error::{Result},
     query::SearchQuery,
     result::SearchResult,
 };
@@ -107,13 +107,19 @@ impl SearchEngine for Wttr {
         let resp = self
             .client
             .get(&url)
+            .timeout(std::time::Duration::from_secs(6))
             .header(
                 "User-Agent",
                 "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
             )
             .send()
-            .await
-            .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
+            .await;
+
+        // wttr.in may be slow or unreachable — return empty gracefully
+        let resp = match resp {
+            Ok(r) => r,
+            Err(_) => return Ok(Vec::new()),
+        };
 
         // Handle any non-success response (e.g., 404 = unknown location, 500 = server error)
         if !resp.status().is_success() {

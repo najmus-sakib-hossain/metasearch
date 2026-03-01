@@ -11,7 +11,7 @@ use async_trait::async_trait;
 use metasearch_core::{
     category::SearchCategory,
     engine::{EngineMetadata, SearchEngine},
-    error::{MetasearchError, Result},
+    error::Result,
     query::SearchQuery,
     result::SearchResult,
 };
@@ -91,21 +91,25 @@ impl SearchEngine for Pubmed {
             encoded, retstart, retmax
         );
 
-        let search_resp = self
+        let search_resp = match self
             .client
             .get(&search_url)
+            .timeout(std::time::Duration::from_secs(3))
             .header(
                 "User-Agent",
                 "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
             )
             .send()
             .await
-            .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
+        {
+            Ok(r) => r,
+            Err(_) => return Ok(Vec::new()),
+        };
 
-        let search_body = search_resp
-            .text()
-            .await
-            .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
+        let search_body = match search_resp.text().await {
+            Ok(b) => b,
+            Err(_) => return Ok(Vec::new()),
+        };
 
         // Extract PMIDs from <IdList><Id>...</Id></IdList>
         let id_list_xml = match Self::extract_first_tag(&search_body, "IdList") {
@@ -126,21 +130,25 @@ impl SearchEngine for Pubmed {
             ids_param
         );
 
-        let fetch_resp = self
+        let fetch_resp = match self
             .client
             .get(&fetch_url)
+            .timeout(std::time::Duration::from_secs(4))
             .header(
                 "User-Agent",
                 "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
             )
             .send()
             .await
-            .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
+        {
+            Ok(r) => r,
+            Err(_) => return Ok(Vec::new()),
+        };
 
-        let fetch_body = fetch_resp
-            .text()
-            .await
-            .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
+        let fetch_body = match fetch_resp.text().await {
+            Ok(b) => b,
+            Err(_) => return Ok(Vec::new()),
+        };
 
         let mut results = Vec::new();
 

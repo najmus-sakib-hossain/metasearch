@@ -65,24 +65,31 @@ impl SearchEngine for Selfhst {
 
         for item in items {
             let reference = item["Reference"].as_str().unwrap_or_default();
-            let ref_lower = reference.to_lowercase();
+            let name = item["Name"].as_str().unwrap_or(reference);
+            let tags = item["Tags"].as_str().unwrap_or_default();
+            let category = item["Category"].as_str().unwrap_or_default();
 
-            let matches = query_words.iter().all(|word| ref_lower.contains(word));
+            let search_text = format!("{} {} {} {}", name, reference, tags, category).to_lowercase();
+
+            let matches = query_words.iter().any(|word| search_text.contains(word));
             if !matches {
                 continue;
             }
 
-            let name = item["Name"].as_str().unwrap_or(reference);
+            // Values are strings "Yes" / "" — not JSON booleans
+            let is_yes = |v: &serde_json::Value| {
+                v.as_str().map(|s| s.eq_ignore_ascii_case("yes")).unwrap_or(false)
+                    || v.as_bool().unwrap_or(false)
+            };
 
-            // Determine best format for image URL
-            let format = if item["SVG"].as_bool().unwrap_or(false) {
+            let format = if is_yes(&item["SVG"]) {
                 "svg"
-            } else if item["PNG"].as_bool().unwrap_or(false) {
+            } else if is_yes(&item["PNG"]) {
                 "png"
-            } else if item["WebP"].as_bool().unwrap_or(false) {
+            } else if is_yes(&item["WebP"]) {
                 "webp"
             } else {
-                continue;
+                "png" // fallback
             };
 
             let image_url = format!(

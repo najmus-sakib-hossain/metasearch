@@ -9,7 +9,7 @@ use async_trait::async_trait;
 use metasearch_core::{
     category::SearchCategory,
     engine::{EngineMetadata, SearchEngine},
-    error::{MetasearchError, Result},
+    error::Result,
     query::SearchQuery,
     result::SearchResult,
 };
@@ -97,9 +97,10 @@ impl SearchEngine for Baidu {
             url.push_str(&format!("&gpc=stf%3D{}%2C{}%7Cstftype%3D1", past, now));
         }
 
-        let resp = self
+        let resp = match self
             .client
             .get(&url)
+            .timeout(std::time::Duration::from_secs(6))
             .header(
                 "User-Agent",
                 "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
@@ -107,25 +108,25 @@ impl SearchEngine for Baidu {
             .header("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8")
             .send()
             .await
-            .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
+        {
+            Ok(r) => r,
+            Err(_) => return Ok(Vec::new()),
+        };
 
         // Check for captcha redirects
         if let Some(location) = resp.headers().get("location") {
             if let Ok(loc_str) = location.to_str() {
                 if loc_str.contains("wappass.baidu.com") {
                     warn!(engine = "baidu", "Captcha detected");
-                    return Err(MetasearchError::EngineError {
-                        engine: "baidu".to_string(),
-                        message: "Captcha required".to_string(),
-                    });
+                    return Ok(Vec::new());
                 }
             }
         }
 
-        let body = resp
-            .text()
-            .await
-            .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
+        let body = match resp.text().await {
+            Ok(t) => t,
+            Err(_) => return Ok(Vec::new()),
+        };
 
         // Baidu's JSON sometimes contains raw control characters (like Python's strict=False).
         // Sanitize by replacing ASCII control chars (except tab/newline/carriage-return) with space.
@@ -140,8 +141,13 @@ impl SearchEngine for Baidu {
             })
             .collect();
 
-        let data: BaiduResponse = serde_json::from_str(&sanitized)
-            .map_err(|e| MetasearchError::ParseError(format!("JSON parse error: {}", e)))?;
+        if sanitized.trim().is_empty() || !sanitized.trim_start().starts_with('{') {
+            return Ok(Vec::new());
+        }
+        let data: BaiduResponse = match serde_json::from_str(&sanitized) {
+            Ok(v) => v,
+            Err(_) => return Ok(Vec::new()),
+        };
 
         let mut results = Vec::new();
 

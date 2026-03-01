@@ -56,20 +56,28 @@ impl SearchEngine for ScanrStructures {
             "pageSize": 20
         });
 
-        let resp = self
+        let resp = match self
             .client
             .post(format!("{}/api/structures/search", SCANR_BASE))
+            .timeout(std::time::Duration::from_secs(6))
             .header("Content-Type", "application/json")
             .header("Accept", "application/json")
             .json(&body)
             .send()
             .await
-            .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
+        {
+            Ok(r) => r,
+            Err(_) => return Ok(Vec::new()),
+        };
 
-        let data: serde_json::Value = resp
-            .json()
-            .await
-            .map_err(|e| MetasearchError::ParseError(format!("JSON error: {}", e)))?;
+        if !resp.status().is_success() {
+            return Ok(Vec::new());
+        }
+
+        let data: serde_json::Value = match resp.json().await {
+            Ok(v) => v,
+            Err(_) => return Ok(Vec::new()),
+        };
 
         let mut results = Vec::new();
 

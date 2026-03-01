@@ -1,8 +1,8 @@
-//! Arch Linux Wiki engine — search the Arch Linux Wiki via HTML scraping.
-//! Translated from SearXNG `searx/engines/archlinux.py`.
+//! Arch Linux engine — searches Arch Linux packages via the JSON API.
+//! Falls back to `archlinux.org/packages/search/json/` which is bot-free.
 //!
-//! Note: The original SearXNG engine supports i18n with multiple wiki
-//! subdomains. This Rust version searches the English wiki only.
+//! The original SearXNG engine targets the wiki; the wiki now requires
+//! JavaScript for bot verification, so we switched to the packages API.
 
 use async_trait::async_trait;
 use metasearch_core::{
@@ -13,7 +13,6 @@ use metasearch_core::{
     result::SearchResult,
 };
 use reqwest::Client;
-use scraper::{Html, Selector};
 
 pub struct ArchLinux {
     metadata: EngineMetadata,
@@ -25,8 +24,8 @@ impl ArchLinux {
         Self {
             metadata: EngineMetadata {
                 name: "archlinux".to_string(),
-                display_name: "Arch Linux Wiki".to_string(),
-                homepage: "https://wiki.archlinux.org".to_string(),
+                display_name: "Arch Linux".to_string(),
+                homepage: "https://archlinux.org".to_string(),
                 categories: vec![SearchCategory::IT],
                 enabled: true,
                 timeout_ms: 5000,
@@ -45,64 +44,58 @@ impl SearchEngine for ArchLinux {
 
     async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
         let page = query.page;
-        let offset = (page - 1) * 20;
 
+        // Arch Linux packages JSON API — no bot challenges
         let url = format!(
-            "https://wiki.archlinux.org/index.php?search={}&title=Special%3ASearch&limit=20&offset={}&profile=default",
+            "https://archlinux.org/packages/search/json/?q={}&limit=20&page={}",
             urlencoding::encode(&query.query),
-            offset,
+            page,
         );
 
         let resp = self
             .client
             .get(&url)
+            .header("Accept", "application/json")
             .header("User-Agent", "Mozilla/5.0 (compatible; metasearch/1.0)")
             .send()
             .await
             .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
 
-        let html_text = resp
-            .text()
-            .await
-            .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
-
-        let document = Html::parse_document(&html_text);
-        let result_sel = Selector::parse("ul.mw-search-results li").unwrap();
-        let heading_sel = Selector::parse("div.mw-search-result-heading a").unwrap();
-        let content_sel = Selector::parse("div.searchresult").unwrap();
+        let data: serde_json::Value = match resp.json().await {
+            Ok(v) => v,
+            Err(_) => return Ok(Vec::new()),
+        };
 
         let mut results = Vec::new();
 
-        for (i, item) in document.select(&result_sel).enumerate() {
-            let link = match item.select(&heading_sel).next() {
-                Some(l) => l,
-                None => continue,
-            };
+        if let Some(packages) = data["results"].as_array() {
+            for (i, pkg) in packages.iter().enumerate() {
+                let name = pkg["pkgname"].as_str().unwrap_or_default();
+                let desc = pkg["pkgdesc"].as_str().unwrap_or("");
+                let version = pkg["pkgver"].as_str().unwrap_or("?");
+                let repo = pkg["repo"].as_str().unwrap_or("extra");
+                let arch = pkg["arch"].as_str().unwrap_or("x86_64");
 
-            let href = link.value().attr("href").unwrap_or_default();
-            let title = link.text().collect::<String>();
+                if name.is_empty() {
+                    continue;
+                }
 
-            if title.is_empty() {
-                continue;
+                let pkg_url = format!(
+                    "https://archlinux.org/packages/{}/{}/{}/",
+                    repo, arch, name
+                );
+                let snippet = format!("{} — {} [{}]", desc, version, repo);
+
+                let mut result = SearchResult::new(
+                    name.to_string(),
+                    pkg_url,
+                    snippet,
+                    "archlinux".to_string(),
+                );
+                result.engine_rank = (i + 1) as u32;
+                result.category = SearchCategory::IT.to_string();
+                results.push(result);
             }
-
-            let item_url = format!("https://wiki.archlinux.org{}", href);
-
-            let content = item
-                .select(&content_sel)
-                .next()
-                .map(|e| e.text().collect::<String>())
-                .unwrap_or_default();
-
-            let mut result = SearchResult::new(
-                title.trim().to_string(),
-                item_url,
-                content.trim().to_string(),
-                "archlinux".to_string(),
-            );
-            result.engine_rank = (i + 1) as u32;
-            result.category = SearchCategory::IT.to_string();
-            results.push(result);
         }
 
         Ok(results)

@@ -8,7 +8,7 @@ use async_trait::async_trait;
 use metasearch_core::{
     category::SearchCategory,
     engine::{EngineMetadata, SearchEngine},
-    error::{MetasearchError, Result},
+    error::Result,
     query::SearchQuery,
     result::SearchResult,
 };
@@ -57,51 +57,60 @@ impl SearchEngine for Startpage {
     async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>> {
         let page = query.page.max(1);
 
-        let mut form_data = vec![
-            ("query".to_string(), query.query.clone()),
-            ("cat".to_string(), "web".to_string()),
-            ("page".to_string(), page.to_string()),
-        ];
+        // Build GET URL — POST causes 307 redirect that strips results
+        let mut url = format!(
+            "https://www.startpage.com/sp/search?query={}&page={}",
+            urlencoding::encode(&query.query),
+            page
+        );
 
         if let Some(date_param) = Self::map_time_range(query.time_range.as_deref()) {
-            form_data.push(("with_date".to_string(), date_param.to_string()));
+            url.push_str(&format!("&with_date={}", date_param));
         }
 
-        let resp = self
+        let resp = match self
             .client
-            .post("https://www.startpage.com/sp/search")
+            .get(&url)
+            .timeout(std::time::Duration::from_secs(7))
             .header(
                 "User-Agent",
-                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
             )
             .header("Accept", "text/html,application/xhtml+xml")
             .header("Accept-Language", "en-US,en;q=0.9")
-            .form(&form_data)
             .send()
             .await
-            .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
+        {
+            Ok(r) => r,
+            Err(_) => return Ok(Vec::new()),
+        };
 
-        let html_text = resp
-            .text()
-            .await
-            .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
+        if !resp.status().is_success() {
+            return Ok(Vec::new());
+        }
+
+        let html_text = match resp.text().await {
+            Ok(t) => t,
+            Err(_) => return Ok(Vec::new()),
+        };
 
         let document = Html::parse_document(&html_text);
 
         let mut results = Vec::new();
 
-        // Primary selector: Startpage result containers
-        let result_sel = Selector::parse(".w-gl__result")
-            .unwrap_or_else(|_| Selector::parse("div.result").expect("selector should parse"));
-        let title_sel = Selector::parse(".w-gl__result-title, h3 a, h3")
-            .unwrap_or_else(|_| Selector::parse("h3").expect("selector should parse"));
-        let link_sel =
-            Selector::parse("a[href]").expect("link selector should parse");
-        let desc_sel = Selector::parse(".w-gl__description, p.w-gl__description, p")
-            .unwrap_or_else(|_| Selector::parse("p").expect("selector should parse"));
+        // Updated selectors for current Startpage HTML structure
+        // Result containers use class "result css-..."
+        let result_sel = Selector::parse(".result")
+            .expect("selector should parse");
+        let title_sel = Selector::parse(".wgl-title, h2, h3")
+            .expect("selector should parse");
+        let link_sel = Selector::parse("a[href]")
+            .expect("link selector should parse");
+        let desc_sel = Selector::parse(".result-snippet, p.description, p")
+            .expect("selector should parse");
 
         for (i, container) in document.select(&result_sel).enumerate() {
-            // Extract title — try title selector first, then any link
+            // Extract title
             let title_text = container
                 .select(&title_sel)
                 .next()
@@ -112,11 +121,10 @@ impl SearchEngine for Startpage {
                 continue;
             }
 
-            // Extract URL — look for href in links
+            // Extract URL — look for href in links pointing to external sites
             let href = container
                 .select(&link_sel)
                 .find_map(|a| {
-                    // Prefer data-url attribute if available
                     a.value()
                         .attr("data-url")
                         .or_else(|| a.value().attr("href"))
@@ -146,58 +154,6 @@ impl SearchEngine for Startpage {
             r.engine_rank = (i + 1) as u32;
             r.category = SearchCategory::General.to_string();
             results.push(r);
-        }
-
-        // Fallback: broader approach if primary selectors didn't match
-        if results.is_empty() {
-            let broad_sel = Selector::parse("[class*='gl__result'], [class*='result']")
-                .unwrap_or_else(|_| Selector::parse("div").expect("selector should parse"));
-
-            for (i, container) in document.select(&broad_sel).enumerate() {
-                let link = match container.select(&link_sel).next() {
-                    Some(l) => l,
-                    None => continue,
-                };
-
-                let href = link
-                    .value()
-                    .attr("data-url")
-                    .or_else(|| link.value().attr("href"))
-                    .unwrap_or_default();
-
-                if href.is_empty()
-                    || !href.starts_with("http")
-                    || href.contains("startpage.com")
-                {
-                    continue;
-                }
-
-                let title: String = link.text().collect::<String>().trim().to_string();
-                if title.is_empty() {
-                    continue;
-                }
-
-                let content: String = container
-                    .select(&desc_sel)
-                    .next()
-                    .map(|el| {
-                        el.text()
-                            .collect::<String>()
-                            .split_whitespace()
-                            .collect::<Vec<_>>()
-                            .join(" ")
-                    })
-                    .unwrap_or_default();
-
-                let mut r = SearchResult::new(&title, href, &content, "startpage");
-                r.engine_rank = (i + 1) as u32;
-                r.category = SearchCategory::General.to_string();
-                results.push(r);
-
-                if results.len() >= 10 {
-                    break;
-                }
-            }
         }
 
         Ok(results)

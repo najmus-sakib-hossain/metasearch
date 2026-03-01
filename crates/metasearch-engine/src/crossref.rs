@@ -49,17 +49,28 @@ impl SearchEngine for Crossref {
             offset,
         );
 
-        let resp = self.client
+        let resp = match self.client
             .get(&url)
+            .timeout(std::time::Duration::from_secs(7))
             .header("User-Agent", "metasearch-engine/1.0 (https://github.com/najmus-sakib-hossain/metasearch; mailto:metasearch@example.com)")
             .send()
             .await
-            .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
+        {
+            Ok(r) => r,
+            Err(_) => return Ok(Vec::new()),
+        };
 
-        let data: serde_json::Value = resp
+        if !resp.status().is_success() {
+            return Ok(Vec::new());
+        }
+
+        let data: serde_json::Value = match resp
             .json()
             .await
-            .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
+        {
+            Ok(v) => v,
+            Err(_) => return Ok(Vec::new()),
+        };
 
         let mut results = Vec::new();
 

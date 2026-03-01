@@ -49,19 +49,21 @@ impl SearchEngine for Openclipart {
             query.page,
         );
 
-        let resp = self
+        let resp = match self
             .client
             .get(&url)
+            .timeout(std::time::Duration::from_secs(6))
             .header(
                 "User-Agent",
                 "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:120.0) Gecko/20100101 Firefox/120.0",
             )
             .send()
             .await
-            .map_err(|_| {
-                // Site may be down – return empty results gracefully
-                MetasearchError::HttpError("openclipart.org unreachable".to_string())
-            })?;
+        {
+            Ok(r) => r,
+            // Site may be slow or down
+            Err(_) => return Ok(Vec::new()),
+        };
 
         if !resp.status().is_success() {
             return Ok(Vec::new());

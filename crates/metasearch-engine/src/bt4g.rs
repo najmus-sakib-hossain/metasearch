@@ -48,17 +48,27 @@ impl SearchEngine for Bt4g {
             search_term, page
         );
 
-        let resp = self
+        let resp = match self
             .client
             .get(&url)
+            .timeout(std::time::Duration::from_secs(6))
+            .header("User-Agent", "Mozilla/5.0 (compatible; metasearch-bot/1.0)")
+            .header("Accept", "application/rss+xml, application/xml, text/xml")
             .send()
             .await
-            .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
+        {
+            Ok(r) => r,
+            Err(_) => return Ok(Vec::new()),
+        };
 
-        let body = resp
-            .text()
-            .await
-            .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
+        if !resp.status().is_success() {
+            return Ok(Vec::new());
+        }
+
+        let body = match resp.text().await {
+            Ok(b) => b,
+            Err(_) => return Ok(Vec::new()),
+        };
 
         let mut results = Vec::new();
 

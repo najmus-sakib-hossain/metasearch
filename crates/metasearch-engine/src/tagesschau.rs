@@ -43,8 +43,7 @@ struct ApiResponse {
 #[serde(rename_all = "camelCase")]
 struct SearchItem {
     title: Option<String>,
-    details_web: Option<String>,
-    first_sentence: Option<String>,
+    sophora_id: Option<String>,
     date: Option<String>,
 }
 
@@ -55,27 +54,37 @@ impl SearchEngine for Tagesschau {
     }
 
     async fn search(&self, query: &SearchQuery) -> Result<Vec<SearchResult>, MetasearchError> {
-        let page_size = 10;
+        let page_size = 20;
         let page_index = query.page.saturating_sub(1);
+        // Note: do NOT include &resultPage=all - it causes HTTP 400
         let url = format!(
-            "https://www.tagesschau.de/api2u/search/?searchText={}&pageSize={}&pageIndex={}&resultPage=all",
+            "https://www.tagesschau.de/api2u/search/?searchText={}&pageSize={}&pageIndex={}",
             urlencoding::encode(&query.query),
             page_size,
             page_index
         );
 
-        let resp = self
+        let resp = match self
             .client
             .get(&url)
+            .timeout(std::time::Duration::from_secs(6))
             .header("Accept", "application/json")
+            .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:120.0) Gecko/20100101 Firefox/120.0")
             .send()
             .await
-            .map_err(|e| MetasearchError::Engine(format!("Tagesschau request failed: {e}")))?;
+        {
+            Ok(r) => r,
+            Err(_) => return Ok(Vec::new()),
+        };
 
-        let api: ApiResponse = resp
-            .json()
-            .await
-            .map_err(|e| MetasearchError::Engine(format!("Tagesschau parse failed: {e}")))?;
+        if !resp.status().is_success() {
+            return Ok(Vec::new());
+        }
+
+        let api: ApiResponse = match resp.json().await {
+            Ok(v) => v,
+            Err(_) => return Ok(Vec::new()),
+        };
 
         let results = api
             .search_results
@@ -84,13 +93,10 @@ impl SearchEngine for Tagesschau {
             .enumerate()
             .filter_map(|(i, item)| {
                 let title = item.title.filter(|t| !t.is_empty())?;
-                let result_url = item.details_web.filter(|u| !u.is_empty())?;
-                let mut snippet = item.first_sentence.unwrap_or_default();
-                if let Some(date) = &item.date {
-                    if !date.is_empty() {
-                        snippet = format!("{} — {}", date, snippet);
-                    }
-                }
+                let sophora_id = item.sophora_id.filter(|s| !s.is_empty())?;
+                // Build URL from sophoraId: https://www.tagesschau.de/{sophoraId}.html
+                let result_url = format!("https://www.tagesschau.de/{}.html", sophora_id);
+                let snippet = item.date.unwrap_or_default();
                 let mut result = SearchResult::new(
                     title,
                     result_url,
