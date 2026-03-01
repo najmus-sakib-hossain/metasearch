@@ -46,23 +46,36 @@ impl SearchEngine for Yep {
             urlencoding::encode(&query.query)
         );
 
-        let resp: serde_json::Value = self
+        let resp = self
             .client
             .get(&url)
             .header("Referer", "https://yep.com/")
             .header("Origin", "https://yep.com")
             .send()
             .await
-            .map_err(|e| MetasearchError::HttpError(e.to_string()))?
-            .json()
+            .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
+
+        let text = resp
+            .text()
             .await
             .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
 
+        // Handle non-JSON / empty responses
+        if text.trim().is_empty() || text.starts_with("<!") || text.starts_with("<html") {
+            return Ok(Vec::new());
+        }
+
+        let resp: serde_json::Value = serde_json::from_str(&text)
+            .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
+
+        // Yep returns an array: [metadata, {results: [...]}]
         let empty = vec![];
         let items = resp
             .get(1)
             .and_then(|v| v.get("results"))
             .and_then(|v| v.as_array())
+            // Fallback: try 'results' at top level
+            .or_else(|| resp.get("results").and_then(|v| v.as_array()))
             .unwrap_or(&empty);
 
         let mut results = Vec::new();

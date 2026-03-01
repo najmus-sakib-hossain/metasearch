@@ -63,9 +63,10 @@ impl SearchEngine for Stract {
         let body = SearchRequest {
             query: query.query.clone(),
             page: query.page.saturating_sub(1),
-            selected_region: "all".to_string(),
+            selected_region: "All".to_string(),
         };
 
+        // Try the API endpoint
         let resp = self
             .client
             .post("https://stract.com/beta/api/search")
@@ -77,9 +78,17 @@ impl SearchEngine for Stract {
             .await
             .map_err(|e| MetasearchError::Engine(format!("Stract request failed: {e}")))?;
 
-        let api: ApiResponse = resp
-            .json()
+        let text = resp
+            .text()
             .await
+            .map_err(|e| MetasearchError::Engine(format!("Stract read failed: {e}")))?;
+
+        // Handle non-JSON responses gracefully
+        if text.trim().is_empty() || text.starts_with("<!") || text.starts_with("<html") {
+            return Ok(Vec::new());
+        }
+
+        let api: ApiResponse = serde_json::from_str(&text)
             .map_err(|e| MetasearchError::Engine(format!("Stract parse failed: {e}")))?;
 
         let results = api

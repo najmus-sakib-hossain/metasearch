@@ -61,9 +61,17 @@ impl SearchEngine for Presearch {
                 "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:120.0) Gecko/20100101 Firefox/120.0",
             )
             .header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
+            .header("Cookie", "b=1; presearch_session=; use_local_search_results=false; use_safe_search=true")
             .send()
             .await
             .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
+
+        // Capture response cookies for step 2
+        let cookies: Vec<String> = resp
+            .cookies()
+            .map(|c| format!("{}={}", c.name(), c.value()))
+            .collect();
+        let cookie_str = cookies.join("; ");
 
         let html_text = resp
             .text()
@@ -96,18 +104,36 @@ impl SearchEngine for Presearch {
                 "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:120.0) Gecko/20100101 Firefox/120.0",
             )
             .header("Accept", "application/json")
+            .header("Cookie", &cookie_str)
             .send()
             .await
             .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
 
-        let data: serde_json::Value = resp
-            .json()
+        let text = resp
+            .text()
             .await
-            .map_err(|e| MetasearchError::ParseError(format!("JSON error: {}", e)))?;
+            .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
+
+        // Handle non-JSON responses
+        if text.trim().is_empty() || text.starts_with("<!") || text.starts_with("<html") {
+            return Ok(Vec::new());
+        }
+
+        let data: serde_json::Value = match serde_json::from_str(&text) {
+            Ok(v) => v,
+            Err(_) => return Ok(Vec::new()),
+        };
 
         let mut results = Vec::new();
 
-        let items = match data.get("standardResults").and_then(|s| s.as_array()) {
+        // Try results.standardResults first, then top-level standardResults
+        let items = data
+            .get("results")
+            .and_then(|r| r.get("standardResults"))
+            .and_then(|s| s.as_array())
+            .or_else(|| data.get("standardResults").and_then(|s| s.as_array()));
+
+        let items = match items {
             Some(items) => items,
             None => return Ok(results),
         };
@@ -121,7 +147,10 @@ impl SearchEngine for Presearch {
                 continue;
             }
 
-            let mut r = SearchResult::new(title, link, description, "presearch");
+            let clean_title = html_escape::decode_html_entities(title).to_string();
+            let clean_desc = html_escape::decode_html_entities(description).to_string();
+
+            let mut r = SearchResult::new(&clean_title, link, &clean_desc, "presearch");
             r.engine_rank = (i + 1) as u32;
             r.category = SearchCategory::General.to_string();
             results.push(r);

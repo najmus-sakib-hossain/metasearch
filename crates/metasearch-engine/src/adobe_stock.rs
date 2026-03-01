@@ -52,14 +52,27 @@ impl SearchEngine for AdobeStock {
             .client
             .get(&url)
             .header("Accept-Language", "en-US,en;q=0.5")
+            .header("X-Requested-With", "XMLHttpRequest")
+            .header("Accept", "application/json")
             .send()
             .await
             .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
 
-        let json: serde_json::Value = resp
-            .json::<serde_json::Value>()
+        let text = resp
+            .text()
             .await
             .map_err(|e| MetasearchError::ParseError(e.to_string()))?;
+
+        // Handle non-JSON responses (bot protection, error pages)
+        if text.trim().is_empty() || text.starts_with("<!") || text.starts_with("<html") {
+            return Ok(Vec::new());
+        }
+
+        let json: serde_json::Value = serde_json::from_str(&text)
+            .map_err(|_| {
+                // Don't fail hard on parse errors, just return empty
+                MetasearchError::ParseError("Adobe Stock returned non-JSON response".to_string())
+            })?;
 
         let mut results = Vec::new();
 

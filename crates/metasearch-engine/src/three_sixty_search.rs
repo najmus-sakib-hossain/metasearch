@@ -64,6 +64,37 @@ impl SearchEngine for ThreeSixtySearch {
             }
         }
 
+        // Step 1: Get cookie by making a non-redirect request first
+        let cookie_client = Client::builder()
+            .redirect(reqwest::redirect::Policy::none())
+            .timeout(std::time::Duration::from_secs(5))
+            .build()
+            .unwrap_or_else(|_| self.client.clone());
+
+        let cookie_resp = cookie_client
+            .get(&url)
+            .header(
+                "User-Agent",
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:120.0) Gecko/20100101 Firefox/120.0",
+            )
+            .header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
+            .header("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8")
+            .send()
+            .await
+            .ok();
+
+        // Extract cookie from response
+        let cookie_str = cookie_resp
+            .as_ref()
+            .map(|r| {
+                r.cookies()
+                    .map(|c| format!("{}={}", c.name(), c.value()))
+                    .collect::<Vec<_>>()
+                    .join("; ")
+            })
+            .unwrap_or_default();
+
+        // Step 2: Make actual request with cookie
         let resp = self
             .client
             .get(&url)
@@ -74,9 +105,15 @@ impl SearchEngine for ThreeSixtySearch {
             .header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
             .header("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8")
             .header("Referer", "https://www.so.com/")
+            .header("Cookie", &cookie_str)
             .send()
-            .await
-            .map_err(|e| MetasearchError::HttpError(e.to_string()))?;
+            .await;
+
+        // Handle request failure gracefully
+        let resp = match resp {
+            Ok(r) => r,
+            Err(_) => return Ok(Vec::new()),
+        };
 
         // Handle redirect detection (e.g., CAPTCHA or geo-block)
         if !resp.status().is_success() {
