@@ -48,10 +48,11 @@ impl SearchEngine for ElasticsearchEngine {
         EngineMetadata {
             name: "Elasticsearch".to_string(),
             display_name: "Elasticsearch".to_string(),
-            homepage: "https://Elasticsearch.com".to_string(),
-                .to_string(),
-            categories: vec![metasearch_core::category::SearchCategory::General],
+            homepage: "https://www.elastic.co".to_string(),
+            categories: vec![SearchCategory::General],
             enabled: !self.base_url.is_empty() && !self.index.is_empty(),
+            timeout_ms: 5000,
+            weight: 1.0,
         }
     }
 
@@ -149,12 +150,12 @@ impl SearchEngine for ElasticsearchEngine {
                 content,
                 engine: "Elasticsearch".to_string(),
                 engine_rank: (i + 1) as u32,
-                    score: 0.0,
-                    thumbnail: None,
-                    published_date: None,
-                    category: String::new(),
-                    metadata: serde_json::Value::Null,
-                });
+                score: 0.0,
+                thumbnail: None,
+                published_date: None,
+                category: String::new(),
+                metadata: serde_json::Value::Null,
+            });
         }
         Ok(results)
     }

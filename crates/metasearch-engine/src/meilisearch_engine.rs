@@ -40,10 +40,11 @@ impl SearchEngine for MeilisearchEngine {
         EngineMetadata {
             name: "MeiliSearch".to_string(),
             display_name: "MeiliSearch".to_string(),
-            homepage: "https://MeiliSearch.com".to_string(),
-                .to_string(),
-            categories: vec![metasearch_core::category::SearchCategory::General],
+            homepage: "https://www.meilisearch.com".to_string(),
+            categories: vec![SearchCategory::General],
             enabled: !self.base_url.is_empty() && !self.index.is_empty(),
+            timeout_ms: 5000,
+            weight: 1.0,
         }
     }
 
@@ -117,6 +118,11 @@ impl SearchEngine for MeilisearchEngine {
                 content,
                 engine: "MeiliSearch".to_string(),
                 engine_rank: (i + 1) as u32,
+                score: 0.0,
+                thumbnail: None,
+                published_date: None,
+                category: String::new(),
+                metadata: serde_json::Value::Null,
             });
         }
         Ok(results)

@@ -52,11 +52,11 @@ impl SearchEngine for Invidious {
         EngineMetadata {
             name: "Invidious".to_string(),
             display_name: "Invidious".to_string(),
-            homepage: "https://Invidious.com".to_string(),
-                "Invidious (alt YouTube frontend) video search — configurable instance URL"
-                    .to_string(),
-            categories: vec![metasearch_core::category::SearchCategory::Videos],
+            homepage: "https://invidious.io".to_string(),
+            categories: vec![SearchCategory::Videos],
             enabled: !self.base_url.is_empty(),
+            timeout_ms: 5000,
+            weight: 1.0,
         }
     }
 
@@ -114,12 +114,12 @@ impl SearchEngine for Invidious {
                 content: content_parts.join(" — "),
                 engine: "Invidious".to_string(),
                 engine_rank: (i + 1) as u32,
-                    score: 0.0,
-                    thumbnail: None,
-                    published_date: None,
-                    category: String::new(),
-                    metadata: serde_json::Value::Null,
-                });
+                score: 0.0,
+                thumbnail: None,
+                published_date: None,
+                category: String::new(),
+                metadata: serde_json::Value::Null,
+            });
         }
         Ok(results)
     }
