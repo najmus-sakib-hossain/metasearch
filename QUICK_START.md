@@ -1,4 +1,4 @@
-# Quick Start Guide
+uick Start Guide
 
 ## What's Fixed
 ✅ Failed engines now show their actual names instead of "unknown"

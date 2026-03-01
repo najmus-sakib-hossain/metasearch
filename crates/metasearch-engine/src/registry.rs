@@ -38,6 +38,7 @@ use crate::{
     peertube::PeerTube, photon::Photon, pinterest::Pinterest, piped::Piped, piratebay::PirateBay,
     pkg_go_dev::PkgGoDev, podcastindex::PodcastIndex, pypi::PyPI, quark::Quark, qwant::Qwant,
     radio_browser::RadioBrowser, recoll_engine::RecollEngine, reddit::Reddit,
+    rightdao::RightDao,
     rottentomatoes::RottenTomatoes, rumble::Rumble, searchcode::Searchcode,
     semantic_scholar::SemanticScholar, sepiasearch::SepiaSearch, sogou::Sogou,
     solidtorrents::SolidTorrents, soundcloud::SoundCloud, sourcehut::Sourcehut, spotify::Spotify,
@@ -95,15 +96,9 @@ impl EngineRegistry {
         // Note: reqwest::Client is already Arc-backed internally — no need to wrap
 
         // ── Original engines ──────────────────────────────
-        // Google: Blocked by TLS fingerprinting (only 25/91 SearXNG instances work)
-        // registry.register(Arc::new(Google::new(client.clone())));
-        
-        // DuckDuckGo: Blocked by CAPTCHA challenges
-        // registry.register(Arc::new(DuckDuckGo::new(client.clone())));
-        
-        // Brave scraping: Blocked by bot detection (use API instead)
-        // registry.register(Arc::new(Brave::new(client.clone(), None)));
-        
+        registry.register(Arc::new(Google::new(client.clone())));
+        registry.register(Arc::new(DuckDuckGo::new(client.clone())));
+        registry.register(Arc::new(Brave::new(client.clone(), None)));
         registry.register(Arc::new(Wikipedia::new(client.clone())));
 
         // ── Batch 1: SearXNG translations ─────────────────
@@ -266,6 +261,7 @@ impl EngineRegistry {
         // ── Batch 19: Wired orphans ───────────────────────
         registry.register(Arc::new(PirateBay::new(client.clone())));
         registry.register(Arc::new(OpenAlex::new(client.clone())));
+        registry.register(Arc::new(RightDao::new(client.clone())));
 
         // ── Batch 20: More SearXNG translations ───────────
         registry.register(Arc::new(Sogou::new(client.clone())));

@@ -4,6 +4,7 @@ use std::sync::Arc;
 
 use metasearch_core::config::Settings;
 use metasearch_engine::EngineRegistry;
+use reqwest;
 
 use crate::cache::SearchCache;
 use crate::health::EngineHealthTracker;
@@ -20,4 +21,6 @@ pub struct AppState {
     pub orchestrator: Arc<SearchOrchestrator>,
     /// Per-engine health tracker shared with the orchestrator.
     pub health: Arc<EngineHealthTracker>,
+    /// Shared HTTP client for outbound requests (e.g. autocomplete).
+    pub http_client: reqwest::Client,
 }

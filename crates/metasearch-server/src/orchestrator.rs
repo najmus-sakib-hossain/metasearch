@@ -119,17 +119,17 @@ impl SearchOrchestrator {
                     Ok(Ok(results)) => {
                         health.record_success(&name, latency_ms);
                         tracing::debug!(engine = %name, count = results.len(), latency_ms, "Engine responded");
-                        (name.clone(), Some((name, weight, results)))
+                        Some((name, weight, results))
                     }
                     Ok(Err(e)) => {
                         health.record_failure(&name);
                         tracing::warn!(engine = %name, error = %e, "Engine error");
-                        (name, None)
+                        None
                     }
                     Err(_) => {
                         health.record_failure(&name);
                         tracing::warn!(engine = %name, timeout_ms = timeout_dur.as_millis(), "Engine timeout");
-                        (name, None)
+                        None
                     }
                 }
             });
@@ -142,25 +142,12 @@ impl SearchOrchestrator {
         let mut engines_used: Vec<String> = Vec::new();
         let mut engines_failed: Vec<String> = Vec::new();
 
-        // Early return thresholds for sub-second response
-        const MIN_ENGINES: usize = 5;  // Wait for at least 5 engines
-        const MIN_RESULTS: usize = 50; // Or 50 unique results
-        const MAX_WAIT_MS: u128 = 800; // But never wait more than 800ms
-
-        while let Some((engine_name, result)) = futures.next().await {
+        while let Some(result) = futures.next().await {
             match result {
-                Some((_, weight, results)) => {
-                    engines_used.push(engine_name);
+                Some((engine_name, weight, results)) => {
+                    engines_used.push(engine_name.clone());
                     for mut r in results {
-                        // Base score from engine rank and weight
-                        let base_score = weight * (1.0 / (r.engine_rank as f64 + 1.0));
-                        
-                        // Relevance boost based on query term matches
-                        let relevance_boost = calculate_relevance(&r, &query.query);
-                        
-                        // Final score combines base score with relevance
-                        let score = base_score * (1.0 + relevance_boost);
-                        
+                        let score = weight * (1.0 / (r.engine_rank as f64 + 1.0));
                         let normalized = normalize_url(&r.url);
                         url_map
                             .entry(normalized)
@@ -175,32 +162,9 @@ impl SearchOrchestrator {
                 }
                 None => {
                     // Engine failed/timed out — name already logged; record as failed
-                    engines_failed.push(engine_name);
+                    // (we can't get the name back here, so just count the failure)
+                    engines_failed.push("unknown".to_string());
                 }
-            }
-
-            // Early return: stop waiting if we have enough results
-            let elapsed = start.elapsed().as_millis();
-            let have_enough = engines_used.len() >= MIN_ENGINES && url_map.len() >= MIN_RESULTS;
-            let timeout_reached = elapsed >= MAX_WAIT_MS;
-            
-            if have_enough || timeout_reached {
-                if have_enough {
-                    tracing::debug!(
-                        engines = engines_used.len(),
-                        results = url_map.len(),
-                        elapsed_ms = elapsed,
-                        "Early return: sufficient results"
-                    );
-                } else {
-                    tracing::debug!(
-                        engines = engines_used.len(),
-                        results = url_map.len(),
-                        elapsed_ms = elapsed,
-                        "Early return: timeout reached"
-                    );
-                }
-                break;
             }
         }
 
@@ -233,64 +197,6 @@ impl SearchOrchestrator {
             search_time_ms,
         }
     }
-}
-
-/// Calculate relevance boost based on query term matches in title, URL, and content.
-/// Returns a multiplier (0.0 to 10.0) where higher = more relevant.
-fn calculate_relevance(result: &SearchResult, query: &str) -> f64 {
-    let query_lower = query.to_lowercase();
-    let query_terms: Vec<&str> = query_lower
-        .split_whitespace()
-        .filter(|t| t.len() > 2) // Ignore very short terms
-        .collect();
-    
-    if query_terms.is_empty() {
-        return 0.0;
-    }
-    
-    let title_lower = result.title.to_lowercase();
-    let url_lower = result.url.to_lowercase();
-    let content_lower = result.content.to_lowercase();
-    
-    // Penalize weather/currency/definition results for non-weather queries
-    if (result.engine.contains("weather") || result.engine.contains("currency") || 
-        result.engine.contains("definition")) && 
-       !query_lower.contains("weather") && !query_lower.contains("currency") {
-        return 0.0; // No boost for irrelevant utility results
-    }
-    
-    let mut boost: f64 = 0.0;
-    
-    for term in &query_terms {
-        // Exact phrase match in title = huge boost
-        if title_lower.contains(&query_lower) {
-            boost += 5.0;
-        }
-        
-        // Term in title = high boost
-        if title_lower.contains(term) {
-            boost += 2.0;
-        }
-        
-        // Term in URL = medium boost (especially for domain/path)
-        if url_lower.contains(term) {
-            boost += 1.5;
-        }
-        
-        // Term in content = small boost
-        if content_lower.contains(term) {
-            boost += 0.5;
-        }
-    }
-    
-    // Bonus for matching all terms
-    let all_terms_in_title = query_terms.iter().all(|t| title_lower.contains(t));
-    if all_terms_in_title {
-        boost += 3.0;
-    }
-    
-    // Cap the boost to prevent extreme scores
-    boost.min(10.0)
 }
 
 /// Normalize a URL for deduplication (strip fragment, normalise scheme/trailing slash).

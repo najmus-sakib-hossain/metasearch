@@ -256,6 +256,7 @@ pub mod yandex;
 // Batch 19 (wired orphans)
 pub mod openalex;
 pub mod piratebay;
+pub mod rightdao;
 
 // Batch 20
 pub mod quark;

@@ -11,6 +11,49 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230070f3' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><circle cx='11' cy='11' r='8'/><path d='m21 21-4.35-4.35'/></svg>">
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
   <script>document.addEventListener('DOMContentLoaded', () => lucide.createIcons())</script>
+  <style>
+    /* ── Autocomplete dropdown ────────────────────────── */
+    .autocomplete-dropdown {
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0;
+      right: 0;
+      background: rgba(15, 15, 30, 0.97);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+      list-style: none;
+      margin: 0;
+      padding: 4px 0;
+      z-index: 1000;
+      backdrop-filter: blur(12px);
+      overflow: hidden;
+    }
+    .autocomplete-dropdown li {
+      padding: 10px 16px;
+      cursor: pointer;
+      font-size: 0.92rem;
+      color: rgba(255,255,255,0.85);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: background 0.12s;
+    }
+    .autocomplete-dropdown li:hover,
+    .autocomplete-dropdown li[aria-selected="true"] {
+      background: rgba(0, 112, 243, 0.18);
+      color: #fff;
+    }
+    .autocomplete-dropdown li .ac-icon {
+      opacity: 0.45;
+      flex-shrink: 0;
+      width: 16px;
+      height: 16px;
+    }
+    #search-input-wrap {
+      position: relative;
+    }
+  </style>
 </head>
 <body class="home-page">
 
@@ -50,20 +93,26 @@
 
       <!-- Search Box -->
       <div class="hero-search-wrap">
-        <form action="/search" method="get" class="hero-form">
-          <div class="hero-input-wrap">
+        <form action="/search" method="get" class="hero-form" id="search-form">
+          <div class="hero-input-wrap" id="search-input-wrap">
             <span class="hero-input-icon"><i data-lucide="search"></i></span>
             <input
               type="text"
               name="q"
+              id="search-input"
               class="hero-input"
               placeholder="Search anything…"
               autocomplete="off"
               autofocus
+              aria-autocomplete="list"
+              aria-controls="autocomplete-list"
+              aria-expanded="false"
             >
             <button type="submit" class="hero-btn">
               <i data-lucide="arrow-right"></i>
             </button>
+            <!-- Autocomplete Dropdown -->
+            <ul id="autocomplete-list" class="autocomplete-dropdown" role="listbox" hidden></ul>
           </div>
         </form>
 
@@ -189,5 +238,132 @@
     </div>
   </footer>
 
+  <!-- ── Search Autocomplete ──────────────────────────────── -->
+  <script>
+  (function () {
+    var input = document.getElementById('search-input');
+    var list  = document.getElementById('autocomplete-list');
+    var form  = document.getElementById('search-form');
+    if (!input || !list) return;
+
+    var activeIdx = -1;
+    var lastQuery = '';
+    var timer;
+    var currentFetch;
+
+    function clearDropdown() {
+      list.innerHTML = '';
+      list.hidden = true;
+      input.setAttribute('aria-expanded', 'false');
+      activeIdx = -1;
+    }
+
+    function renderSuggestions(query, suggestions) {
+      clearDropdown();
+      if (!suggestions || suggestions.length === 0) return;
+      suggestions.forEach(function (text, i) {
+        var li = document.createElement('li');
+        li.setAttribute('role', 'option');
+        li.setAttribute('id', 'ac-item-' + i);
+
+        // Search icon inside each item
+        var icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        icon.setAttribute('class', 'ac-icon');
+        icon.setAttribute('viewBox', '0 0 24 24');
+        icon.setAttribute('fill', 'none');
+        icon.setAttribute('stroke', 'currentColor');
+        icon.setAttribute('stroke-width', '2');
+        icon.setAttribute('stroke-linecap', 'round');
+        icon.setAttribute('stroke-linejoin', 'round');
+        var circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        circle.setAttribute('cx', '11'); circle.setAttribute('cy', '11'); circle.setAttribute('r', '8');
+        var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        path.setAttribute('d', 'm21 21-4.35-4.35');
+        icon.append(circle, path);
+
+        var span = document.createElement('span');
+        span.textContent = text;
+        li.append(icon, span);
+
+        li.addEventListener('mousedown', function (e) {
+          e.preventDefault(); // prevent blur before click
+          input.value = text;
+          clearDropdown();
+          form.submit();
+        });
+        list.appendChild(li);
+      });
+      list.hidden = false;
+      input.setAttribute('aria-expanded', 'true');
+    }
+
+    function setActiveItem(idx) {
+      var items = list.querySelectorAll('li');
+      items.forEach(function (el, i) {
+        if (i === idx) {
+          el.setAttribute('aria-selected', 'true');
+          input.value = el.querySelector('span').textContent;
+        } else {
+          el.removeAttribute('aria-selected');
+        }
+      });
+      activeIdx = idx;
+    }
+
+    function fetchSuggestions(query) {
+      if (currentFetch) currentFetch = null;
+      fetch('/autocomplete?q=' + encodeURIComponent(query))
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          // data = [query, [suggestion, ...]]
+          if (Array.isArray(data) && data.length >= 2) {
+            renderSuggestions(data[0], data[1]);
+          }
+        })
+        .catch(function () { /* silent fail */ });
+    }
+
+    input.addEventListener('input', function () {
+      var q = input.value.trim();
+      if (q === lastQuery) return;
+      lastQuery = q;
+      activeIdx = -1;
+      clearTimeout(timer);
+      if (q.length < 2) { clearDropdown(); return; }
+      timer = setTimeout(function () { fetchSuggestions(q); }, 180);
+    });
+
+    input.addEventListener('keydown', function (e) {
+      var items = list.querySelectorAll('li');
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        var next = Math.min(activeIdx + 1, items.length - 1);
+        setActiveItem(next);
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        var prev = Math.max(activeIdx - 1, -1);
+        if (prev === -1) { input.value = lastQuery; items.forEach(function(el){ el.removeAttribute('aria-selected'); }); activeIdx = -1; }
+        else setActiveItem(prev);
+      } else if (e.key === 'Escape') {
+        clearDropdown();
+      } else if (e.key === 'Enter') {
+        if (activeIdx >= 0) { e.preventDefault(); form.submit(); }
+      }
+    });
+
+    input.addEventListener('blur', function () {
+      // Small delay so mousedown click can fire first
+      setTimeout(clearDropdown, 150);
+    });
+
+    input.addEventListener('focus', function () {
+      var q = input.value.trim();
+      if (q.length >= 2 && list.children.length > 0) {
+        list.hidden = false;
+        input.setAttribute('aria-expanded', 'true');
+      }
+    });
+  }());
+  </script>
 </body>
 </html>
