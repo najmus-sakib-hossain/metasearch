@@ -290,7 +290,7 @@ metasearch/
 git clone https://github.com/najmus-sakib-hossain/metasearch.git
 cd metasearch
 cargo run -- serve
-# → 🔍 Metasearch listening on http://0.0.0.0:8888
+# → 🔍 Metasearch listening on http://localhost:8888
 ```
 
 ### With Docker

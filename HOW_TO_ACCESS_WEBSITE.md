@@ -2,7 +2,7 @@
 
 ## ❌ The Problem
 
-You're trying to access: `http://0.0.0.0:8888/`
+You're trying to access: `http://0.0.0.0:8888/` (if you were)
 
 This won't work! `0.0.0.0` is a special address that servers use to listen on all network interfaces, but browsers can't connect to it.
 
@@ -84,7 +84,6 @@ You should see the Metasearch homepage with a search box.
 
 ## 📝 Summary
 
-**Wrong URL:** `http://0.0.0.0:8888/` ❌  
 **Correct URL:** `http://localhost:8888/` ✅
 
 The server is working perfectly. Just use `localhost` instead of `0.0.0.0` in your browser!
